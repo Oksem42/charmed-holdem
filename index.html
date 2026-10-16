@@ -29,6 +29,7 @@
   --fx-water: #6cc4f0;
   --fx-green: #7fe0a0;
   --fx-purple: #c79cff;
+  --fx-pink: #f59ac0;
   --f-display: "Bowlby One", "Arial Black", Impact, sans-serif;
   --f-body: "Nunito Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "Space Mono", ui-monospace, Menlo, monospace;
@@ -126,9 +127,12 @@ p { margin: 0; }
 .receipt .tot { display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; padding-top: 6px; }
 .receipt .empty { color: var(--muted); font-family: var(--f-body); font-size: 14px; }
 @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.levels { display: grid; grid-template-columns: 1fr auto auto; gap: 2px 12px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
-.levels span:nth-child(3n+2) { font-family: var(--f-mono); color: var(--charm); }
-.levels span:nth-child(3n) { font-family: var(--f-mono); color: var(--muted); text-align: right; }
+.levels { display: grid; gap: 2px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.lvrow { display: grid; grid-template-columns: 1fr auto 52px; gap: 12px; padding: 3px 8px; margin: 0 -8px; border-radius: 8px; transition: background .25s ease; }
+.lvrow span:nth-child(2) { font-family: var(--f-mono); color: var(--charm); }
+.lvrow span:nth-child(3) { font-family: var(--f-mono); color: var(--muted); text-align: right; }
+.lvrow.now { background: rgba(242, 184, 75, .16); box-shadow: inset 3px 0 0 var(--charm); font-weight: 800; }
+.lvrow.now span:nth-child(3) { color: var(--text); }
 .how { color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
 .how b { color: var(--text); }
 
@@ -146,6 +150,66 @@ p { margin: 0; }
 .item .btn { padding: 8px 14px; font-size: 13.5px; }
 .item.sold { opacity: .45; }
 .shop-foot { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- Interface ---------- */
+.hint { color: var(--muted); font-size: 13px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radius: 5px; border: 1px solid currentColor; opacity: .7; line-height: 1.4; }
+.pips { display: flex; gap: 5px; align-items: center; height: 26px; }
+.pips i { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--muted); opacity: .45; transition: all .3s ease; }
+.pips i.on { background: var(--charm); border-color: var(--charm); opacity: 1; }
+.goal-row { align-items: baseline; }
+.goal-row b { color: var(--charm); }
+
+/* Rack: each charm is coloured by its type */
+.rack-wrap { display: grid; gap: 8px; }
+.rack-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; }
+.charm { position: relative; --tc: var(--charm); border-top: 3px solid var(--tc); }
+.charm .g { background: var(--tc); }
+.charm .ty, .item .ty { display: block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--tc, var(--muted)); line-height: 1.3; }
+.charm.fire { border-color: var(--tc); box-shadow: 0 0 0 2px var(--tc), 0 0 22px -4px var(--tc); }
+.charm .badge { position: absolute; top: -10px; right: 10px; font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--tc); color: var(--ink); }
+.charm.empty { display: grid; gap: 2px; border-top-width: 1px; }
+.charm.empty small { font-size: 11.5px; opacity: .8; }
+
+/* Table */
+.persona { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,.22); padding: 5px 14px 5px 5px; border-radius: 99px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--stock); color: var(--ink); font-family: var(--f-display); font-size: 16px; }
+.persona b { display: block; font-size: 14px; line-height: 1.2; }
+.persona small { display: block; color: #cfe0d6; font-size: 12px; line-height: 1.2; }
+.felt-mid { display: grid; gap: 10px; justify-items: center; padding: 12px 0; border-block: 1px dashed rgba(236,230,218,.12); }
+.mid-row { display: flex; gap: 10px 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.streets { display: flex; gap: 4px; }
+.streets span { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; color: rgba(236,230,218,.45); border: 1px solid rgba(236,230,218,.15); transition: all .25s ease; }
+.streets span.done { color: #cfe0d6; border-color: rgba(236,230,218,.3); }
+.streets span.now { color: var(--charm-ink); background: var(--charm); border-color: var(--charm); font-weight: 700; }
+.hn.pill:not(:empty) { background: rgba(0,0,0,.3); padding: 2px 14px; border-radius: 99px; border: 1px solid rgba(242,184,75,.35); color: var(--charm); }
+.btn.act { display: inline-flex; align-items: center; gap: 10px; min-width: 112px; justify-content: center; }
+.btn.big { padding: 14px 28px; font-size: 16px; }
+.btn.sm { padding: 6px 12px; font-size: 13px; }
+.card.peeked { box-shadow: 0 0 0 3px var(--fx-water), 0 8px 16px rgba(0,0,0,.35); }
+.card.peeked::after { content: "◉"; position: absolute; top: -9px; right: -9px; width: 20px; height: 20px; border-radius: 50%; background: var(--fx-water); color: var(--ink); font-size: 12px; display: grid; place-items: center; }
+
+/* Shop */
+.shop-head { display: flex; justify-content: space-between; gap: 14px; align-items: start; flex-wrap: wrap; }
+.shop-head .sub b { color: var(--text); }
+.wallet { background: var(--room-2); border: 1px solid var(--line); border-radius: 12px; padding: 6px 16px; display: grid; }
+.wallet b { font-family: var(--f-mono); font-size: 22px; color: var(--charm); }
+.shop-sec { display: grid; gap: 10px; }
+.sec-row { display: flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
+.item { --tc: var(--charm); }
+.item .g { background: var(--tc); }
+.item-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.item-actions .btn { margin-left: auto; }
+.mini { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); font-size: 11px; }
+.mini:hover:not([disabled]) { border-color: var(--charm); color: var(--charm); }
+.mini[disabled] { opacity: .3; cursor: default; }
+.owned .item { background: rgba(0,0,0,.2); }
+
+.fx-flame, .fx-eye, .fx-scan { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 52; }
+.fx-flame { width: 20px; height: 30px; border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%; background: radial-gradient(circle at 50% 75%, #fff3c4 0 18%, var(--charm) 40%, #ff7a3a 75%); box-shadow: 0 0 16px 4px rgba(255,122,58,.6); }
+.fx-eye { font-size: 40px; line-height: 1; color: var(--fx-water); text-shadow: 0 0 18px var(--fx-water); }
+.fx-scan { height: 3px; border-radius: 2px; background: var(--fx-water); box-shadow: 0 0 14px 3px var(--fx-water); }
 
 /* ---------- Motion ---------- */
 .btn { transition: transform .12s ease, filter .15s ease; }
@@ -224,38 +288,39 @@ p { margin: 0; }
     </div>
     <div class="stats">
       <div class="stat"><span class="label">Table</span><b id="s-table">1 / 8</b></div>
-      <div class="stat"><span class="label">Hands left</span><b id="s-hands">6</b></div>
+      <div class="stat"><span class="label">Hands left</span><div class="pips" id="s-hands"></div></div>
       <div class="stat bank"><span class="label">Chips</span><b id="s-bank">200</b></div>
     </div>
   </header>
 
   <div class="goal">
     <div class="goal-row">
-      <span class="opp">Opponent: <b id="o-name">Penny</b> <span id="o-quirk">· Plays it straight.</span></span>
-      <span class="mono">Win <b id="g-now">+0</b> / <b id="g-target">+60</b> at this table</span>
+      <span class="label">Table goal</span>
+      <span class="mono">Won <b id="g-now">+0</b> of <b id="g-target">+60</b></span>
     </div>
     <div class="bar"><i id="g-bar"></i></div>
   </div>
 
-  <div>
-    <p class="label" style="margin-bottom:8px">Your charms <span id="c-count">(1/5)</span></p>
+  <div class="rack-wrap">
+    <div class="rack-head"><p class="label">Your charms · <span id="c-count">1/5</span></p><p class="hint">They pay left to right after each hand you win.</p></div>
     <div class="rack" id="rack"></div>
   </div>
 
   <div class="main">
     <div class="table" id="table">
-      <div class="seat">
-        <span class="who" id="opp-who">Penny</span>
+      <div class="seat opp-seat">
+        <div class="persona"><span class="avatar" id="opp-av">P</span><div><b id="opp-who">Penny</b><small id="opp-quirk">Plays it straight.</small></div></div>
         <div class="cards" id="opp"></div>
         <span class="hn" id="opp-hn"></span>
       </div>
-      <div class="cards" id="board"></div>
-      <div class="pot">Pot <b id="pot">0</b></div>
+      <div class="felt-mid">
+        <div class="cards" id="board"></div>
+        <div class="mid-row"><div class="streets" id="streets"></div><div class="pot">Pot <b id="pot">0</b></div></div>
+      </div>
       <div class="msg" id="msg"></div>
-      <div class="seat">
+      <div class="seat you-seat">
         <div class="cards" id="you"></div>
-        <span class="hn" id="you-hn"></span>
-        <span class="who">You</span>
+        <span class="hn pill" id="you-hn"></span>
       </div>
       <div class="actions" id="actions"></div>
       <div class="screen" id="screen" hidden></div>
@@ -275,7 +340,8 @@ p { margin: 0; }
         <h2 style="color:var(--text)">How to play</h2>
         <p><b>Each hand</b> costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.</p>
         <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends.</p>
-        <p><b>Between tables</b> spend chips on charms and hand levels. Beat all 8 tables to win.</p>
+        <p><b>Between tables</b> buy, sell and reorder charms, and level up hands. Beat all 8 tables to win.</p>
+        <p><b>Keys:</b> <kbd>B</kbd> bet, <kbd>C</kbd> check or call, <kbd>F</kbd> fold, <kbd>↵</kbd> continue.</p>
       </div>
     </aside>
   </div>
@@ -322,21 +388,32 @@ p { margin: 0; }
 
   // ---------- Charms ----------
   // Each charm reads the finished hand and returns a bonus line, or nothing.
+  // Types: payout (flat chips), mult (multiplies the payout), play (changes how you play), grow (gets stronger), combo (works with other charms).
+  const TYPES = {
+    payout: { label: "Payout", color: "var(--charm)" },
+    mult:   { label: "Multiplier", color: "var(--fx-purple)" },
+    play:   { label: "Play style", color: "var(--fx-water)" },
+    grow:   { label: "Grows", color: "var(--fx-green)" },
+    combo:  { label: "Combo", color: "var(--fx-pink)" },
+  };
   const CHARMS = {
-    pairpal:  { name: "Pair Pal", g: "II", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
-    heart:    { name: "Heartbreaker", g: "♥", price: 50, desc: "+15 for each ♥ in your winning hand", run: x => { if (!x.win || !x.five) return; const n = x.five.filter(c => c.s === "♥").length; return n && { add: 15 * n }; } },
-    bluff:    { name: "Bluff Master", g: "?!", price: 50, desc: "Win because they folded: +50", run: x => x.win && x.byFold && { add: 50 } },
-    pocket:   { name: "Pocket Rockets", g: "PP", price: 60, desc: "Win holding a pocket pair: +80", run: x => x.win && x.hole[0].r === x.hole[1].r && { add: 80 } },
-    river:    { name: "River Rat", g: "~", price: 60, desc: "Win after the river improves your hand: +70", run: x => x.win && x.riverUp && { add: 70 } },
-    under:    { name: "Underdog", g: "7", price: 45, desc: "Win with a 7 or lower in your hole cards: +35", run: x => x.win && x.hole.some(c => c.r <= 7) && { add: 35 } },
-    ace:      { name: "Ace Up", g: "A", price: 40, desc: "Win holding an Ace: +30", run: x => x.win && x.hole.some(c => c.r === 14) && { add: 30 } },
-    kicker:   { name: "Kicker King", g: "K", price: 55, desc: "Win with only High Card: +100", run: x => x.win && x.cat === 0 && { add: 100 } },
-    double:   { name: "Double Trouble", g: "2x", price: 70, desc: "Win with Two Pair or better: +50", run: x => x.win && x.cat >= 2 && { add: 50 } },
-    insure:   { name: "Insurance", g: "+", price: 45, desc: "Lose at showdown: get 25 back", run: x => x.lostShowdown && { add: 25 } },
-    flushfund:{ name: "Flush Fund", g: "♦", price: 90, desc: "Flushes pay ×2", run: x => x.win && (x.cat === 5 || x.cat === 8) && { mult: 2 } },
-    straight: { name: "Straight Shooter", g: "→", price: 90, desc: "Straights pay ×2", run: x => x.win && (x.cat === 4 || x.cat === 8) && { mult: 2 } },
-    roller:   { name: "High Roller", g: "$", price: 80, desc: "Bet on every street and win: ×1.5", run: x => x.win && x.betEvery && { mult: 1.5 } },
-    trips:    { name: "Third Wheel", g: "III", price: 55, desc: "Win with Three of a Kind or a Full House: +75", run: x => x.win && (x.cat === 3 || x.cat === 6) && { add: 75 } },
+    pairpal:  { name: "Pair Pal", g: "II", type: "payout", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
+    heart:    { name: "Heartbreaker", g: "♥", type: "payout", price: 50, desc: "+15 for each ♥ in your winning hand", run: x => { if (!x.win || !x.five) return; const n = x.five.filter(c => c.s === "♥").length; return n && { add: 15 * n }; } },
+    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded: +50", run: x => x.win && x.byFold && { add: 50 } },
+    pocket:   { name: "Pocket Rockets", g: "PP", type: "payout", price: 60, desc: "Win holding a pocket pair: +150 and Pair levels up", run: x => x.win && x.hole[0].r === x.hole[1].r && { add: 150, levelUp: 1 } },
+    river:    { name: "River Rat", g: "~", type: "payout", price: 60, desc: "Win after the river improves your hand: +70", run: x => x.win && x.riverUp && { add: 70 } },
+    under:    { name: "Underdog", g: "7", type: "payout", price: 45, desc: "Win with both hole cards 7 or lower: +70", run: x => x.win && x.hole.every(c => c.r <= 7) && { add: 70 } },
+    ace:      { name: "Ace Up", g: "A", type: "payout", price: 40, desc: "Win holding an Ace: +30", run: x => x.win && x.hole.some(c => c.r === 14) && { add: 30 } },
+    kicker:   { name: "Kicker King", g: "K", type: "payout", price: 55, desc: "Win with only High Card: +100", run: x => x.win && x.cat === 0 && { add: 100 } },
+    double:   { name: "Double Trouble", g: "2x", type: "payout", price: 70, desc: "Win with Two Pair or better: +50", run: x => x.win && x.cat >= 2 && { add: 50 } },
+    insure:   { name: "Insurance", g: "+", type: "payout", price: 45, desc: "Lose at showdown: get 25 back", run: x => x.lostShowdown && { add: 25 } },
+    flushfund:{ name: "Flush Fund", g: "♦", type: "mult", price: 90, desc: "Flushes pay ×2", run: x => x.win && (x.cat === 5 || x.cat === 8) && { mult: 2 } },
+    straight: { name: "Straight Shooter", g: "→", type: "mult", price: 90, desc: "Straights pay ×2", run: x => x.win && (x.cat === 4 || x.cat === 8) && { mult: 2 } },
+    roller:   { name: "High Roller", g: "$", type: "mult", price: 80, desc: "Bet on every street and win: ×1.5", run: x => x.win && x.betEvery && { mult: 1.5 } },
+    trips:    { name: "Third Wheel", g: "III", type: "payout", price: 55, desc: "Win with Three of a Kind or a Full House: +75", run: x => x.win && (x.cat === 3 || x.cat === 6) && { add: 75 } },
+    streak:   { name: "Hot Streak", g: "▲", type: "grow", price: 55, desc: "+10 for each win in a row. Resets when you lose.", run: x => x.win && x.streak > 0 && { add: 10 * x.streak } },
+    echo:     { name: "Echo", g: "↻", type: "combo", price: 70, desc: "The charm to its left triggers twice. Order matters.", run: () => null },
+    peek:     { name: "Peek", g: "◉", type: "play", price: 50, desc: "Bet on the flop to see one of your opponent's cards.", run: () => null },
   };
   const MAX_CHARMS = 5;
 
@@ -356,7 +433,7 @@ p { margin: 0; }
   // ---------- State ----------
   let G, H;
   function newRun() {
-    G = { t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null };
+    G = { t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0 };
     $("screen").hidden = true;
     receiptEmpty();
     renderAll();
@@ -419,6 +496,11 @@ p { margin: 0; }
     }
     if (kind === "bet") {
       G.bank -= b; H.pot += b; H.myBets++;
+      // Peek: betting the flop reveals one of the opponent's hole cards.
+      if (H.street === 1 && G.charms.includes("peek") && H.peek === undefined) {
+        H.peek = Math.random() < .5 ? 0 : 1;
+        setTimeout(() => { pulseCharm("peek"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
+      }
       if (oppCalls()) { H.pot += b; say(`You bet ${b}. ${TABLES[G.t].name} calls.`); return nextStreet(); }
       return finish({ fold: "opp" });
     }
@@ -452,6 +534,9 @@ p { margin: 0; }
       const c = cmp(you.score, opp.score);
       if (c > 0) win = true; else if (c < 0) lostShowdown = true; else split = true;
     }
+    // Win streak (for Hot Streak): wins add one, any loss resets, a split changes nothing.
+    if (win) G.streak++;
+    else if (!split) G.streak = 0;
     // River Rat: did the river card improve your hand category?
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
@@ -460,6 +545,7 @@ p { margin: 0; }
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,
       betEvery: H.myBets === 4,
+      streak: G.streak,
     };
 
     let total = 0, flat = 0, mult = 1;
@@ -470,12 +556,21 @@ p { margin: 0; }
       const lb = LEVEL_BASE[you.cat] * G.lv[you.cat];
       if (lb) { lines.push([`${nameOf(you.score)} Lv.${G.lv[you.cat]}`, lb, ""]); flat += lb; }
     }
-    G.charms.forEach(id => {
+    // Charms pay left to right. Echo, sitting to the right of a charm, makes that charm pay again.
+    const pay = (key, name, r) => {
+      if (r.add) { lines.push([name, r.add, "ch", key]); flat += r.add; }
+      if (r.mult) { lines.push([name, "×" + r.mult, "ch mult", key]); mult *= r.mult; }
+      if (r.levelUp) { G.lv[1] += r.levelUp; lines.push(["Pair levels up", "Lv." + G.lv[1], "ch lvl", key]); }
+    };
+    G.charms.forEach((id, i) => {
       const r = CHARMS[id].run(ctx);
       if (!r) return;
       fired.push([id, r]);
-      if (r.add) { lines.push([CHARMS[id].name, r.add, "ch", id]); flat += r.add; }
-      if (r.mult) { lines.push([CHARMS[id].name, "×" + r.mult, "ch mult", id]); mult *= r.mult; }
+      pay(id, CHARMS[id].name, r);
+      if (G.charms[i + 1] === "echo") {
+        fired.push(["echo", r, id]);
+        pay("echo", `Echo: ${CHARMS[id].name}`, r);
+      }
     });
     const payout = Math.round((total + flat) * mult);
     G.bank += payout;
@@ -495,7 +590,7 @@ p { margin: 0; }
     G.handsLeft--;
     hudDelay = payout > 0 ? payAt : 0;
     renderAll();
-    fired.forEach(([id, r]) => { if (CHARM_FX[id] && !reduceMotion) setTimeout(() => CHARM_FX[id](r), fxAt[id]); });
+    fired.forEach(([id, r, src]) => { if (CHARM_FX[id] && !reduceMotion) setTimeout(() => CHARM_FX[id](r, src), fxAt[id]); });
     if (payout > 0 && win) {
       const big = mult > 1 || payout >= 150;
       flyChips(Math.min(16, 5 + Math.round(payout / 25)), payAt - 200);
@@ -589,39 +684,70 @@ p { margin: 0; }
   }
 
   // ---------- Shop ----------
-  function openShop() {
+  function rollCharms() {
     const owned = new Set(G.charms);
     const pool = Object.keys(CHARMS).filter(k => !owned.has(k));
     const pick = [];
     while (pick.length < 3 && pool.length) pick.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    return pick.map(id => ({ id, sold: false }));
+  }
+  function openShop() {
     const cats = [1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - .5).slice(0, 2);
-    G.shop = { charms: pick.map(id => ({ id, sold: false })), levels: cats.map(c => ({ c, sold: false })) };
+    G.shop = { charms: rollCharms(), levels: cats.map(c => ({ c, sold: false })), reroll: 10 };
     renderShop();
   }
   const levelPrice = (c) => 25 + 15 * G.lv[c];
+  const sellPrice = (id) => Math.floor(CHARMS[id].price / 2);
+  const typeOf = (id) => TYPES[CHARMS[id].type];
+  function charmFace(id) {
+    const c = CHARMS[id], ty = typeOf(id);
+    return `<div class="top-i"><span class="g" style="--tc:${ty.color}">${c.g}</span><div><span class="ty" style="--tc:${ty.color}">${ty.label}</span><b>${c.name}</b></div></div><p>${c.desc}</p>`;
+  }
   function renderShop() {
-    const t = TABLES[G.t];
+    const t = TABLES[G.t], nx = TABLES[G.t + 1];
     const s = $("screen");
     s.hidden = false;
     s.classList.toggle("enter", !G.shop.entered);
     G.shop.entered = true;
     const just = G.shop.just; G.shop.just = null;
+    const full = G.charms.length >= MAX_CHARMS;
     s.innerHTML = `
-      <div><h2>Table ${G.t + 1} cleared</h2><p class="sub">You beat ${t.name}. Spend chips, then move on. The next target is ${fmt(TABLES[G.t + 1].target)} against ${TABLES[G.t + 1].name}.</p></div>
-      <p class="label">Charms · ${G.charms.length}/${MAX_CHARMS} slots used</p>
-      <div class="shop-grid">${G.shop.charms.map((it, i) => {
-        const c = CHARMS[it.id], full = G.charms.length >= MAX_CHARMS, poor = G.bank < c.price;
-        return `<div class="item${it.sold ? " sold" : ""}${just === "c" + i ? " just" : ""}" style="--i:${i + 1}"><div class="top-i"><span class="g">${c.g}</span><b>${c.name}</b></div><p>${c.desc}</p>
-          <button class="btn" data-buy="c${i}" ${it.sold || full || poor ? "disabled" : ""}>${it.sold ? "Bought" : full ? "Slots full" : "Buy · " + c.price}</button></div>`;
-      }).join("")}</div>
-      <p class="label">Hand level-ups</p>
-      <div class="shop-grid">${G.shop.levels.map((it, i) => {
-        const p = levelPrice(it.c), poor = G.bank < p;
-        return `<div class="item${it.sold ? " sold" : ""}${just === "l" + i ? " just" : ""}" style="--i:${i + 4}"><div class="top-i"><span class="g lvl">Lv</span><b>${HAND[it.c]}</b></div><p>Lv.${G.lv[it.c]} → Lv.${G.lv[it.c] + 1}. Bonus becomes +${LEVEL_BASE[it.c] * (G.lv[it.c] + 1)}.</p>
-          <button class="btn alt" data-buy="l${i}" ${it.sold || poor ? "disabled" : ""}>${it.sold ? "Bought" : "Buy · " + p}</button></div>`;
-      }).join("")}</div>
-      <div class="shop-foot"><button class="btn" id="next-table">Next table →</button><span class="mono">Chips: ${G.bank}</span></div>`;
+      <div class="shop-head">
+        <div><h2>Table ${G.t + 1} cleared</h2><p class="sub">You beat ${t.name}. Next up: <b>${nx.name}</b> (${nx.quirk.toLowerCase().replace(/\.$/, "")}). Target ${fmt(nx.target)}.</p></div>
+        <div class="wallet"><span class="label">Chips</span><b>${G.bank}</b></div>
+      </div>
+      <section class="shop-sec">
+        <div class="sec-row"><p class="label">Your rack · ${G.charms.length}/${MAX_CHARMS}</p><p class="hint">Charms pay left to right. Use the arrows to reorder, which matters for Echo.</p></div>
+        <div class="shop-grid owned">${G.charms.map((id, i) => `
+          <div class="item${just === "o" + id ? " just" : ""}" style="--i:${i + 1}">${charmFace(id)}
+            <div class="item-actions">
+              <button class="mini" data-move="${i}:-1" ${i === 0 ? "disabled" : ""} aria-label="Move ${CHARMS[id].name} left">◀</button>
+              <button class="mini" data-move="${i}:1" ${i === G.charms.length - 1 ? "disabled" : ""} aria-label="Move ${CHARMS[id].name} right">▶</button>
+              <button class="btn ghost sm" data-sell="${i}">Sell · ${sellPrice(id)}</button>
+            </div>
+          </div>`).join("") || `<p class="hint">No charms yet.</p>`}</div>
+      </section>
+      <section class="shop-sec">
+        <div class="sec-row"><p class="label">Charms for sale</p><button class="btn ghost sm" id="reroll" ${G.bank < G.shop.reroll ? "disabled" : ""}>↻ Reroll · ${G.shop.reroll}</button></div>
+        <div class="shop-grid">${G.shop.charms.map((it, i) => {
+          const c = CHARMS[it.id], poor = G.bank < c.price;
+          return `<div class="item${it.sold ? " sold" : ""}${just === "c" + i ? " just" : ""}" style="--i:${i + 4}">${charmFace(it.id)}
+            <button class="btn" data-buy="c${i}" ${it.sold || full || poor ? "disabled" : ""}>${it.sold ? "Bought" : full ? "Rack full · sell one" : "Buy · " + c.price}</button></div>`;
+        }).join("") || `<p class="hint">You own every charm.</p>`}</div>
+      </section>
+      <section class="shop-sec">
+        <p class="label">Hand level-ups</p>
+        <div class="shop-grid">${G.shop.levels.map((it, i) => {
+          const p = levelPrice(it.c), poor = G.bank < p;
+          return `<div class="item${it.sold ? " sold" : ""}${just === "l" + i ? " just" : ""}" style="--i:${i + 7}"><div class="top-i"><span class="g lvl">Lv</span><div><span class="ty">Hand level</span><b>${HAND[it.c]}</b></div></div><p>Lv.${G.lv[it.c]} → Lv.${G.lv[it.c] + 1}. Bonus becomes +${LEVEL_BASE[it.c] * (G.lv[it.c] + 1)}.</p>
+            <button class="btn alt" data-buy="l${i}" ${it.sold || poor ? "disabled" : ""}>${it.sold ? "Bought" : "Buy · " + p}</button></div>`;
+        }).join("")}</div>
+      </section>
+      <div class="shop-foot"><button class="btn big" id="next-table">Next table →</button><span class="hint">Press Enter to continue</span></div>`;
     s.querySelectorAll("[data-buy]").forEach(b => b.addEventListener("click", () => buy(b.dataset.buy)));
+    s.querySelectorAll("[data-sell]").forEach(b => b.addEventListener("click", () => sell(+b.dataset.sell)));
+    s.querySelectorAll("[data-move]").forEach(b => b.addEventListener("click", () => { const [i, d] = b.dataset.move.split(":").map(Number); move(i, d); }));
+    $("reroll").addEventListener("click", reroll);
     $("next-table").addEventListener("click", nextTable);
     renderAll();
   }
@@ -639,6 +765,28 @@ p { margin: 0; }
     G.shop.just = code;
     renderShop();
   }
+  function sell(i) {
+    const id = G.charms[i];
+    if (!id) return;
+    G.bank += sellPrice(id);
+    G.charms.splice(i, 1);
+    renderShop();
+  }
+  function move(i, d) {
+    const j = i + d;
+    if (j < 0 || j >= G.charms.length) return;
+    [G.charms[i], G.charms[j]] = [G.charms[j], G.charms[i]];
+    G.shop.just = "o" + G.charms[j];
+    renderShop();
+  }
+  function reroll() {
+    if (G.bank < G.shop.reroll) return;
+    G.bank -= G.shop.reroll;
+    G.shop.reroll += 5;
+    G.shop.charms = rollCharms();
+    G.shop.just = "c0";
+    renderShop();
+  }
   function nextTable() {
     G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null;
     $("screen").hidden = true;
@@ -653,7 +801,7 @@ p { margin: 0; }
     s.innerHTML = victory
       ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div><div class="shop-foot"><button class="btn" id="again">Play again</button></div>`
       : `<div><h2>Run over</h2><p class="sub">${t.name} held you to ${fmt(G.bank - G.start)} of the ${fmt(t.target)} you needed at table ${G.t + 1}.</p></div>
-         <p class="label">Your charms</p><div class="shop-grid">${G.charms.map(id => `<div class="item"><div class="top-i"><span class="g">${CHARMS[id].g}</span><b>${CHARMS[id].name}</b></div><p>${CHARMS[id].desc}</p></div>`).join("")}</div>
+         <p class="label">Your charms</p><div class="shop-grid">${G.charms.map(id => `<div class="item">${charmFace(id)}</div>`).join("")}</div>
          <div class="shop-foot"><button class="btn" id="again">New run</button></div>`;
     $("again").addEventListener("click", newRun);
   }
@@ -698,7 +846,7 @@ p { margin: 0; }
     el.animate([{ filter: "none" }, { filter: `brightness(1.35) drop-shadow(0 0 14px ${color})` }, { filter: "none" }], { duration: 700, delay });
   }
   function beamFrom(id, p, color) {
-    const tile = [...document.querySelectorAll("#rack .charm")].find(t => t.querySelector("b")?.textContent === CHARMS[id].name);
+    const tile = rackTile(id);
     if (!tile) return;
     const s = pt(tile.querySelector(".g"));
     const dot = fx("fx-dot", "", { background: color, boxShadow: `0 0 16px 4px ${color}` });
@@ -973,14 +1121,72 @@ p { margin: 0; }
       ring({ x: p.x, y: p.y - 30 }, "var(--fx-green)", 1100, 3);
       callout(`Third Wheel ${bonusText(r)}`, { x: p.x, y: p.y - 110 }, "var(--fx-green)", 500);
     },
+    // Echo: pink sound waves pulse out of the Echo tile, then the copied charm's effect plays again.
+    echo(r, src) {
+      const tile = rackTile("echo");
+      if (tile) {
+        const p = pt(tile.querySelector(".g"));
+        for (let i = 0; i < 3; i++) ring(p, "var(--fx-pink)", i * 120, 3 + i);
+      }
+      if (src && CHARM_FX[src]) setTimeout(() => CHARM_FX[src](r), 200);
+      const p = potPt();
+      callout(`ECHO! ${bonusText(r)}`, { x: p.x, y: p.y - 120 }, "var(--fx-pink)", 150);
+    },
+    // Hot Streak: a column of flames rises from the pot, one per win in the streak.
+    streak(r) {
+      const p = potPt();
+      beamFrom("streak", p, "var(--fx-green)");
+      const n = Math.min(G.streak, 8);
+      for (let i = 0; i < n; i++) {
+        const x = p.x + (i - (n - 1) / 2) * 26;
+        const f = fx("fx-flame");
+        play(f, [
+          { transform: at(f, x, p.y, "scale(.2)"), opacity: 0 },
+          { transform: at(f, x, p.y - 40 - i % 2 * 10, "scale(1.1)"), opacity: 1, offset: .35 },
+          { transform: at(f, x, p.y - 90, "scale(.5)"), opacity: 0 },
+        ], { duration: 900, delay: i * 90 });
+      }
+      callout(`${G.streak} IN A ROW ${bonusText(r)}`, { x: p.x, y: p.y - 110 }, "var(--fx-green)", 250);
+    },
+    // Peek: an eye opens over the revealed card and a scan line sweeps it.
+    peek() {
+      const card = document.querySelector(`#opp .card:nth-child(${H.peek + 1})`);
+      if (!card) return;
+      const p = pt(card);
+      const eye = fx("fx-eye", "◉");
+      play(eye, [
+        { transform: at(eye, p.x, p.y, "scaleY(.05) scale(1.6)"), opacity: 0 },
+        { transform: at(eye, p.x, p.y, "scaleY(1) scale(1.6)"), opacity: 1, offset: .3 },
+        { transform: at(eye, p.x, p.y, "scaleY(1) scale(1.6)"), opacity: 1, offset: .6 },
+        { transform: at(eye, p.x, p.y - 30, "scaleY(.05) scale(1)"), opacity: 0 },
+      ], { duration: 900 });
+      const scan = fx("fx-scan", "", { width: p.w + 16 + "px" });
+      play(scan, [
+        { transform: at(scan, p.x, p.t), opacity: 0 },
+        { transform: at(scan, p.x, p.t + 4), opacity: 1, offset: .1 },
+        { transform: at(scan, p.x, p.t + p.h), opacity: 1, offset: .9 },
+        { transform: at(scan, p.x, p.t + p.h), opacity: 0 },
+      ], { duration: 650, delay: 250, easing: "ease-in-out" });
+      glowCard(card, "var(--fx-water)", 300);
+      callout("Peek!", { x: p.x, y: p.y - 80 }, "var(--fx-water)", 200);
+    },
   };
+  const rackTile = (id) => [...document.querySelectorAll("#rack .charm")].find(t => t.dataset.id === id);
+  // Pop a rack tile outside the payout sequence (used by Peek).
+  function pulseCharm(id) {
+    const t = rackTile(id);
+    if (!t) return;
+    t.classList.add("fire");
+    t.style.setProperty("--d", "0s");
+    restart(t, "pop");
+  }
 
   // ---------- Rendering ----------
   function say(html) { $("msg").innerHTML = `<span>${html}</span>`; }
   function cardEl(c, o = {}) {
     const el = document.createElement("div");
     if (!c || o.down) { el.className = "card back"; el.setAttribute("aria-label", "face-down card"); return el; }
-    el.className = "card" + (c.s === "♥" || c.s === "♦" ? " red" : "") + (o.used ? " used" : "") + (o.dim ? " dim" : "");
+    el.className = "card" + (c.s === "♥" || c.s === "♦" ? " red" : "") + (o.used ? " used" : "") + (o.dim ? " dim" : "") + (o.peek ? " peeked" : "");
     el.setAttribute("aria-label", rt(c.r) + c.s);
     el.innerHTML = `<span class="c">${rt(c.r)}<br>${c.s}</span><span class="p">${c.s}</span>`;
     return el;
@@ -1005,6 +1211,8 @@ p { margin: 0; }
       return el;
     };
     H.opp.forEach((c, i) => {
+      const peeked = !sd && H.peek === i;
+      if (peeked) { opp.append(anim(cardEl(c, { peek: true }), "o" + i + "p", "flip", 0)); return; }
       const el = cardEl(c, sd ? style(c) : { down: true });
       opp.append(sd ? anim(el, "o" + i + "u", "flip", .15 * flipN++) : anim(el, "o" + i, "deal", .08 + i * .16, 160));
     });
@@ -1025,51 +1233,86 @@ p { margin: 0; }
     const a = $("actions");
     a.replaceChildren();
     if (!H || !$("screen").hidden) return;
-    const add = (label, fn, cls = "btn", dis = false) => { const b = document.createElement("button"); b.className = cls; b.textContent = label; b.disabled = dis; b.addEventListener("click", fn); a.append(b); };
+    // Each action button shows its keyboard shortcut.
+    const add = (label, key, fn, cls = "btn", dis = false) => {
+      const b = document.createElement("button");
+      b.className = cls + " act"; b.disabled = dis; b.dataset.key = key;
+      b.innerHTML = `<span>${label}</span><kbd>${key === "Enter" ? "↵" : key.toUpperCase()}</kbd>`;
+      b.addEventListener("click", fn); a.append(b);
+    };
     if (H.over) {
       const won = G.bank - G.start, t = TABLES[G.t];
       const label = won >= t.target ? (G.t === TABLES.length - 1 ? "Claim victory" : "Go to shop →") : (G.handsLeft <= 0 || G.bank < ANTE) ? "See result" : "Next hand";
-      add(label, afterHand);
+      add(label, "Enter", afterHand, "btn big");
       return;
     }
     const b = BETS[H.street];
+    const peekHint = H.street === 1 && G.charms.includes("peek") && H.peek === undefined;
     if (H.facing) {
-      add(`Call ${H.facing}`, () => act("call"), "btn", G.bank < H.facing);
-      add("Fold", () => act("fold"), "btn ghost");
+      add(`Call ${H.facing}`, "c", () => act("call"), "btn", G.bank < H.facing);
+      add("Fold", "f", () => act("fold"), "btn ghost");
     } else {
-      add(`Bet ${b}`, () => act("bet"), "btn", G.bank < b);
-      add("Check", () => act("check"), "btn alt");
-      add("Fold", () => act("fold"), "btn ghost");
+      add(peekHint ? `Bet ${b} · Peek` : `Bet ${b}`, "b", () => act("bet"), "btn", G.bank < b);
+      add("Check", "c", () => act("check"), "btn alt");
+      add("Fold", "f", () => act("fold"), "btn ghost");
     }
   }
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input, textarea")) return;
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (!$("screen").hidden) {
+      if (key === "Enter" && !e.target.closest("button")) { const nb = $("next-table") || $("again"); if (nb) { e.preventDefault(); nb.click(); } }
+      return;
+    }
+    if (key === "Enter" && e.target.closest("button")) return;
+    const btn = [...document.querySelectorAll("#actions button")].find(b => b.dataset.key === key && !b.disabled);
+    if (btn) { e.preventDefault(); btn.click(); }
+  });
   function renderRack(fired = []) {
     const r = $("rack");
     r.replaceChildren();
     for (let i = 0; i < MAX_CHARMS; i++) {
       const id = G.charms[i];
       const d = document.createElement("div");
-      if (!id) { d.className = "charm empty"; d.textContent = "Empty slot"; r.append(d); continue; }
-      const c = CHARMS[id];
+      if (!id) { d.className = "charm empty"; d.innerHTML = `<span>Empty slot</span><small>Buy charms between tables</small>`; r.append(d); continue; }
+      const c = CHARMS[id], ty = typeOf(id);
       d.className = "charm" + (fired.includes(id) ? " fire" : "") + (firePending && fired.includes(id) ? " pop" : "");
+      d.dataset.id = id;
+      d.style.setProperty("--tc", ty.color);
       if (fireDelays[id] !== undefined) d.style.setProperty("--d", fireDelays[id] + "s");
-      d.innerHTML = `<span class="g">${c.g}</span><div><b>${c.name}</b><small>${c.desc}</small></div>`;
+      // Live status for charms that track something.
+      let note = c.desc, badge = "";
+      if (id === "streak") badge = G.streak ? `${G.streak} in a row` : "No streak";
+      if (id === "echo") { const left = G.charms[i - 1]; note = left ? `Doubles ${CHARMS[left].name}` : "Nothing to its left yet. Move it right of a charm."; }
+      if (id === "peek" && H && H.peek !== undefined) badge = "Peeking";
+      d.title = c.desc;
+      d.innerHTML = `<span class="g">${c.g}</span><div><span class="ty">${ty.label}</span><b>${c.name}</b><small>${note}</small></div>${badge ? `<span class="badge">${badge}</span>` : ""}`;
       r.append(d);
     }
     firePending = false;
-    $("c-count").textContent = `(${G.charms.length}/${MAX_CHARMS})`;
+    $("c-count").textContent = `${G.charms.length}/${MAX_CHARMS}`;
   }
   function renderLevels() {
-    $("levels").innerHTML = HAND.slice(1).map((h, i) => `<span>${h}</span><span>Lv.${G.lv[i + 1]}</span><span>+${LEVEL_BASE[i + 1] * G.lv[i + 1]}</span>`).join("");
+    // Highlight the hand you're currently holding.
+    let cur = -1;
+    if (H) { const mine = best(H.over ? [...H.you, ...H.board.slice(0, H.showdown ? 5 : shown())] : visible(H.you)); if (mine) cur = mine.cat; }
+    $("levels").innerHTML = HAND.slice(1).map((h, i) => `<div class="lvrow${cur === i + 1 ? " now" : ""}"><span>${h}</span><span>Lv.${G.lv[i + 1]}</span><span>+${LEVEL_BASE[i + 1] * G.lv[i + 1]}</span></div>`).join("");
   }
+  const STREETS = ["Preflop", "Flop", "Turn", "River"];
   function renderHud() {
     const t = TABLES[G.t], won = G.bank - G.start;
     $("s-table").textContent = `${G.t + 1} / ${TABLES.length}`;
-    $("s-hands").textContent = G.handsLeft;
+    $("s-hands").innerHTML = Array.from({ length: HANDS_PER_TABLE }, (_, i) => `<i class="${i < G.handsLeft ? "on" : ""}"></i>`).join("") + `<span class="sr">${G.handsLeft} hands left</span>`;
     const d = hudDelay; hudDelay = 0;
     tween($("s-bank"), shownBank, G.bank, n => n.toLocaleString("en-US"), d);
     shownBank = G.bank;
-    $("o-name").textContent = t.name; $("opp-who").textContent = t.name;
-    $("o-quirk").textContent = "· " + t.quirk;
+    $("opp-who").textContent = t.name;
+    $("opp-av").textContent = t.name.replace(/^The /, "")[0];
+    $("opp-quirk").textContent = t.quirk;
+    $("streets").innerHTML = STREETS.map((s, i) => {
+      const st = !H ? "" : H.over && H.showdown ? "done" : i < H.street ? "done" : i === H.street && !H.over ? "now" : "";
+      return `<span class="${st}">${s}</span>`;
+    }).join("");
     tween($("g-now"), shownWon, won, fmt, d);
     shownWon = won;
     $("g-target").textContent = fmt(t.target);
