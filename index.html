@@ -316,7 +316,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   <div class="main">
     <div class="table" id="table">
       <div class="seat opp-seat">
-        <div class="persona"><span class="avatar" id="opp-av">P</span><div><b id="opp-who">Penny</b><small id="opp-quirk">Plays it straight.</small></div></div>
+        <div class="persona"><span class="avatar" id="opp-av">D</span><div><b id="opp-who">Dunkin Badecher</b><small id="opp-quirk">Plays it straight.</small></div></div>
         <div class="cards" id="opp"></div>
         <span class="hn" id="opp-hn"></span>
       </div>
@@ -414,7 +414,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const CHARMS = {
     pairpal:  { name: "Pair Pal", g: "II", type: "payout", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
     heart:    { name: "Heartbreaker", g: "♥", type: "payout", price: 50, desc: "+15 for each ♥ in your winning hand", run: x => { if (!x.win || !x.five) return; const n = x.five.filter(c => c.s === "♥").length; return n && { add: 15 * n }; } },
-    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded: +50", run: x => x.win && x.byFold && { add: 50 } },
+    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded to a bet (not an all in): +50", run: x => x.win && x.byFold && !x.shoved && { add: 50 } },
     pocket:   { name: "Pocket Rockets", g: "PP", type: "payout", price: 60, desc: "Win holding a pocket pair: +150 and Pair levels up", run: x => x.win && x.hole[0].r === x.hole[1].r && { add: 150, levelUp: 1 } },
     river:    { name: "River Rat", g: "~", type: "payout", price: 60, desc: "Win after the river improves your hand: +70", run: x => x.win && x.riverUp && { add: 70 } },
     under:    { name: "Underdog", g: "7", type: "payout", price: 45, desc: "Win with both hole cards 7 or lower: +70", run: x => x.win && x.hole.every(c => c.r <= 7) && { add: 70 } },
@@ -434,7 +434,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   // ---------- Opponents ----------
   const TABLES = [
-    { name: "Penny",      quirk: "Plays it straight.",            target: 60,  call: 0,    bet: 0,    bluff: .08, shove: 0 },
+    { name: "Dunkin Badecher", quirk: "Plays it straight.",            target: 60,  call: 0,    bet: 0,    bluff: .08, shove: 0 },
     { name: "Big Lou",    quirk: "Calls almost anything.",        target: 100, call: .25,  bet: 0,    bluff: .05, shove: -.14 },
     { name: "The Rock",   quirk: "Folds unless strong.",          target: 140, call: -.2,  bet: -.1,  bluff: .02, shove: .12 },
     { name: "Maniac Mel", quirk: "Bets a lot. Bluffs a lot.",     target: 200, call: .1,   bet: .2,   bluff: .35, shove: -.08 },
@@ -451,7 +451,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // ---------- State ----------
   let G, H;
   function newRun() {
-    G = { t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0 };
+    G = { t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0 };
     G.target = targetFor(0, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -505,12 +505,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (t.wall && H.street >= 1) return true;
     return oppStrength() + Math.random() * .3 + t.call > .42;
   }
-  // Calling a shove risks a lot, so opponents need a much stronger hand. Bigger shoves make them tighter still.
+  // Calling a shove risks a lot, so opponents need a strong hand for the first one. Bigger shoves make them tighter.
+  // They remember: every shove you've made at this table makes them call the next one with a weaker hand.
   function oppCallsShove(amt) {
     const t = TABLES[G.t];
     if (t.wall && H.street >= 1) return true;
     const sizePenalty = Math.min(.12, amt / 2500);
-    return oppStrength() + Math.random() * .2 > .62 + (t.shove || 0) + sizePenalty;
+    const suspicion = Math.min(.45, G.shoves * .15);
+    return oppStrength() + Math.random() * .2 > .62 + (t.shove || 0) + sizePenalty - suspicion;
   }
 
   function act(kind) {
@@ -531,9 +533,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       // Voluntary all in: push every chip. If they're betting, you call and raise the rest.
       const amt = G.bank, name = TABLES[G.t].name;
       const extra = amt - H.facing;
-      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0;
+      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0; H.shoved = true;
       if (extra <= 0) { say(`You're all in for ${amt}.`); return goAllIn(); }
-      if (oppCallsShove(extra)) { H.pot += extra; say(`You shove ${amt}. <b>${name} calls!</b>`); return goAllIn(); }
+      const calls = oppCallsShove(extra);
+      G.shoves++;
+      if (calls) { H.pot += extra; say(`You shove ${amt}. <b>${name} ${G.shoves > 1 ? "has seen enough shoves and calls!" : "calls!"}</b>`); return goAllIn(); }
       return finish({ fold: "opp" });
     }
     if (kind === "bet" && G.bank <= b) {
@@ -602,7 +606,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // River Rat: did the river card improve your hand category?
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
-      win, byFold, lostShowdown, hole: H.you,
+      win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,
@@ -861,7 +865,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     renderShop();
   }
   function nextTable() {
-    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null;
+    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0;
     G.target = targetFor(G.t, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -1408,7 +1412,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     shownBank = G.bank;
     $("opp-who").textContent = t.name;
     $("opp-av").textContent = t.name.replace(/^The /, "")[0];
-    $("opp-quirk").textContent = t.quirk;
+    $("opp-quirk").textContent = G.shoves >= 2 ? `Wise to your shoves (${G.shoves}). Calls them lighter now.` : G.shoves === 1 ? `${t.quirk} Remembers your shove.` : t.quirk;
     $("streets").innerHTML = STREETS.map((s, i) => {
       const st = !H ? "" : H.over && H.showdown ? "done" : i < H.street ? "done" : i === H.street && !H.over ? "now" : "";
       return `<span class="${st}">${s}</span>`;
