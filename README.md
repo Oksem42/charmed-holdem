@@ -9,7 +9,9 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 - Each table gives you 6 hands to win the chip target. Miss it and the run ends.
 - Between tables, buy, sell and reorder charms, reroll the shop, and level up hands.
 - Beat all 8 tables to win.
-- Keys: `B` bet, `C` check or call, `F` fold, `Enter` continue.
+- All in (`A`, press twice) pushes every chip. Opponents only call with strong hands, and losing one ends your run.
+- A big stack raises the table target to half your chips minus 50, if that beats the base target.
+- Keys: `B` bet, `C` check or call, `F` fold, `A` all in, `Enter` continue.
 
 ## Charm types
 - **Payout**: flat bonus chips (Pair Pal, Underdog, Pocket Rockets...)
