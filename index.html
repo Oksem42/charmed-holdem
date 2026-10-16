@@ -184,6 +184,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .streets span.done { color: #cfe0d6; border-color: rgba(236,230,218,.3); }
 .streets span.now { color: var(--charm-ink); background: var(--charm); border-color: var(--charm); font-weight: 700; }
 .hn.pill:not(:empty) { background: rgba(0,0,0,.3); padding: 2px 14px; border-radius: 99px; border: 1px solid rgba(242,184,75,.35); color: var(--charm); }
+.msg small { display: block; color: #cfe0d6; font-size: 13px; margin-top: 4px; font-weight: 400; }
+.msg .five { font-family: var(--f-mono); font-size: 13px; font-weight: 700; background: rgba(0,0,0,.28); padding: 1px 7px; border-radius: 6px; white-space: nowrap; }
+.btn.allin { background: var(--lose); color: var(--ink); box-shadow: 0 0 0 3px rgba(241,154,142,.25); }
+.allin-note { font-family: var(--f-mono); font-size: 13px; letter-spacing: .06em; color: var(--lose); padding: 12px 0; animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .45; } }
 .btn.act { display: inline-flex; align-items: center; gap: 10px; min-width: 112px; justify-content: center; }
 .btn.big { padding: 14px 28px; font-size: 16px; }
 .btn.sm { padding: 6px 12px; font-size: 13px; }
@@ -385,6 +390,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     return { score: top, cards: five, cat: top[0] };
   }
   const nameOf = (s) => s[0] === 8 && s[1] === 14 ? "Royal Flush" : HAND[s[0]];
+  // The best five cards in reading order: grouped cards first, then kickers high to low.
+  function fiveText(b) {
+    const cnt = {}; b.cards.forEach(c => cnt[c.r] = (cnt[c.r] || 0) + 1);
+    let cs = [...b.cards].sort((x, y) => cnt[y.r] - cnt[x.r] || y.r - x.r);
+    if (b.cat === 4 || b.cat === 8) { cs = [...b.cards].sort((x, y) => y.r - x.r); if (b.score[1] === 5) cs.push(cs.shift()); }
+    return cs.map(c => rt(c.r) + c.s).join(" ");
+  }
 
   // ---------- Charms ----------
   // Each charm reads the finished hand and returns a bonus line, or nothing.
@@ -455,6 +467,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const d = shuffle();
     H = { you: [d[0], d[2]], opp: [d[1], d[3]], board: [d[5], d[6], d[7], d[9], d[11]], street: 0, pot: ANTE * 2, facing: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set() };
     G.bank -= ANTE;
+    if (G.bank === 0) { say("Your ante was your last 10 chips, so you're all in."); return goAllIn(); }
     say("Your move. Bet to build the pot, or check to see the next card cheaply.");
     renderAll();
   }
@@ -490,9 +503,22 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const b = BETS[H.street];
     if (kind === "fold") { return finish({ fold: "you" }); }
     if (kind === "call") {
-      G.bank -= H.facing; H.pot += H.facing; H.facing = 0;
-      say(`You call ${b}.`);
+      // Short of the full call: go all in, and the opponent's unmatched chips go back to them.
+      const amt = Math.min(H.facing, G.bank);
+      if (amt < H.facing) {
+        H.pot -= H.facing - amt;
+        say(`You're all in for ${amt}. ${TABLES[G.t].name} takes back the ${H.facing - amt} you can't match.`);
+      } else say(`You call ${amt}.`);
+      G.bank -= amt; H.pot += amt; H.facing = 0;
+      if (G.bank === 0) return goAllIn();
       return nextStreet();
+    }
+    if (kind === "bet" && G.bank <= b) {
+      // Not enough for a full bet: shove what's left. They call or fold as usual.
+      const amt = G.bank;
+      G.bank = 0; H.pot += amt; H.myBets++;
+      if (oppCalls()) { H.pot += amt; say(`You go all in for ${amt}. ${TABLES[G.t].name} calls.`); return goAllIn(); }
+      return finish({ fold: "opp" });
     }
     if (kind === "bet") {
       G.bank -= b; H.pot += b; H.myBets++;
@@ -518,6 +544,19 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (H.street === 3) return finish({});
     H.street++;
     renderAll();
+  }
+  // All in: no more betting. Both hands are turned face up and the rest of the board is dealt out.
+  function goAllIn() {
+    H.allIn = true;
+    renderAll();
+    const step = () => {
+      if (H.over) return;
+      if (H.street === 3) return finish({});
+      H.street++;
+      renderAll();
+      setTimeout(step, reduceMotion ? 0 : 900);
+    };
+    setTimeout(step, reduceMotion ? 0 : 900);
   }
 
   function finish({ fold }) {
@@ -576,10 +615,21 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     G.bank += payout;
     const net = G.bank - H.startBank;
 
-    if (win && byFold) say(`<span class="w">${TABLES[G.t].name} folds.</span> The pot is yours.`);
-    else if (win) say(`<span class="w">You win</span> with ${nameOf(you.score)} over ${nameOf(opp.score)}.`);
-    else if (lostShowdown) say(`<span class="l">${TABLES[G.t].name} wins</span> with ${nameOf(opp.score)} over your ${nameOf(you.score)}.`);
-    else if (split) say(`<b>Split pot.</b> You both have ${nameOf(you.score)}.`);
+    // Showdown messages name each player's best five cards, so ties and kickers make sense.
+    const opName = TABLES[G.t].name;
+    const kickerNote = you.cat === opp.cat && !split ? `<small>Same hand type, so the highest card that isn't shared decides it (the kicker).</small>` : "";
+    if (win && byFold) say(`<span class="w">${opName} folds.</span> The pot is yours.`);
+    else if (win) say(`<span class="w">You win</span> with ${nameOf(you.score)} <b class="five">${fiveText(you)}</b> over ${nameOf(opp.score)} <b class="five">${fiveText(opp)}</b>.${kickerNote}`);
+    else if (lostShowdown) say(`<span class="l">${opName} wins</span> with ${nameOf(opp.score)} <b class="five">${fiveText(opp)}</b> over your ${nameOf(you.score)} <b class="five">${fiveText(you)}</b>.${kickerNote}`);
+    else if (split) {
+      // Name the hole cards that didn't make either best five: that's usually why a tie surprises people.
+      const cardTxt = (c) => rt(c.r) + c.s;
+      const myOut = H.you.filter(c => !you.cards.includes(c)), oppOut = H.opp.filter(c => !opp.cards.includes(c));
+      const outs = [myOut.length && `your ${myOut.map(cardTxt).join(" and ")}`, oppOut.length && `their ${oppOut.map(cardTxt).join(" and ")}`].filter(Boolean);
+      const why = !myOut.length && !oppOut.length ? "Both best five cards are equal in rank."
+        : `Only your best five cards count, so ${outs.join(" and ")} ${myOut.length + oppOut.length > 1 ? "don't" : "doesn't"} play. The board's higher cards fill the hand instead.`;
+      say(`<b>Split pot.</b> You both play ${nameOf(you.score)} <b class="five">${fiveText(you)}</b>.<small>${why}</small>`);
+    }
 
     // Charms go off one after another, each with its own effect, then the chips roll in.
     const fxAt = {};
@@ -1197,7 +1247,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (!H) return;
     const sd = H.over && H.showdown;
     let winFive = null;
-    if (sd) { const c = cmp(H.youBest.score, H.oppBest.score); winFive = c > 0 ? H.youBest.cards : c < 0 ? H.oppBest.cards : null; }
+    if (sd) { const c = cmp(H.youBest.score, H.oppBest.score); winFive = c > 0 ? H.youBest.cards : c < 0 ? H.oppBest.cards : H.youBest.cards; }
+    const faceUp = sd || H.allIn;
     const style = (c) => winFive ? { used: winFive.includes(c), dim: !winFive.includes(c) } : {};
     // Animate each card only the first time it appears in a given face-up/face-down state.
     let flipN = 0;
@@ -1211,10 +1262,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       return el;
     };
     H.opp.forEach((c, i) => {
-      const peeked = !sd && H.peek === i;
+      const peeked = !faceUp && H.peek === i;
       if (peeked) { opp.append(anim(cardEl(c, { peek: true }), "o" + i + "p", "flip", 0)); return; }
-      const el = cardEl(c, sd ? style(c) : { down: true });
-      opp.append(sd ? anim(el, "o" + i + "u", "flip", .15 * flipN++) : anim(el, "o" + i, "deal", .08 + i * .16, 160));
+      const el = cardEl(c, faceUp ? style(c) : { down: true });
+      opp.append(faceUp ? anim(el, "o" + i + "u", "flip", .15 * flipN++) : anim(el, "o" + i, "deal", .08 + i * .16, 160));
     });
     H.you.forEach((c, i) => you.append(anim(cardEl(c, style(c)), "y" + i, "deal", i * .16, -200)));
     const n = H.over ? (H.showdown ? 5 : shown()) : shown();
@@ -1246,13 +1297,22 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       add(label, "Enter", afterHand, "btn big");
       return;
     }
+    if (H.allIn) {
+      const note = document.createElement("p");
+      note.className = "allin-note";
+      note.textContent = "All in. Dealing out the board…";
+      a.append(note);
+      return;
+    }
     const b = BETS[H.street];
     const peekHint = H.street === 1 && G.charms.includes("peek") && H.peek === undefined;
     if (H.facing) {
-      add(`Call ${H.facing}`, "c", () => act("call"), "btn", G.bank < H.facing);
+      // Can't cover the call? Calling puts you all in for what you have.
+      add(G.bank < H.facing ? `All in ${G.bank}` : `Call ${H.facing}`, "c", () => act("call"), G.bank < H.facing ? "btn allin" : "btn", G.bank <= 0);
       add("Fold", "f", () => act("fold"), "btn ghost");
     } else {
-      add(peekHint ? `Bet ${b} · Peek` : `Bet ${b}`, "b", () => act("bet"), "btn", G.bank < b);
+      const short = G.bank <= b;
+      add(short ? `All in ${G.bank}` : peekHint ? `Bet ${b} · Peek` : `Bet ${b}`, "b", () => act("bet"), short ? "btn allin" : "btn", G.bank <= 0);
       add("Check", "c", () => act("check"), "btn alt");
       add("Fold", "f", () => act("fold"), "btn ghost");
     }
