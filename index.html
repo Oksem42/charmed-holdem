@@ -26,6 +26,9 @@
   --line: rgba(236, 230, 218, 0.13);
   --win: #8fdca0;
   --lose: #f19a8e;
+  --fx-water: #6cc4f0;
+  --fx-green: #7fe0a0;
+  --fx-purple: #c79cff;
   --f-display: "Bowlby One", "Arial Black", Impact, sans-serif;
   --f-body: "Nunito Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "Space Mono", ui-monospace, Menlo, monospace;
@@ -176,6 +179,25 @@ p { margin: 0; }
 .fx-suit { position: fixed; z-index: 48; left: 0; top: 0; pointer-events: none; font-size: 22px; font-weight: 700; line-height: 1; }
 .fx-text { position: fixed; z-index: 50; left: 0; top: 0; pointer-events: none; font-family: var(--f-display); font-size: 30px; color: var(--charm); text-shadow: 0 3px 0 rgba(0,0,0,.45); white-space: nowrap; }
 .fx-text.big { font-size: 44px; }
+/* Charm effect pieces. All are fixed, start at the top-left corner and are placed with transforms. */
+.fx-call, .fx-ring, .fx-dot, .fx-card, .fx-heart, .fx-stamp, .fx-rocket, .fx-spark, .fx-dust, .fx-shine, .fx-crown, .fx-shield, .fx-arrow, .fx-orb { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 52; }
+.fx-call { font-family: var(--f-display); font-size: 22px; white-space: nowrap; text-shadow: 0 2px 0 rgba(0,0,0,.55), 0 0 18px rgba(0,0,0,.4); }
+.fx-call.big { font-size: 64px; }
+.fx-ring { width: 40px; height: 40px; border-radius: 50%; border: 4px solid; }
+.fx-dot { width: 14px; height: 14px; border-radius: 50%; }
+.fx-card { width: 48px; aspect-ratio: 5/7; border-radius: 6px; background: var(--stock); color: var(--ink); display: grid; place-items: center; font-family: var(--f-mono); font-weight: 700; font-size: 22px; box-shadow: 0 0 0 3px var(--charm), 0 8px 16px rgba(0,0,0,.4); }
+.fx-heart { font-size: 56px; line-height: 1; color: var(--pip-red); text-shadow: 0 0 18px rgba(192,49,47,.7); }
+.fx-stamp { font-family: var(--f-display); font-size: 34px; color: var(--lose); border: 5px solid var(--lose); border-radius: 10px; padding: 2px 14px; letter-spacing: .06em; background: rgba(27,26,23,.35); }
+.fx-rocket { width: 22px; height: 40px; background: linear-gradient(var(--stock) 0 55%, var(--charm) 55%); clip-path: polygon(50% 0, 100% 45%, 100% 100%, 50% 85%, 0 100%, 0 45%); filter: drop-shadow(0 0 8px var(--charm)); }
+.fx-spark { width: 8px; height: 8px; border-radius: 50%; background: var(--charm); box-shadow: 0 0 10px 2px #ff9c3a; }
+.fx-dust { width: 16px; height: 16px; border-radius: 50%; background: rgba(236,230,218,.45); filter: blur(2px); }
+.fx-shine { border-radius: 8px; overflow: hidden; }
+.fx-shine i { position: absolute; top: -10%; left: 0; width: 40%; height: 120%; background: linear-gradient(90deg, transparent, rgba(255,240,190,.85), transparent); }
+.fx-crown { font-size: 46px; line-height: 1; color: var(--charm); text-shadow: 0 0 16px var(--charm), 0 3px 0 var(--charm-ink); }
+.fx-shield { width: 190px; height: 200px; background: radial-gradient(circle at 50% 35%, rgba(127,224,160,.5), rgba(127,224,160,.15) 70%); border: 4px solid var(--fx-green); clip-path: polygon(50% 0, 100% 14%, 94% 62%, 50% 100%, 6% 62%, 0 14%); box-shadow: inset 0 0 30px var(--fx-green); }
+.fx-arrow { width: 170px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, transparent, var(--fx-water)); box-shadow: 0 0 18px 3px var(--fx-water); }
+.fx-arrow b { position: absolute; right: -14px; top: -10px; width: 0; height: 0; border-left: 20px solid var(--fx-water); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
+.fx-orb { width: 18px; height: 18px; border-radius: 50%; }
 
 @media (max-width: 900px) {
   .main { grid-template-columns: 1fr; }
@@ -451,9 +473,9 @@ p { margin: 0; }
     G.charms.forEach(id => {
       const r = CHARMS[id].run(ctx);
       if (!r) return;
-      fired.push([id, lines.length]);
-      if (r.add) { lines.push([CHARMS[id].name, r.add, "ch"]); flat += r.add; }
-      if (r.mult) { lines.push([CHARMS[id].name, "×" + r.mult, "ch mult"]); mult *= r.mult; }
+      fired.push([id, r]);
+      if (r.add) { lines.push([CHARMS[id].name, r.add, "ch", id]); flat += r.add; }
+      if (r.mult) { lines.push([CHARMS[id].name, "×" + r.mult, "ch mult", id]); mult *= r.mult; }
     });
     const payout = Math.round((total + flat) * mult);
     G.bank += payout;
@@ -464,17 +486,21 @@ p { margin: 0; }
     else if (lostShowdown) say(`<span class="l">${TABLES[G.t].name} wins</span> with ${nameOf(opp.score)} over your ${nameOf(you.score)}.`);
     else if (split) say(`<b>Split pot.</b> You both have ${nameOf(you.score)}.`);
 
-    showReceipt(lines, net, fired);
+    // Charms go off one after another, each with its own effect, then the chips roll in.
+    const fxAt = {};
+    fired.forEach(([id], k) => fxAt[id] = (reduceMotion ? 0 : 350 + k * 650));
+    const lastFx = fired.length ? fxAt[fired[fired.length - 1][0]] + 700 : 0;
+    const payAt = Math.max(lines.length * 120 + 250, lastFx);
+    showReceipt(lines, net, fired, fxAt);
     G.handsLeft--;
-    // Let the receipt lines land before the chip counter rolls up.
-    const payAt = lines.length * 120 + 250;
     hudDelay = payout > 0 ? payAt : 0;
     renderAll();
+    fired.forEach(([id, r]) => { if (CHARM_FX[id] && !reduceMotion) setTimeout(() => CHARM_FX[id](r), fxAt[id]); });
     if (payout > 0 && win) {
       const big = mult > 1 || payout >= 150;
       flyChips(Math.min(16, 5 + Math.round(payout / 25)), payAt - 200);
-      floatText(big ? `BIG WIN +${payout}` : `+${payout}`, 150, big);
-      suitBurst(big ? 26 : 12, 100);
+      floatText(big ? `BIG WIN +${payout}` : `+${payout}`, payAt - 250, big);
+      suitBurst(big ? 26 : 12, payAt - 250);
     } else if (payout > 0) {
       flyChips(4, payAt - 200);
     }
@@ -632,6 +658,323 @@ p { margin: 0; }
     $("again").addEventListener("click", newRun);
   }
 
+  // ---------- Charm effects ----------
+  // Every charm has its own signature effect, played when it triggers.
+  const pt = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, l: r.left, t: r.top, w: r.width, h: r.height }; };
+  function fx(cls, html, css) {
+    const el = document.createElement("div");
+    el.className = cls; el.innerHTML = html || "";
+    if (css) Object.assign(el.style, css);
+    document.body.append(el);
+    return el;
+  }
+  function play(el, frames, opts) {
+    const a = el.animate(frames, Object.assign({ fill: "backwards", easing: "ease-out" }, opts));
+    a.onfinish = () => el.remove();
+    return a;
+  }
+  // Position helper: translate so the element's centre sits on (x, y).
+  const at = (el, x, y, extra = "") => `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) ${extra}`;
+  const potPt = () => pt($("pot"));
+  const winCards = () => [...document.querySelectorAll("#you .card.used, #board .card.used")];
+  const label = (el) => el.getAttribute("aria-label") || "";
+  function callout(text, p, color, delay = 0) {
+    const t = fx("fx-call", text, { color });
+    play(t, [
+      { transform: at(t, p.x, p.y, "scale(.4)"), opacity: 0 },
+      { transform: at(t, p.x, p.y - 30, "scale(1.15)"), opacity: 1, offset: .2 },
+      { transform: at(t, p.x, p.y - 40, "scale(1)"), opacity: 1, offset: .75 },
+      { transform: at(t, p.x, p.y - 70, "scale(.9)"), opacity: 0 },
+    ], { duration: 1300, delay });
+  }
+  function ring(p, color, delay = 0, size = 3) {
+    const r = fx("fx-ring", "", { borderColor: color });
+    play(r, [
+      { transform: at(r, p.x, p.y, "scale(.2)"), opacity: 1 },
+      { transform: at(r, p.x, p.y, `scale(${size})`), opacity: 0 },
+    ], { duration: 700, delay });
+  }
+  function glowCard(el, color, delay = 0) {
+    el.animate([{ filter: "none" }, { filter: `brightness(1.35) drop-shadow(0 0 14px ${color})` }, { filter: "none" }], { duration: 700, delay });
+  }
+  function beamFrom(id, p, color) {
+    const tile = [...document.querySelectorAll("#rack .charm")].find(t => t.querySelector("b")?.textContent === CHARMS[id].name);
+    if (!tile) return;
+    const s = pt(tile.querySelector(".g"));
+    const dot = fx("fx-dot", "", { background: color, boxShadow: `0 0 16px 4px ${color}` });
+    play(dot, [
+      { transform: at(dot, s.x, s.y, "scale(1.4)"), opacity: 1 },
+      { transform: at(dot, p.x, p.y, "scale(.6)"), opacity: .9 },
+    ], { duration: 320, easing: "cubic-bezier(.5,0,.5,1)" });
+  }
+  const bonusText = (r) => r.mult ? `×${r.mult}` : `+${r.add}`;
+
+  const CHARM_FX = {
+    // Two cards of the pair slide in from either side and clash over the pot.
+    pairpal(r) {
+      const p = potPt();
+      beamFrom("pairpal", p, "var(--charm)");
+      const five = H.youBest ? H.youBest.cards : [];
+      const cnt = {}; five.forEach(c => cnt[c.r] = (cnt[c.r] || 0) + 1);
+      const rank = rt(+(Object.keys(cnt).find(k => cnt[k] === 2) || 2));
+      [-1, 1].forEach(side => {
+        const c = fx("fx-card", rank);
+        play(c, [
+          { transform: at(c, p.x + side * 170, p.y - 20, `rotate(${side * 30}deg)`), opacity: 0 },
+          { transform: at(c, p.x + side * 16, p.y - 20, `rotate(${side * -8}deg)`), opacity: 1, offset: .45 },
+          { transform: at(c, p.x + side * 26, p.y - 26, `rotate(${side * -14}deg)`), opacity: 1, offset: .7 },
+          { transform: at(c, p.x + side * 40, p.y - 50, `rotate(${side * -20}deg)`), opacity: 0 },
+        ], { duration: 950, easing: "cubic-bezier(.3,.8,.3,1)" });
+      });
+      ring({ x: p.x, y: p.y - 20 }, "var(--charm)", 400);
+      callout(`Pair Pal ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--charm)", 380);
+    },
+    // A heart rises from every heart card and breaks in two.
+    heart(r) {
+      const cards = winCards().filter(c => label(c).endsWith("♥"));
+      cards.forEach((card, i) => {
+        const p = pt(card);
+        [0, 1].forEach(half => {
+          const h = fx("fx-heart", "♥", { clipPath: half ? "inset(0 0 0 50%)" : "inset(0 50% 0 0)" });
+          const dir = half ? 1 : -1;
+          play(h, [
+            { transform: at(h, p.x, p.y, "scale(.3)"), opacity: 0 },
+            { transform: at(h, p.x, p.y - 60, "scale(1.2)"), opacity: 1, offset: .35 },
+            { transform: at(h, p.x, p.y - 60, "scale(1.2)"), opacity: 1, offset: .5 },
+            { transform: at(h, p.x + dir * 30, p.y - 20, `scale(1) rotate(${dir * 35}deg)`), opacity: 0 },
+          ], { duration: 1000, delay: i * 120 });
+        });
+      });
+      const p = potPt();
+      callout(`Heartbreaker ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--pip-red)", 300);
+    },
+    // A FOLDED stamp slams onto the opponent's cards.
+    bluff(r) {
+      const p = pt($("opp"));
+      const s = fx("fx-stamp", "FOLDED");
+      play(s, [
+        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(3)"), opacity: 0 },
+        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(.95)"), opacity: 1, offset: .2 },
+        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(1)"), opacity: 1, offset: .85 },
+        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(1)"), opacity: 0 },
+      ], { duration: 1500, easing: "cubic-bezier(.2,.9,.3,1.2)" });
+      $("opp").animate([{ transform: "none" }, { transform: "translateY(6px)" }, { transform: "none" }], { duration: 250, delay: 260 });
+      ["?", "!", "?"].forEach((ch, i) => {
+        const q = fx("fx-call", ch, { color: "var(--charm)" });
+        const a = (i - 1) * 70;
+        play(q, [
+          { transform: at(q, p.x, p.y, "scale(.2)"), opacity: 0 },
+          { transform: at(q, p.x + a, p.y - 50 - (i % 2) * 15, `scale(1.3) rotate(${a / 4}deg)`), opacity: 1, offset: .4 },
+          { transform: at(q, p.x + a * 1.2, p.y - 80, "scale(1)"), opacity: 0 },
+        ], { duration: 900, delay: 300 + i * 80 });
+      });
+      callout(`Bluff Master ${bonusText(r)}`, { x: p.x, y: p.y + 70 }, "var(--charm)", 350);
+    },
+    // Rockets launch from both hole cards, trailing sparks.
+    pocket(r) {
+      [...document.querySelectorAll("#you .card")].forEach((card, i) => {
+        const p = pt(card);
+        const rk = fx("fx-rocket");
+        play(rk, [
+          { transform: at(rk, p.x, p.y, "scale(.6)"), opacity: 0 },
+          { transform: at(rk, p.x, p.y - 30, "scale(1)"), opacity: 1, offset: .1 },
+          { transform: at(rk, p.x + (i ? 30 : -30), p.y - 360, "scale(1)"), opacity: 1, offset: .85 },
+          { transform: at(rk, p.x + (i ? 34 : -34), p.y - 400, "scale(.4)"), opacity: 0 },
+        ], { duration: 900, delay: i * 120, easing: "cubic-bezier(.5,0,.7,.4)" });
+        for (let k = 0; k < 10; k++) {
+          const sp = fx("fx-spark");
+          const y = p.y - 40 - k * 32, x = p.x + (i ? 1 : -1) * k * 3;
+          play(sp, [
+            { transform: at(sp, x, y, "scale(1)"), opacity: 1 },
+            { transform: at(sp, x + (Math.random() - .5) * 30, y + 30, "scale(.2)"), opacity: 0 },
+          ], { duration: 500, delay: i * 120 + 80 + k * 60 });
+        }
+        const top = { x: p.x + (i ? 34 : -34), y: p.y - 400 };
+        ring(top, "var(--charm)", i * 120 + 820, 2);
+      });
+      const p = potPt();
+      callout(`Pocket Rockets ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--charm)", 300);
+    },
+    // Water ripples spread from the river card.
+    river(r) {
+      const riv = document.querySelector("#board .card:nth-child(5)");
+      if (!riv) return;
+      const p = pt(riv);
+      glowCard(riv, "var(--fx-water)");
+      for (let i = 0; i < 4; i++) ring(p, "var(--fx-water)", i * 160, 2.6 + i * .5);
+      [...document.querySelectorAll("#board .card")].reverse().forEach((c, i) => {
+        c.animate([{ translate: "0 0" }, { translate: "0 -10px" }, { translate: "0 0" }], { duration: 380, delay: 120 + i * 90, easing: "ease-in-out" });
+      });
+      callout(`River Rat ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--fx-water)", 250);
+    },
+    // The low card puffs up like it's proud of itself, kicking up dust.
+    under(r) {
+      const low = [...document.querySelectorAll("#you .card")].filter(c => { const k = label(c).slice(0, -1); return !isNaN(+k) && +k <= 7; });
+      low.forEach((card, i) => {
+        card.animate([{ scale: "1", rotate: "0deg" }, { scale: "1.4", rotate: "-8deg", offset: .35 }, { scale: "1.25", rotate: "6deg", offset: .6 }, { scale: "1", rotate: "0deg" }], { duration: 900, delay: i * 150, easing: "ease-out" });
+        const p = pt(card);
+        for (let k = 0; k < 8; k++) {
+          const d = fx("fx-dust");
+          const ang = Math.PI + (k / 7) * Math.PI * -1;
+          play(d, [
+            { transform: at(d, p.x, p.y + p.h / 2, "scale(.4)"), opacity: .9 },
+            { transform: at(d, p.x + Math.cos(ang) * 60, p.y + p.h / 2 + Math.sin(ang) * 26, "scale(1.6)"), opacity: 0 },
+          ], { duration: 700, delay: 280 + i * 150 });
+        }
+      });
+      const p = low[0] ? pt(low[0]) : potPt();
+      callout(`Underdog ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "var(--fx-green)", 300);
+    },
+    // Aces spin around with a gold shine.
+    ace(r) {
+      const aces = [...document.querySelectorAll("#you .card")].filter(c => label(c).startsWith("A"));
+      aces.forEach((card, i) => {
+        card.animate([{ rotate: "y 0deg" }, { rotate: "y 360deg" }], { duration: 700, delay: i * 120, easing: "cubic-bezier(.4,0,.2,1)" });
+        const p = pt(card);
+        const sh = fx("fx-shine", "<i></i>", { width: p.w + "px", height: p.h + "px", transform: `translate(${p.l}px, ${p.t}px)` });
+        sh.firstChild.animate([{ transform: "translateX(-120%) skewX(-20deg)" }, { transform: "translateX(220%) skewX(-20deg)" }], { duration: 600, delay: 650 + i * 120, fill: "backwards" });
+        setTimeout(() => sh.remove(), 1350 + i * 120);
+        ring(p, "var(--charm)", 650 + i * 120, 2);
+      });
+      const p = aces[0] ? pt(aces[0]) : potPt();
+      callout(`Ace Up ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "var(--charm)", 600);
+    },
+    // A crown drops onto your best card.
+    kicker(r) {
+      const mine = [...document.querySelectorAll("#you .card")];
+      const rank = (c) => { const k = label(c).slice(0, -1); return { J: 11, Q: 12, K: 13, A: 14 }[k] || +k; };
+      const top = mine.sort((a, b) => rank(b) - rank(a))[0];
+      if (!top) return;
+      const p = pt(top);
+      const cr = fx("fx-crown", "♛");
+      play(cr, [
+        { transform: at(cr, p.x, p.y - 220, "rotate(-20deg)"), opacity: 0 },
+        { transform: at(cr, p.x, p.y - p.h / 2 - 12, "rotate(0deg)"), opacity: 1, offset: .3 },
+        { transform: at(cr, p.x, p.y - p.h / 2 - 26, "rotate(0deg)"), opacity: 1, offset: .4 },
+        { transform: at(cr, p.x, p.y - p.h / 2 - 12, "rotate(0deg)"), opacity: 1, offset: .5 },
+        { transform: at(cr, p.x, p.y - p.h / 2 - 12, "rotate(0deg)"), opacity: 1, offset: .85 },
+        { transform: at(cr, p.x, p.y - p.h / 2 - 30, "rotate(0deg)"), opacity: 0 },
+      ], { duration: 1800, easing: "cubic-bezier(.3,.7,.3,1)" });
+      glowCard(top, "var(--charm)", 500);
+      callout(`Kicker King ${bonusText(r)}`, { x: p.x, y: p.y - 110 }, "var(--charm)", 500);
+    },
+    // A "2×" appears, then splits into two ghosts that fly apart.
+    double(r) {
+      const p = potPt();
+      beamFrom("double", p, "var(--fx-purple)");
+      const main = fx("fx-call big", "2×", { color: "var(--fx-purple)" });
+      play(main, [
+        { transform: at(main, p.x, p.y - 40, "scale(.3)"), opacity: 0 },
+        { transform: at(main, p.x, p.y - 40, "scale(1.3)"), opacity: 1, offset: .3 },
+        { transform: at(main, p.x, p.y - 40, "scale(1)"), opacity: 1, offset: .5 },
+        { transform: at(main, p.x, p.y - 40, "scale(1)"), opacity: 0, offset: .55 },
+      ], { duration: 1200 });
+      [-1, 1].forEach(side => {
+        const g = fx("fx-call big", "2×", { color: "var(--fx-purple)" });
+        play(g, [
+          { transform: at(g, p.x, p.y - 40), opacity: 0 },
+          { transform: at(g, p.x, p.y - 40), opacity: .9, offset: .01 },
+          { transform: at(g, p.x + side * 120, p.y - 70, `rotate(${side * 15}deg)`), opacity: 0 },
+        ], { duration: 650, delay: 620 });
+      });
+      ring({ x: p.x, y: p.y - 40 }, "var(--fx-purple)", 600, 3.5);
+      callout(`Double Trouble ${bonusText(r)}`, { x: p.x, y: p.y - 100 }, "var(--fx-purple)", 650);
+    },
+    // A shield covers your cards and bounces a few chips back.
+    insure(r) {
+      const p = pt($("you"));
+      const s = fx("fx-shield");
+      play(s, [
+        { transform: at(s, p.x, p.y, "scale(.3)"), opacity: 0 },
+        { transform: at(s, p.x, p.y, "scale(1.1)"), opacity: .95, offset: .2 },
+        { transform: at(s, p.x, p.y, "scale(1)"), opacity: .85, offset: .35 },
+        { transform: at(s, p.x, p.y, "scale(1.04)"), opacity: .9, offset: .6 },
+        { transform: at(s, p.x, p.y, "scale(1.2)"), opacity: 0 },
+      ], { duration: 1400 });
+      const pp = potPt();
+      for (let i = 0; i < 4; i++) {
+        const c = fx("fx-chip");
+        play(c, [
+          { transform: at(c, pp.x, pp.y), opacity: 0 },
+          { transform: at(c, (pp.x + p.x) / 2 + (i - 1.5) * 30, Math.min(pp.y, p.y) - 60), opacity: 1, offset: .45 },
+          { transform: at(c, p.x + (i - 1.5) * 20, p.y), opacity: 0 },
+        ], { duration: 800, delay: 300 + i * 80, easing: "ease-in-out" });
+      }
+      callout(`Insurance ${bonusText(r)} back`, { x: p.x, y: p.y - 80 }, "var(--fx-green)", 300);
+    },
+    // It rains the flush suit across the table.
+    flushfund(r) {
+      const tb = pt($("table"));
+      const suit = H.youBest ? H.youBest.cards[0].s : "♦";
+      const red = suit === "♥" || suit === "♦";
+      for (let i = 0; i < 28; i++) {
+        const s = fx("fx-suit", suit, { color: red ? "var(--pip-red)" : "var(--stock)", fontSize: (16 + Math.random() * 22) + "px" });
+        const x = tb.l + Math.random() * tb.w;
+        play(s, [
+          { transform: at(s, x, tb.t - 20, "rotate(0deg)"), opacity: 0 },
+          { transform: at(s, x, tb.t + 40, "rotate(40deg)"), opacity: 1, offset: .15 },
+          { transform: at(s, x + (Math.random() - .5) * 60, tb.t + tb.h - 30, `rotate(${(Math.random() - .5) * 400}deg)`), opacity: 0 },
+        ], { duration: 1100 + Math.random() * 500, delay: Math.random() * 500, easing: "cubic-bezier(.4,0,.8,.6)" });
+      }
+      winCards().forEach((c, i) => glowCard(c, red ? "var(--pip-red)" : "var(--stock)", 100 + i * 70));
+      const p = potPt();
+      callout(`Flush Fund ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--charm)", 350);
+    },
+    // An arrow streaks across the board, lighting up each card in order.
+    straight(r) {
+      const b = pt($("board"));
+      const ar = fx("fx-arrow", "<b></b>");
+      play(ar, [
+        { transform: at(ar, b.l - 120, b.y), opacity: 0 },
+        { transform: at(ar, b.l - 40, b.y), opacity: 1, offset: .1 },
+        { transform: at(ar, b.l + b.w + 60, b.y), opacity: 1, offset: .85 },
+        { transform: at(ar, b.l + b.w + 140, b.y), opacity: 0 },
+      ], { duration: 800, easing: "cubic-bezier(.6,0,.4,1)" });
+      const used = winCards().sort((a, c) => pt(a).x - pt(c).x);
+      used.forEach((c, i) => {
+        glowCard(c, "var(--fx-water)", 150 + i * 110);
+        c.animate([{ translate: "0 0" }, { translate: "0 -12px" }, { translate: "0 0" }], { duration: 300, delay: 150 + i * 110 });
+      });
+      callout(`Straight Shooter ${bonusText(r)}`, { x: b.x, y: b.t - 30 }, "var(--fx-water)", 600);
+    },
+    // Jackpot: the rail flashes gold and coins shower down.
+    roller(r) {
+      const tb = pt($("table"));
+      $("table").animate([
+        { borderColor: "var(--rail)" }, { borderColor: "var(--charm)", boxShadow: "inset 0 0 70px rgba(0,0,0,.45), 0 0 50px 8px var(--charm)" }, { borderColor: "var(--rail)" },
+        { borderColor: "var(--charm)" }, { borderColor: "var(--rail)" },
+      ], { duration: 1100 });
+      for (let i = 0; i < 22; i++) {
+        const c = fx("fx-chip");
+        const x = tb.l + 20 + Math.random() * (tb.w - 40);
+        play(c, [
+          { transform: at(c, x, tb.t - 40, "rotateX(0deg)"), opacity: 0 },
+          { transform: at(c, x, tb.t, "rotateX(180deg)"), opacity: 1, offset: .1 },
+          { transform: at(c, x + (Math.random() - .5) * 40, tb.t + tb.h * (.6 + Math.random() * .35), "rotateX(900deg)"), opacity: 0 },
+        ], { duration: 1000 + Math.random() * 400, delay: Math.random() * 400, easing: "cubic-bezier(.5,0,.9,.5)" });
+      }
+      const p = potPt();
+      callout(`HIGH ROLLER ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--charm)", 300);
+    },
+    // Three rings orbit the pot.
+    trips(r) {
+      const p = potPt();
+      beamFrom("trips", p, "var(--fx-green)");
+      ["var(--charm)", "var(--fx-green)", "var(--fx-purple)"].forEach((col, i) => {
+        const o = fx("fx-orb", "", { background: col, boxShadow: `0 0 14px 3px ${col}` });
+        const w = o.offsetWidth / 2;
+        play(o, [
+          { transform: `translate(${p.x - w}px, ${p.y - 30 - w}px) rotate(${i * 120}deg) translateX(10px) rotate(${-i * 120}deg)`, opacity: 0 },
+          { transform: `translate(${p.x - w}px, ${p.y - 30 - w}px) rotate(${i * 120 + 240}deg) translateX(70px) rotate(${-i * 120 - 240}deg)`, opacity: 1, offset: .4 },
+          { transform: `translate(${p.x - w}px, ${p.y - 30 - w}px) rotate(${i * 120 + 600}deg) translateX(50px) rotate(${-i * 120 - 600}deg)`, opacity: 1, offset: .85 },
+          { transform: `translate(${p.x - w}px, ${p.y - 30 - w}px) rotate(${i * 120 + 720}deg) translateX(0px) rotate(${-i * 120 - 720}deg)`, opacity: 0 },
+        ], { duration: 1300, easing: "linear" });
+      });
+      ring({ x: p.x, y: p.y - 30 }, "var(--fx-green)", 1100, 3);
+      callout(`Third Wheel ${bonusText(r)}`, { x: p.x, y: p.y - 110 }, "var(--fx-green)", 500);
+    },
+  };
+
   // ---------- Rendering ----------
   function say(html) { $("msg").innerHTML = `<span>${html}</span>`; }
   function cardEl(c, o = {}) {
@@ -741,17 +1084,17 @@ p { margin: 0; }
     lastFired = []; fireDelays = {}; firePending = false;
     $("receipt").innerHTML = `<p class="empty">Win a hand to see your charms pay out here.</p>`;
   }
-  function showReceipt(lines, net, fired) {
+  function showReceipt(lines, net, fired, fxAt) {
     lastFired = fired.map(f => f[0]);
-    fireDelays = Object.fromEntries(fired.map(([id, i]) => [id, i * 0.12]));
+    fireDelays = Object.fromEntries(fired.map(([id]) => [id, fxAt[id] / 1000]));
     firePending = true;
     const r = $("receipt");
     r.innerHTML = "";
     if (!lines.length) lines.push(["Nothing paid out", "", ""]);
-    lines.forEach(([k, v, cls], i) => {
+    lines.forEach(([k, v, cls, id], i) => {
       const d = document.createElement("div");
       d.className = "ln " + cls;
-      d.style.animationDelay = (i * 0.12) + "s";
+      d.style.animationDelay = (id ? fxAt[id] / 1000 : i * 0.12) + "s";
       d.innerHTML = `<span>${k}</span><span>${typeof v === "number" ? "+" + Math.round(v) : v}</span>`;
       r.append(d);
     });
