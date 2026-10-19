@@ -270,6 +270,30 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .fx-arrow b { position: absolute; right: -14px; top: -10px; width: 0; height: 0; border-left: 20px solid var(--fx-water); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
 .fx-orb { width: 18px; height: 18px; border-radius: 50%; }
 
+/* ---------- Rarity, themes and card backs ---------- */
+:root { --r-common: #9fb8c6; --r-rare: #4f8cff; --r-epic: #b46bff; --r-legend: #f2b84b; }
+/* Table themes set the felt, rail and room colours. The same rules colour the little previews. */
+:root[data-skin="theme_velvet"], [data-skin-preview="theme_velvet"] { --baize: #7a1f2b; --baize-dark: #4a1119; --rail: #2d1a12; --room: #170c0e; --room-2: #24151a; }
+:root[data-skin="theme_midnight"], [data-skin-preview="theme_midnight"] { --baize: #1f4274; --baize-dark: #11264a; --rail: #232a3a; --room: #0a0f1d; --room-2: #131b2e; }
+:root[data-skin="theme_forest"], [data-skin-preview="theme_forest"] { --baize: #2f5d2a; --baize-dark: #1b3a18; --rail: #4a3520; --room: #0e180d; --room-2: #172615; }
+:root[data-skin="theme_royal"], [data-skin-preview="theme_royal"] { --baize: #4d2b80; --baize-dark: #2c1652; --rail: #8a6a24; --room: #110b1d; --room-2: #1c142f; }
+:root[data-skin="theme_sunset"], [data-skin-preview="theme_sunset"] { --baize: #b04d2b; --baize-dark: #6b2614; --rail: #2b1830; --room: #1a0d14; --room-2: #2a1620; }
+:root[data-skin="theme_neon"], [data-skin-preview="theme_neon"] { --baize: #14203a; --baize-dark: #070c18; --rail: #ff2bd6; --room: #05070e; --room-2: #0e1426; }
+:root[data-skin="theme_gold"], [data-skin-preview="theme_gold"] { --baize: #6e5517; --baize-dark: #3a2c08; --rail: #d9ab3c; --room: #110d04; --room-2: #1e180a; }
+:root[data-skin="theme_classic"], [data-skin-preview="theme_classic"] { --baize: #17574f; --baize-dark: #0f3f39; --rail: #5a3a22; --room: #0e1c1d; --room-2: #15292a; }
+:root[data-skin="theme_neon"] .table, :root[data-skin="theme_neon"] .mini-felt { box-shadow: inset 0 0 70px rgba(0,0,0,.5), 0 0 34px -4px #ff2bd6, 0 0 70px -20px #28e0ff; }
+:root[data-skin="theme_gold"] .table, :root[data-skin="theme_gold"] .mini-felt { box-shadow: inset 0 0 70px rgba(0,0,0,.5), 0 0 40px -10px #f2b84b; }
+
+.card.back.cb-midnight { background: repeating-linear-gradient(45deg, #23447a 0 6px, #172f59 6px 12px); }
+.card.back.cb-emerald { background: repeating-linear-gradient(45deg, #1f6b4a 0 6px, #144e35 6px 12px); }
+.card.back.cb-carbon { background: repeating-linear-gradient(45deg, #2b2b2b 0 3px, #1a1a1a 3px 6px), #1a1a1a; border-color: #9aa3a8; background-blend-mode: normal; }
+.card.back.cb-royal { background: radial-gradient(circle at 50% 50%, #e7c66a 0 14%, #8a6a24 15% 19%, transparent 20%), repeating-linear-gradient(45deg, #4d2b80 0 6px, #3a1f62 6px 12px); border-color: #e7c66a; }
+.card.back.cb-neon { background: linear-gradient(rgba(255,43,214,.7) 1px, transparent 1px) 0 0 / 9px 9px, linear-gradient(90deg, rgba(40,224,255,.7) 1px, transparent 1px) 0 0 / 9px 9px, #0b0f1d; border-color: #ff2bd6; box-shadow: 0 0 12px -2px #ff2bd6, 0 8px 16px rgba(0,0,0,.35); }
+.card.back.cb-galaxy { background: radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 20%, #fff, transparent), radial-gradient(1.5px 1.5px at 40% 75%, #fff, transparent), radial-gradient(1px 1px at 85% 65%, #fff, transparent), radial-gradient(circle at 30% 30%, #6b3fd1, transparent 60%), radial-gradient(circle at 75% 70%, #1d6fd1, transparent 55%), #120a2b; background-size: 100% 100%; border-color: #c9b6ff; animation: twinkle 3s ease-in-out infinite; }
+.card.back.cb-gold { background: linear-gradient(110deg, #7d5e16 0%, #f7d774 40%, #fff3c4 48%, #c99a2e 56%, #7d5e16 100%); background-size: 250% 100%; border-color: #fff3c4; animation: shimmer 2.4s linear infinite; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+@keyframes twinkle { 50% { filter: brightness(1.35) saturate(1.2); } }
+
 /* ---------- Rival seats ---------- */
 .opps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: start; }
 .opps.solo { grid-template-columns: minmax(0, 420px); justify-content: center; }
@@ -292,6 +316,108 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
 .mode-chip { display: inline-block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 1px 8px; border-radius: 99px; border: 1px solid rgba(242,184,75,.5); color: var(--charm); margin-right: 6px; }
 .shove-note { text-transform: none; letter-spacing: 0; color: var(--lose); font-family: var(--f-body); font-size: 12.5px; margin-left: 6px; }
+
+/* ---------- Casino, collection, leaderboard ---------- */
+.profile-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
+.name-field { display: grid; gap: 4px; }
+.name-field input { font: inherit; font-weight: 700; background: var(--room-2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; width: 180px; }
+.name-field input:focus-visible { outline: 2px solid var(--charm); outline-offset: 2px; }
+.wallet-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; background: rgba(242,184,75,.12); border: 1px solid rgba(242,184,75,.45); color: var(--charm); text-decoration: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wallet-chip.big { font-size: 18px; padding: 10px 18px; }
+.quick-links { display: flex; gap: 14px; align-items: center; padding-bottom: 8px; }
+.quick-links a { color: var(--muted); font-size: 14px; }
+.quick-links a:hover { color: var(--charm); }
+.sec-split { display: flex; justify-content: space-between; align-items: end; gap: 12px 20px; flex-wrap: wrap; }
+.sec-split > div { display: grid; gap: 6px; max-width: 62ch; }
+.stat.tokens b { color: var(--charm); }
+
+.case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.case-card { position: relative; background: var(--room-2); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; overflow: hidden; }
+.case-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--r-rare), var(--r-epic), var(--r-legend)); opacity: .8; }
+.case-vault { border-color: rgba(242,184,75,.5); background: linear-gradient(160deg, rgba(242,184,75,.12), var(--room-2) 55%); }
+.case-lid { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.case-name { font-family: var(--f-display); font-size: 20px; }
+.case-price { font-family: var(--f-mono); color: var(--charm); white-space: nowrap; }
+.case-card > p { color: var(--muted); font-size: 13.5px; }
+.odds { display: flex; height: 6px; border-radius: 99px; overflow: hidden; gap: 2px; }
+.odds-key { font-size: 11.5px !important; font-family: var(--f-mono); }
+.case-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.mini-item { border-radius: 8px; border-bottom: 3px solid var(--rc); background: rgba(0,0,0,.25); padding: 3px; opacity: .55; }
+.mini-item.got { opacity: 1; }
+.mini-item .pv { width: 30px; height: 30px; }
+.case-card .btn { justify-self: start; }
+
+/* Previews of cosmetics */
+.pv { display: grid; place-items: center; width: 56px; height: 56px; flex: none; }
+.pv-back .card { --w: 34px; width: 34px; box-shadow: 0 4px 8px rgba(0,0,0,.35); }
+.mini-item .pv-back .card { --w: 20px; width: 20px; border-width: 2px; border-radius: 4px; }
+.pv-theme i { display: block; width: 86%; aspect-ratio: 4 / 3; border-radius: 50% / 46%; background: radial-gradient(ellipse at 50% 45%, var(--baize), var(--baize-dark)); border: 4px solid var(--rail); }
+.mini-item .pv-theme i { border-width: 2px; }
+.pv-win b { font-family: var(--f-display); font-size: 26px; color: var(--charm); text-shadow: 0 0 14px rgba(242,184,75,.6); }
+.mini-item .pv-win b { font-size: 15px; }
+
+/* Case opening */
+.case-modal { position: fixed; inset: 0; z-index: 60; background: rgba(4, 8, 8, .82); display: grid; place-items: center; padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
+.case-box { width: min(760px, 100%); background: var(--room-2); border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.reel-window { position: relative; overflow: hidden; border-radius: 14px; background: rgba(0,0,0,.35); padding: 12px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.reel { display: flex; gap: 8px; width: max-content; will-change: transform; }
+.rtile { width: 118px; flex: none; display: grid; justify-items: center; gap: 6px; padding: 10px 6px; border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.2)); border-bottom: 4px solid var(--rc); text-align: center; }
+.rtile span:last-child { font-size: 12px; font-weight: 700; line-height: 1.2; }
+.rtile.won { background: linear-gradient(180deg, color-mix(in srgb, var(--rc) 35%, transparent), rgba(0,0,0,.2)); box-shadow: 0 0 24px -4px var(--rc); }
+.reel-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: var(--charm); box-shadow: 0 0 12px var(--charm); }
+.reel-marker::before, .reel-marker::after { content: ""; position: absolute; left: -7px; border: 8px solid transparent; }
+.reel-marker::before { top: 0; border-top-color: var(--charm); }
+.reel-marker::after { bottom: 0; border-bottom-color: var(--charm); }
+.prize { display: flex; gap: 16px; align-items: center; padding: 14px; border-radius: 16px; border: 2px solid var(--rc); background: color-mix(in srgb, var(--rc) 14%, transparent); animation: rise .4s ease backwards; }
+.prize .pv { width: 80px; height: 80px; }
+.prize .pv-back .card { --w: 48px; width: 48px; }
+.prize .pv-win b { font-size: 40px; }
+.prize .rar { display: block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--rc); }
+.prize b { font-family: var(--f-display); font-size: 26px; display: block; }
+.prize small { color: var(--muted); }
+.prize.r-legendary { box-shadow: 0 0 40px -6px var(--r-legend); }
+.case-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Collection */
+.collection { display: grid; gap: 18px; }
+.col-group { display: grid; gap: 8px; }
+.col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.col-item { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; padding: 10px; border-radius: 14px; background: var(--room-2); border: 1px solid var(--line); border-left: 4px solid var(--rc); min-width: 0; }
+.col-item.on { box-shadow: inset 0 0 0 1.5px var(--charm); }
+.col-item.locked { opacity: .5; }
+.col-item.locked .pv { filter: grayscale(1) brightness(.7); }
+.col-text b { display: block; font-size: 14px; }
+.col-text span { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; }
+.col-btns { grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.col-btns .hint { font-size: 12px; }
+
+/* Leaderboard */
+.seg { display: inline-flex; padding: 3px; border-radius: 99px; background: var(--room-2); border: 1px solid var(--line); }
+.seg-btn { border: 0; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: 99px; font-weight: 700; font-size: 13.5px; }
+.seg-btn[aria-pressed="true"] { background: var(--charm); color: var(--charm-ink); }
+.board-list { display: grid; gap: 4px; overflow-x: auto; }
+.lb-row { display: grid; grid-template-columns: 40px minmax(120px, 1fr) 80px 90px 70px; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 12px; background: var(--room-2); font-variant-numeric: tabular-nums; min-width: 440px; }
+.lb-head { background: transparent; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-block: 2px; }
+.lb-rank { font-family: var(--f-display); font-size: 18px; color: var(--muted); }
+.lb-row.first .lb-rank { color: var(--charm); }
+.lb-name { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-name em { font-style: normal; font-family: var(--f-mono); font-size: 10.5px; color: var(--charm); border: 1px solid rgba(242,184,75,.5); border-radius: 99px; padding: 0 6px; margin-left: 6px; }
+.lb-row.champ { box-shadow: inset 3px 0 0 var(--charm); }
+.lb-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; }
+.run-rewards { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.reward { display: grid; padding: 8px 14px; border-radius: 12px; background: rgba(242,184,75,.12); border: 1px solid rgba(242,184,75,.45); color: var(--charm); font-family: var(--f-display); font-size: 20px; }
+.reward small { font-family: var(--f-body); font-size: 12px; color: var(--muted); }
+.reward.rank { color: var(--fx-water); background: rgba(108,196,240,.1); border-color: rgba(108,196,240,.45); }
+
+/* New effect pieces */
+.fx-confetti, .fx-flash, .fx-bolt, .fx-jackpot, .fx-beam, .fx-pocket { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 53; }
+.fx-confetti { width: 8px; height: 13px; border-radius: 2px; }
+.fx-flash { inset: 0; width: 100vw; height: 100vh; background: #e8f6ff; }
+.fx-jackpot { display: flex; gap: 6px; padding: 8px 12px; border-radius: 14px; background: linear-gradient(#2a1d05, #120c02); border: 3px solid var(--charm); box-shadow: 0 0 30px -4px var(--charm); overflow: hidden; }
+.fx-jackpot span { display: grid; place-items: center; width: 48px; height: 60px; border-radius: 8px; background: var(--stock); color: var(--pip-red); font-family: var(--f-display); font-size: 40px; }
+.fx-beam { border-radius: 8px; filter: blur(2px); transform-origin: 50% 100%; mix-blend-mode: screen; }
+.fx-pocket { font-family: var(--f-display); font-size: 30px; color: var(--fx-pink); white-space: nowrap; text-shadow: 0 3px 0 rgba(0,0,0,.5), 0 0 22px var(--fx-pink); }
+.fx-pocket.aces { color: var(--charm); font-size: 36px; text-shadow: 0 3px 0 var(--charm-ink), 0 0 26px var(--charm); }
 
 /* ---------- Home page ---------- */
 .modes { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
@@ -372,6 +498,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 @media (max-width: 900px) {
   .home-hero { grid-template-columns: 1fr; }
   .modes { grid-template-columns: 1fr; }
+  .case-grid { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr 1fr; }
   .type-grid { grid-template-columns: repeat(2, 1fr); }
   .lineup { grid-template-columns: 1fr; }
@@ -421,6 +548,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         <a class="btn ghost big" href="#modes">Game modes</a>
       </div>
       <p class="hint" id="run-note"></p>
+      <div class="profile-row">
+        <label class="name-field" for="player-name"><span class="label">Your name</span><input id="player-name" type="text" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
+        <a class="wallet-chip" href="#casino" title="Tokens: earn them by playing, spend them on cases">◈ <b class="token-count">0</b> tokens</a>
+        <nav class="quick-links"><a href="#casino">Casino</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
+      </div>
     </div>
     <div class="hero-table" aria-hidden="true">
       <div class="mini-felt">
@@ -458,6 +590,30 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     <p class="hint" id="mode-warn" hidden>Starting a new run ends the one in progress.</p>
   </section>
 
+  <section class="home-sec" id="casino">
+    <div class="home-head sec-split">
+      <div><p class="label">The casino</p><h2>Open a case.</h2><p class="hint">Earn tokens by clearing tables and finishing runs. Every prize is cosmetic: card backs, table themes and win animations. Duplicates turn back into tokens.</p></div>
+      <span class="wallet-chip big">◈ <b class="token-count">0</b> tokens</span>
+    </div>
+    <div class="case-grid" id="case-grid"></div>
+  </section>
+
+  <section class="home-sec" id="collection-sec">
+    <div class="home-head sec-split">
+      <div><p class="label">Collection</p><h2>Your style.</h2><p class="hint">Equip what you've unlocked. Themes recolour the whole casino.</p></div>
+      <span class="hint" id="collection-count"></span>
+    </div>
+    <div class="collection" id="collection"></div>
+  </section>
+
+  <section class="home-sec" id="leaderboard">
+    <div class="home-head sec-split">
+      <div><p class="label">Leaderboard</p><h2>Best runs.</h2><p class="hint">Ranked by tables cleared, then chips. Saved on this device.</p></div>
+      <div class="seg" role="group" aria-label="Leaderboard mode"><button class="seg-btn" data-board="table" aria-pressed="true">4-player table</button><button class="seg-btn" data-board="duel" aria-pressed="false">Heads-up</button></div>
+    </div>
+    <div class="board-list" id="board-list"></div>
+  </section>
+
   <section class="home-sec" id="how">
     <div class="home-head"><p class="label">How a run works</p><h2>Four steps, eight tables, one run.</h2></div>
     <ol class="steps">
@@ -484,6 +640,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </footer>
 </main>
 
+<div class="case-modal" id="case-modal" hidden>
+  <div class="case-box" role="dialog" aria-modal="true" aria-labelledby="case-title">
+    <p class="label" id="case-title">Case</p>
+    <div class="reel-window" id="reel-window"><div class="reel" id="reel"></div><i class="reel-marker"></i></div>
+    <div class="prize" id="prize" hidden></div>
+    <div class="case-actions" id="case-actions"></div>
+  </div>
+</div>
+
 <div class="wrap" id="game" hidden>
   <header class="top">
     <div class="brand">
@@ -495,6 +660,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <div class="stat"><span class="label">Table</span><b id="s-table">1 / 8</b></div>
       <div class="stat"><span class="label">Hands left</span><div class="pips" id="s-hands"></div></div>
       <div class="stat bank"><span class="label">Chips</span><b id="s-bank">200</b></div>
+      <div class="stat tokens"><span class="label">Tokens</span><b class="token-count">0</b></div>
     </div>
   </header>
 
@@ -721,6 +887,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (G.bank === 0) { say("Your ante was your last 10 chips, so you're all in."); return goAllIn(); }
     say(opps.length > 1 ? "Your move. You act first each street." : "Your move. Bet to build the pot, or check to see the next card cheaply.");
     renderAll();
+    // Pocket pair: a special moment once the hole cards have landed.
+    if (you[0].r === you[1].r) setTimeout(pocketPairFx, reduceMotion ? 0 : 750);
   }
   const shown = () => [0, 3, 4, 5][H.street];
   const visible = (hole) => [...hole, ...H.board.slice(0, shown())];
@@ -975,7 +1143,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const big = mult > 1 || payout >= 150;
       flyChips(Math.min(16, 5 + Math.round(payout / 25)), payAt - 200);
       floatText(big ? `BIG WIN +${payout}` : `+${payout}`, payAt - 250, big);
-      suitBurst(big ? 26 : 12, payAt - 250);
+      playWinFx(centerOf($("pot")), big ? 26 : 12, payAt - 250);
     } else if (payout > 0) {
       flyChips(4, payAt - 200);
     }
@@ -1055,6 +1223,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const won = G.bank - G.start;
     if (won >= G.target) {
       if (G.t === NUM_TABLES - 1) return endScreen(true);
+      addTokens(TOKENS_PER_TABLE);
       return openShop();
     }
     if (G.handsLeft <= 0 || G.bank < ANTE) return endScreen(false);
@@ -1093,7 +1262,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     s.innerHTML = `
       <div class="shop-head">
         <div><h2>Table ${G.t + 1} cleared</h2><p class="sub">You beat ${here}. Next up: <b>${listNames(next.map(r => r.name))}</b>. Target ${fmt(targetFor(G.t + 1, G.bank))}<span class="hint"> (the base ${fmt(MODES[G.mode].targets[G.t + 1])}, or half your chips minus 60, if higher)</span>.</p></div>
-        <div class="wallet"><span class="label">Chips</span><b>${G.bank}</b></div>
+        <div class="wallet"><span class="label">Chips</span><b>${G.bank}</b><span class="hint">◈ +${TOKENS_PER_TABLE} tokens for clearing the table</span></div>
       </div>
       <section class="shop-sec">
         <div class="sec-row"><p class="label">Your rack · ${G.charms.length}/${MAX_CHARMS}</p><p class="hint">Charms pay left to right. Use the arrows to reorder, which matters for Echo.</p></div>
@@ -1177,10 +1346,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const s = $("screen");
     s.hidden = false;
     const names = listNames(G.lineup[G.t].map(id => RIVALS[id].name));
+    // Pay out tokens and record the run once, even if this screen is drawn again.
+    if (!G.recorded) {
+      G.recorded = { tokens: runTokens(victory), rank: recordRun(victory) };
+      addTokens(G.recorded.tokens);
+    }
+    const { tokens, rank } = G.recorded;
+    const rewards = `<div class="run-rewards"><span class="reward">◈ +${tokens} tokens<small>for the chips you kept${victory ? " and beating the casino" : ""}</small></span>${rank ? `<span class="reward rank">#${rank}<small>on your ${MODES[G.mode].label.toLowerCase()} leaderboard</small></span>` : ""}<span class="hint">Spend tokens on cases from the home page.</span></div>`;
     s.classList.add("enter");
     s.innerHTML = victory
-      ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables of ${MODES[G.mode].label} beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div><div class="shop-foot"><button class="btn" id="again">Play again</button><button class="btn ghost" id="to-home">Home</button></div>`
+      ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables of ${MODES[G.mode].label} beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div>${rewards}<div class="shop-foot"><button class="btn" id="again">Play again</button><button class="btn ghost" id="to-home">Home</button></div>`
       : `<div><h2>Run over</h2><p class="sub">${names} held you to ${fmt(G.bank - G.start)} of the ${fmt(G.target)} you needed at table ${G.t + 1}.</p></div>
+         ${rewards}
          <p class="label">Your charms</p><div class="shop-grid">${G.charms.map(id => `<div class="item">${charmFace(id)}</div>`).join("")}</div>
          <div class="shop-foot"><button class="btn" id="again">New run</button><button class="btn ghost" id="to-home">Home</button></div>`;
     $("again").addEventListener("click", () => newRun(G.mode));
@@ -1571,7 +1748,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function say(html) { $("msg").innerHTML = `<span>${html}</span>`; }
   function cardEl(c, o = {}) {
     const el = document.createElement("div");
-    if (!c || o.down) { el.className = "card back"; el.setAttribute("aria-label", "face-down card"); return el; }
+    if (!c || o.down) { el.className = "card back " + backClass(); el.setAttribute("aria-label", "face-down card"); return el; }
     el.className = "card" + (c.s === "♥" || c.s === "♦" ? " red" : "") + (o.used ? " used" : "") + (o.dim ? " dim" : "") + (o.peek ? " peeked" : "");
     el.setAttribute("aria-label", rt(c.r) + c.s);
     el.innerHTML = `<span class="c">${rt(c.r)}<br>${c.s}</span><span class="p">${c.s}</span>`;
@@ -1689,6 +1866,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input, textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (!$("home").hidden) {
+      if (!$("case-modal").hidden) { if (key === "Escape" && !$("prize").hidden) closeCase(); return; }
       if (key === "Enter" && !e.target.closest("button, a")) { e.preventDefault(); $("play-btn").click(); }
       return;
     }
@@ -1779,6 +1957,376 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     r.append(t);
   }
 
+  // ---------- Profile (saved on this device) ----------
+  // Tokens, unlocked cosmetics, what's equipped and the leaderboard live in localStorage.
+  // If storage is blocked, everything still works for this visit; it just isn't remembered.
+  const STORE_KEY = "charmed-holdem-profile";
+  const P = (() => {
+    const base = { name: "Player", tokens: 150, owned: [], equip: { back: "back_classic", theme: "theme_classic", win: "win_suits" }, board: [] };
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { saved = null; }
+    if (!saved || typeof saved !== "object") return base;
+    return Object.assign(base, saved, { equip: Object.assign(base.equip, saved.equip || {}) });
+  })();
+  function saveProfile() { try { localStorage.setItem(STORE_KEY, JSON.stringify(P)); } catch (e) { /* storage blocked: keep going */ } }
+  function addTokens(n) { P.tokens += n; saveProfile(); renderWallets(); }
+
+  // ---------- Cosmetics ----------
+  const RARITY = {
+    common:    { label: "Common", color: "var(--r-common)" },
+    rare:      { label: "Rare", color: "var(--r-rare)" },
+    epic:      { label: "Epic", color: "var(--r-epic)" },
+    legendary: { label: "Legendary", color: "var(--r-legend)" },
+  };
+  const KINDS = { back: "Card backs", theme: "Table themes", win: "Win animations" };
+  const COSMETICS = {
+    back_classic:  { kind: "back", name: "Classic Red", rarity: "common", free: true },
+    back_midnight: { kind: "back", name: "Midnight", rarity: "common" },
+    back_emerald:  { kind: "back", name: "Emerald", rarity: "common" },
+    back_carbon:   { kind: "back", name: "Carbon", rarity: "rare" },
+    back_royal:    { kind: "back", name: "Royal Seal", rarity: "rare" },
+    back_neon:     { kind: "back", name: "Neon Grid", rarity: "epic" },
+    back_galaxy:   { kind: "back", name: "Galaxy", rarity: "epic" },
+    back_gold:     { kind: "back", name: "Gold Leaf", rarity: "legendary" },
+    theme_classic:  { kind: "theme", name: "Classic Teal", rarity: "common", free: true },
+    theme_velvet:   { kind: "theme", name: "Velvet Red", rarity: "common", free: true },
+    theme_midnight: { kind: "theme", name: "Midnight Blue", rarity: "common", free: true },
+    theme_forest:   { kind: "theme", name: "Forest", rarity: "common" },
+    theme_royal:    { kind: "theme", name: "Royal Purple", rarity: "rare" },
+    theme_sunset:   { kind: "theme", name: "Sunset Strip", rarity: "rare" },
+    theme_neon:     { kind: "theme", name: "Neon Vegas", rarity: "epic" },
+    theme_gold:     { kind: "theme", name: "Gold Room", rarity: "legendary" },
+    win_suits:     { kind: "win", name: "Suit Burst", rarity: "common", free: true, g: "♠" },
+    win_confetti:  { kind: "win", name: "Confetti", rarity: "common", g: "✦" },
+    win_coins:     { kind: "win", name: "Coin Rain", rarity: "rare", g: "◎" },
+    win_fireworks: { kind: "win", name: "Fireworks", rarity: "epic", g: "✺" },
+    win_lightning: { kind: "win", name: "Lightning", rarity: "epic", g: "ϟ" },
+    win_jackpot:   { kind: "win", name: "Jackpot 777", rarity: "legendary", g: "7" },
+  };
+  const owns = (id) => COSMETICS[id].free || P.owned.includes(id);
+  const CASES = {
+    felt:     { name: "Felt Case", price: 100, kinds: ["back", "theme"], blurb: "Card backs and table themes.", odds: { common: 65, rare: 25, epic: 8, legendary: 2 } },
+    showtime: { name: "Showtime Case", price: 150, kinds: ["win", "back"], blurb: "Win animations and card backs.", odds: { common: 60, rare: 26, epic: 11, legendary: 3 } },
+    vault:    { name: "High Roller Vault", price: 300, kinds: ["back", "theme", "win"], blurb: "Everything, with much better odds.", odds: { common: 30, rare: 38, epic: 24, legendary: 8 } },
+  };
+  // Duplicates turn back into tokens.
+  const REFUND = { common: 20, rare: 45, epic: 90, legendary: 180 };
+  const caseItems = (c) => Object.keys(COSMETICS).filter(id => !COSMETICS[id].free && CASES[c].kinds.includes(COSMETICS[id].kind));
+  function rollCase(c) {
+    const items = caseItems(c), odds = CASES[c].odds;
+    let roll = Math.random() * 100, rarity = "common";
+    for (const r of ["legendary", "epic", "rare", "common"]) { if (roll < odds[r]) { rarity = r; break; } roll -= odds[r]; }
+    // If this case has nothing of that rarity, step down until something exists.
+    const order = ["legendary", "epic", "rare", "common"];
+    for (let i = order.indexOf(rarity); i < order.length; i++) {
+      const pool = items.filter(id => COSMETICS[id].rarity === order[i]);
+      if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
+    }
+    return items[0];
+  }
+  function applyCosmetics() {
+    document.documentElement.dataset.skin = P.equip.theme;
+  }
+  const backClass = () => "cb-" + P.equip.back.replace("back_", "");
+  // A small picture of a cosmetic, for reels, the collection and prize reveals.
+  function preview(id) {
+    const c = COSMETICS[id];
+    if (c.kind === "back") return `<span class="pv pv-back"><span class="card back cb-${id.replace("back_", "")}"></span></span>`;
+    if (c.kind === "theme") return `<span class="pv pv-theme" data-skin-preview="${id}"><i></i></span>`;
+    return `<span class="pv pv-win"><b>${c.g}</b></span>`;
+  }
+
+  // ---------- Win animations ----------
+  // Each takes the point to celebrate around, how big to go, and a delay in ms.
+  function particle(cls, html, css, frames, opts) {
+    const el = fx(cls, html, css);
+    return play(el, frames, opts);
+  }
+  const WIN_FX = {
+    win_suits(p, n, delay) {
+      for (let i = 0; i < n; i++) {
+        const s = SUITS[i % 4];
+        const ang = Math.random() * Math.PI * 2, dist = 80 + Math.random() * 160;
+        particle("fx-suit", s, { color: s === "♥" || s === "♦" ? "var(--pip-red)" : "var(--stock)" }, [
+          { transform: `translate(${p.x - 8}px, ${p.y - 10}px) scale(.3) rotate(0deg)`, opacity: 1 },
+          { transform: `translate(${p.x + Math.cos(ang) * dist}px, ${p.y + Math.sin(ang) * dist * .7 + 40}px) scale(1) rotate(${(Math.random() - .5) * 540}deg)`, opacity: 0 },
+        ], { duration: 900 + Math.random() * 500, delay: delay + Math.random() * 120, easing: "cubic-bezier(.1,.7,.3,1)" });
+      }
+    },
+    win_confetti(p, n, delay) {
+      const cols = ["var(--charm)", "var(--fx-pink)", "var(--fx-water)", "var(--fx-green)", "var(--fx-purple)"];
+      for (let i = 0; i < n * 2.5; i++) {
+        const x = p.x + (Math.random() - .5) * 420, y0 = p.y - 260 - Math.random() * 80;
+        particle("fx-confetti", "", { background: cols[i % cols.length] }, [
+          { transform: `translate(${x}px, ${y0}px) rotate(0deg)`, opacity: 0 },
+          { transform: `translate(${x + 10}px, ${y0 + 40}px) rotate(120deg)`, opacity: 1, offset: .1 },
+          { transform: `translate(${x + (Math.random() - .5) * 120}px, ${p.y + 160}px) rotate(${360 + Math.random() * 720}deg)`, opacity: 0 },
+        ], { duration: 1600 + Math.random() * 800, delay: delay + Math.random() * 400, easing: "cubic-bezier(.3,.1,.6,1)" });
+      }
+    },
+    win_coins(p, n, delay) {
+      for (let i = 0; i < n * 1.6; i++) {
+        const x = p.x + (Math.random() - .5) * 380, y0 = p.y - 300;
+        particle("fx-chip", "", null, [
+          { transform: `translate(${x}px, ${y0}px) rotateX(0deg)`, opacity: 0 },
+          { transform: `translate(${x}px, ${y0 + 30}px) rotateX(180deg)`, opacity: 1, offset: .1 },
+          { transform: `translate(${x + (Math.random() - .5) * 40}px, ${p.y + 120 + Math.random() * 60}px) rotateX(1080deg)`, opacity: 0 },
+        ], { duration: 1100 + Math.random() * 500, delay: delay + Math.random() * 500, easing: "cubic-bezier(.5,0,.9,.5)" });
+      }
+    },
+    win_fireworks(p, n, delay) {
+      const cols = ["var(--charm)", "var(--fx-pink)", "var(--fx-water)", "var(--fx-green)"];
+      for (let b = 0; b < 3; b++) {
+        const cx = p.x + (b - 1) * 140 + (Math.random() - .5) * 40, cy = p.y - 120 - Math.random() * 80, col = cols[b % cols.length], d = delay + b * 280;
+        particle("fx-spark", "", { background: col, boxShadow: `0 0 10px 2px ${col}` }, [
+          { transform: `translate(${p.x}px, ${p.y}px) scale(.6)`, opacity: 1 },
+          { transform: `translate(${cx}px, ${cy}px) scale(1)`, opacity: 1 },
+        ], { duration: 380, delay: d, easing: "cubic-bezier(.2,.8,.4,1)" });
+        for (let i = 0; i < 18; i++) {
+          const a = (i / 18) * Math.PI * 2, r = 70 + Math.random() * 40;
+          particle("fx-spark", "", { background: col, boxShadow: `0 0 10px 2px ${col}` }, [
+            { transform: `translate(${cx}px, ${cy}px) scale(1)`, opacity: 1 },
+            { transform: `translate(${cx + Math.cos(a) * r}px, ${cy + Math.sin(a) * r + 30}px) scale(.3)`, opacity: 0 },
+          ], { duration: 900, delay: d + 380, easing: "cubic-bezier(.1,.8,.3,1)" });
+        }
+      }
+    },
+    win_lightning(p, n, delay) {
+      const flash = fx("fx-flash");
+      play(flash, [{ opacity: 0 }, { opacity: .55, offset: .1 }, { opacity: 0, offset: .3 }, { opacity: .35, offset: .45 }, { opacity: 0 }], { duration: 700, delay });
+      for (let b = 0; b < 2; b++) {
+        const x0 = p.x + (b ? 90 : -110), pts = [];
+        let x = x0, y = p.y - 320;
+        while (y < p.y) { pts.push(`${x},${y}`); y += 30 + Math.random() * 30; x += (Math.random() - .5) * 60; }
+        pts.push(`${p.x},${p.y}`);
+        const xs = pts.map(s => +s.split(",")[0]), ys = pts.map(s => +s.split(",")[1]);
+        const minX = Math.min(...xs) - 10, minY = Math.min(...ys) - 10;
+        const w = Math.max(...xs) - minX + 20, h = Math.max(...ys) - minY + 20;
+        const rel = pts.map(s => { const [a, c] = s.split(",").map(Number); return `${a - minX},${c - minY}`; }).join(" ");
+        const bolt = fx("fx-bolt", `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${rel}" fill="none" stroke="var(--fx-water)" stroke-width="5" stroke-linejoin="round"/><polyline points="${rel}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/></svg>`, { transform: `translate(${minX}px, ${minY}px)` });
+        play(bolt, [{ opacity: 0 }, { opacity: 1, offset: .08 }, { opacity: .2, offset: .25 }, { opacity: 1, offset: .35 }, { opacity: 0 }], { duration: 650, delay: delay + b * 120 });
+      }
+      ring(p, "var(--fx-water)", delay + 120, 4);
+    },
+    win_jackpot(p, n, delay) {
+      const reel = fx("fx-jackpot", "<span>7</span><span>7</span><span>7</span>");
+      const spans = [...reel.querySelectorAll("span")];
+      play(reel, [
+        { transform: at(reel, p.x, p.y - 90, "scale(.4)"), opacity: 0 },
+        { transform: at(reel, p.x, p.y - 90, "scale(1.1)"), opacity: 1, offset: .15 },
+        { transform: at(reel, p.x, p.y - 90, "scale(1)"), opacity: 1, offset: .8 },
+        { transform: at(reel, p.x, p.y - 120, "scale(.9)"), opacity: 0 },
+      ], { duration: 2200, delay });
+      spans.forEach((s, i) => s.animate([{ transform: "translateY(-60%)", filter: "blur(3px)" }, { transform: "translateY(0)", filter: "blur(0)" }], { duration: 420 + i * 220, delay, easing: "cubic-bezier(.2,.9,.3,1.3)", iterations: 1, fill: "backwards" }));
+      for (let i = 0; i < 26; i++) {
+        const vx = (Math.random() - .5) * 360, peak = p.y - 160 - Math.random() * 120;
+        particle("fx-chip", "", null, [
+          { transform: `translate(${p.x}px, ${p.y}px) scale(.6)`, opacity: 0 },
+          { transform: `translate(${p.x + vx * .5}px, ${peak}px) scale(1)`, opacity: 1, offset: .45 },
+          { transform: `translate(${p.x + vx}px, ${p.y + 140}px) scale(.8)`, opacity: 0 },
+        ], { duration: 1300, delay: delay + 700 + i * 30, easing: "cubic-bezier(.3,0,.7,1)" });
+      }
+      callout("JACKPOT!", { x: p.x, y: p.y - 30 }, "var(--charm)", delay + 750);
+    },
+  };
+  function playWinFx(p, n, delay) {
+    if (reduceMotion) return;
+    (WIN_FX[P.equip.win] || WIN_FX.win_suits)(p, n, delay);
+  }
+
+  // ---------- Pocket pair ----------
+  const PLURAL = { 2: "Deuces", 3: "Treys", 4: "Fours", 5: "Fives", 6: "Sixes", 7: "Sevens", 8: "Eights", 9: "Nines", 10: "Tens", 11: "Jacks", 12: "Queens", 13: "Kings", 14: "Aces" };
+  function pocketPairFx() {
+    if (reduceMotion || !H || H.you[0].r !== H.you[1].r) return;
+    const cards = [...document.querySelectorAll("#you .card")];
+    if (cards.length < 2) return;
+    const aces = H.you[0].r === 14, col = aces ? "var(--charm)" : "var(--fx-pink)";
+    const a = pt(cards[0]), b = pt(cards[1]), mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    cards.forEach((c, i) => {
+      c.animate([
+        { translate: "0 0", rotate: "0deg", filter: "none" },
+        { translate: `${i ? 6 : -6}px -22px`, rotate: `${i ? 8 : -8}deg`, filter: `brightness(1.3) drop-shadow(0 0 16px ${col})`, offset: .35 },
+        { translate: "0 -14px", rotate: "0deg", filter: `drop-shadow(0 0 12px ${col})`, offset: .7 },
+        { translate: "0 0", rotate: "0deg", filter: "none" },
+      ], { duration: 1500, easing: "cubic-bezier(.3,1.4,.5,1)" });
+      // A beam sweeps up each card.
+      const p = pt(c);
+      const beam = fx("fx-beam", "", { width: p.w + "px", height: p.h + "px", background: `linear-gradient(transparent, ${col}, transparent)` });
+      play(beam, [
+        { transform: `translate(${p.l}px, ${p.t + p.h}px) scaleY(.2)`, opacity: 0 },
+        { transform: `translate(${p.l}px, ${p.t}px) scaleY(1)`, opacity: .9, offset: .5 },
+        { transform: `translate(${p.l}px, ${p.t - p.h}px) scaleY(.2)`, opacity: 0 },
+      ], { duration: 800, delay: 200 + i * 120 });
+    });
+    for (let i = 0; i < (aces ? 30 : 18); i++) {
+      const ang = Math.random() * Math.PI * 2, r = 60 + Math.random() * (aces ? 140 : 90);
+      particle("fx-spark", "", { background: col, boxShadow: `0 0 10px 2px ${col}` }, [
+        { transform: `translate(${mid.x}px, ${mid.y}px) scale(1)`, opacity: 1 },
+        { transform: `translate(${mid.x + Math.cos(ang) * r}px, ${mid.y + Math.sin(ang) * r}px) scale(.2)`, opacity: 0 },
+      ], { duration: 800 + Math.random() * 400, delay: 350 + Math.random() * 150, easing: "cubic-bezier(.1,.8,.3,1)" });
+    }
+    ring(mid, col, 350, aces ? 5 : 3.5);
+    const banner = fx("fx-pocket" + (aces ? " aces" : ""), aces ? "POCKET ROCKETS!" : `POCKET ${PLURAL[H.you[0].r].toUpperCase()}!`);
+    play(banner, [
+      { transform: at(banner, mid.x, mid.y - 90, "scale(.3) rotate(-8deg)"), opacity: 0 },
+      { transform: at(banner, mid.x, mid.y - 100, "scale(1.15) rotate(-3deg)"), opacity: 1, offset: .18 },
+      { transform: at(banner, mid.x, mid.y - 104, "scale(1) rotate(-3deg)"), opacity: 1, offset: .8 },
+      { transform: at(banner, mid.x, mid.y - 130, "scale(.9) rotate(-3deg)"), opacity: 0 },
+    ], { duration: 2000, delay: 300, easing: "cubic-bezier(.2,.9,.3,1.2)" });
+  }
+
+  // ---------- Leaderboard (this device) ----------
+  // Ranked by tables cleared, then by chips at the end of the run.
+  function recordRun(victory) {
+    const entry = { name: P.name || "Player", mode: G.mode, tables: victory ? NUM_TABLES : G.t, victory, chips: G.bank, charms: G.charms.length, at: Date.now() };
+    P.board.push(entry);
+    const mine = P.board.filter(e => e.mode === G.mode).sort(rankSort);
+    const rank = mine.indexOf(entry) + 1;
+    // Keep the 10 best runs per mode.
+    P.board = Object.keys(MODES).flatMap(m => P.board.filter(e => e.mode === m).sort(rankSort).slice(0, 10));
+    saveProfile();
+    return rank <= 10 ? rank : 0;
+  }
+  const rankSort = (a, b) => b.tables - a.tables || b.chips - a.chips || a.at - b.at;
+  // Tokens for a finished run: chips left over plus a bonus for beating the casino.
+  function runTokens(victory) { return Math.floor(G.bank / 20) + (victory ? 150 : 0); }
+  const TOKENS_PER_TABLE = 25;
+  // ---------- Casino: cases, collection, leaderboard ----------
+  function renderWallets() {
+    document.querySelectorAll(".token-count").forEach(el => el.textContent = P.tokens.toLocaleString("en-US"));
+    if ($("case-grid")) renderCases();
+  }
+  function renderCases() {
+    $("case-grid").innerHTML = Object.entries(CASES).map(([key, c]) => {
+      const items = caseItems(key);
+      const odds = Object.entries(c.odds).map(([r, pct]) => `<i style="flex:${pct};background:${RARITY[r].color}" title="${RARITY[r].label} ${pct}%"></i>`).join("");
+      return `<div class="case-card case-${key}">
+        <div class="case-lid"><span class="case-name">${c.name}</span><span class="case-price">◈ ${c.price}</span></div>
+        <p>${c.blurb}</p>
+        <div class="odds">${odds}</div>
+        <p class="odds-key">${Object.entries(c.odds).map(([r, pct]) => `<span style="color:${RARITY[r].color}">${RARITY[r].label} ${pct}%</span>`).join(" · ")}</p>
+        <div class="case-items">${items.map(id => `<span class="mini-item${owns(id) ? " got" : ""}" style="--rc:${RARITY[COSMETICS[id].rarity].color}" title="${COSMETICS[id].name} (${RARITY[COSMETICS[id].rarity].label})${owns(id) ? ", owned" : ""}">${preview(id)}</span>`).join("")}</div>
+        <button class="btn${key === "vault" ? "" : " alt"}" data-case="${key}" ${P.tokens < c.price ? "disabled" : ""}>${P.tokens < c.price ? `Need ◈ ${c.price - P.tokens} more` : "Open case"}</button>
+      </div>`;
+    }).join("");
+    document.querySelectorAll("[data-case]").forEach(b => b.addEventListener("click", () => openCase(b.dataset.case)));
+  }
+
+  const TILE_W = 118, TILE_GAP = 8, REEL_LEN = 48, WIN_AT = 40;
+  function reelTile(id) {
+    const c = COSMETICS[id];
+    return `<div class="rtile" style="--rc:${RARITY[c.rarity].color}">${preview(id)}<span>${c.name}</span></div>`;
+  }
+  function openCase(key) {
+    const c = CASES[key];
+    if (P.tokens < c.price) return;
+    P.tokens -= c.price;
+    const prize = rollCase(key);
+    const dupe = owns(prize);
+    if (!dupe) P.owned.push(prize);
+    saveProfile();
+
+    const modal = $("case-modal");
+    modal.hidden = false;
+    $("case-title").textContent = c.name;
+    $("prize").hidden = true;
+    $("case-actions").innerHTML = "";
+    // Fill the reel with random rolls from the same case, and plant the prize near the end.
+    const ids = Array.from({ length: REEL_LEN }, (_, i) => i === WIN_AT ? prize : rollCase(key));
+    const reel = $("reel");
+    reel.innerHTML = ids.map(reelTile).join("");
+    const win = $("reel-window").clientWidth;
+    const jitter = (Math.random() - .5) * (TILE_W * .7);
+    const endX = -(WIN_AT * (TILE_W + TILE_GAP) + TILE_W / 2 - win / 2 + jitter);
+    const done = () => revealPrize(key, prize, dupe);
+    if (reduceMotion) { reel.style.transform = `translateX(${endX}px)`; done(); return; }
+    const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration: 5200, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
+    spin.onfinish = done;
+    renderWallets();
+  }
+  function revealPrize(key, id, dupe) {
+    const c = COSMETICS[id], r = RARITY[c.rarity];
+    // Duplicates pay out once the reel has stopped, so the token count doesn't spoil the result.
+    if (dupe) { P.tokens += REFUND[c.rarity]; saveProfile(); }
+    const tiles = $("reel").children;
+    if (tiles[WIN_AT]) tiles[WIN_AT].classList.add("won");
+    const box = $("prize");
+    box.hidden = false;
+    box.style.setProperty("--rc", r.color);
+    box.className = "prize r-" + c.rarity;
+    box.innerHTML = `${preview(id)}<div><span class="rar">${r.label} · ${KINDS[c.kind].replace(/s$/, "")}</span><b>${c.name}</b>${dupe ? `<small>You already own this. Converted to ◈ ${REFUND[c.rarity]} tokens.</small>` : `<small>New! Added to your collection.</small>`}</div>`;
+    const acts = $("case-actions");
+    acts.innerHTML = `${!dupe ? `<button class="btn" id="prize-equip">Equip now</button>` : ""}
+      <button class="btn alt" id="case-again" ${P.tokens < CASES[key].price ? "disabled" : ""}>Open another · ◈ ${CASES[key].price}</button>
+      <button class="btn ghost" id="case-close">Close</button>`;
+    if (!dupe) $("prize-equip").addEventListener("click", () => { equip(id); $("prize-equip").textContent = "Equipped"; $("prize-equip").disabled = true; });
+    $("case-again").addEventListener("click", () => openCase(key));
+    $("case-close").addEventListener("click", closeCase);
+    if (!reduceMotion) {
+      const p = pt(box.querySelector(".pv"));
+      ring(p, r.color, 0, c.rarity === "legendary" ? 6 : 4);
+      if (c.rarity === "epic" || c.rarity === "legendary") WIN_FX.win_fireworks(p, 10, 100);
+    }
+    renderWallets();
+    renderCollection();
+  }
+  function closeCase() {
+    $("case-modal").hidden = true;
+    renderWallets();
+  }
+
+  function equip(id) {
+    P.equip[COSMETICS[id].kind] = id;
+    saveProfile();
+    applyCosmetics();
+    renderCollection();
+  }
+  function renderCollection() {
+    const total = Object.keys(COSMETICS).length, have = Object.keys(COSMETICS).filter(owns).length;
+    $("collection-count").textContent = `${have} of ${total} unlocked`;
+    $("collection").innerHTML = Object.entries(KINDS).map(([kind, label]) => {
+      const ids = Object.keys(COSMETICS).filter(id => COSMETICS[id].kind === kind);
+      return `<div class="col-group"><p class="label">${label}</p><div class="col-grid">${ids.map(id => {
+        const c = COSMETICS[id], r = RARITY[c.rarity], got = owns(id), on = P.equip[kind] === id;
+        const from = Object.keys(CASES).filter(k => CASES[k].kinds.includes(kind)).map(k => CASES[k].name).join(" or ");
+        return `<div class="col-item${got ? "" : " locked"}${on ? " on" : ""}" style="--rc:${r.color}">
+          ${preview(id)}
+          <div class="col-text"><b>${c.name}</b><span style="color:${r.color}">${r.label}${c.free ? " · Free" : ""}</span></div>
+          <div class="col-btns">
+            ${got ? `<button class="btn sm${on ? " ghost" : ""}" data-equip="${id}" ${on ? "disabled" : ""}>${on ? "Equipped" : "Equip"}</button>` : `<span class="hint">From the ${from}</span>`}
+            ${kind === "win" ? `<button class="btn ghost sm" data-preview="${id}">Preview</button>` : ""}
+          </div>
+        </div>`;
+      }).join("")}</div></div>`;
+    }).join("");
+    document.querySelectorAll("[data-equip]").forEach(b => b.addEventListener("click", () => equip(b.dataset.equip)));
+    document.querySelectorAll("[data-preview]").forEach(b => b.addEventListener("click", () => {
+      if (reduceMotion) return;
+      const p = pt(b.closest(".col-item").querySelector(".pv"));
+      (WIN_FX[b.dataset.preview])(p, 18, 0);
+    }));
+  }
+
+  let boardMode = "table";
+  function renderBoard() {
+    document.querySelectorAll("[data-board]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.board === boardMode)));
+    const rows = P.board.filter(e => e.mode === boardMode).sort(rankSort);
+    $("board-list").innerHTML = rows.length ? `<div class="lb-row lb-head"><span>#</span><span>Player</span><span>Tables</span><span>Chips</span><span>Date</span></div>` + rows.map((e, i) => `
+      <div class="lb-row${e.victory ? " champ" : ""}${i === 0 ? " first" : ""}">
+        <span class="lb-rank">${i + 1}</span>
+        <span class="lb-name">${escapeHtml(e.name)}${e.victory ? ` <em>Beat the casino</em>` : ""}</span>
+        <span>${e.tables} / ${NUM_TABLES}</span>
+        <span class="mono">${e.chips.toLocaleString("en-US")}</span>
+        <span class="hint">${new Date(e.at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+      </div>`).join("")
+      : `<p class="hint lb-empty">No ${MODES[boardMode].label.toLowerCase()} runs yet. Finish a run to get on the board.</p>`;
+  }
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  document.querySelectorAll("[data-board]").forEach(b => b.addEventListener("click", () => { boardMode = b.dataset.board; renderBoard(); }));
+  $("player-name").value = P.name;
+  $("player-name").addEventListener("change", () => { P.name = $("player-name").value.trim().slice(0, 18) || "Player"; $("player-name").value = P.name; saveProfile(); });
+  $("case-modal").addEventListener("click", (e) => { if (e.target === $("case-modal") && !$("prize").hidden) closeCase(); });
+
   // ---------- Home page ----------
   const TYPE_BLURB = {
     payout: "Flat bonus chips when their condition hits.",
@@ -1823,6 +2371,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function showHome() {
     $("game").hidden = true;
     $("home").hidden = false;
+    renderWallets(); renderCollection(); renderBoard();
     const live = runLive();
     $("play-btn").querySelector("span").textContent = live ? "Continue run" : "Play";
     $("new-btn").hidden = !live;
@@ -1843,6 +2392,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => showGame(b.dataset.mode)));
   $("home-btn").addEventListener("click", showHome);
 
+  applyCosmetics();
   renderHome();
   showHome();
 })();

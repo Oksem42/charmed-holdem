@@ -13,6 +13,13 @@ Both modes share the charms, shop, hand levels and all in. Rivals are seated by 
 ## Rivals
 Sixteen rivals, each with their own playstyle, including Augustus Primack (folds most hands, but bets every street when he plays), Sly Sadie (traps with big hands), Copycat Cole (copies your last move), Midnight Moe (bluffs the river), Tilted Tina (goes wild after losing), Professor Pip (plays the pot odds) and Lucky Lenny (chases every draw).
 
+## Casino and cosmetics
+- Earn tokens: +25 for each table you clear, plus tokens for the chips left at the end of a run (and +150 for beating the casino).
+- Open cases (Felt Case, Showtime Case, High Roller Vault) on a spinning reel. Prizes are cosmetic only: card backs, table themes and win animations, in Common, Rare, Epic and Legendary rarities. Duplicates turn back into tokens.
+- Equip your unlocks in the Collection. Three table themes are free.
+- Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
+- The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
+
 ## How to play
 - Each hand costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.
 - Each table gives you 6 hands to win the chip target. Miss it and the run ends.
