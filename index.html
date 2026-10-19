@@ -30,6 +30,7 @@
   --fx-green: #7fe0a0;
   --fx-purple: #c79cff;
   --fx-pink: #f59ac0;
+  --fx-curse: #e0566b;
   --f-display: "Bowlby One", "Arial Black", Impact, sans-serif;
   --f-body: "Nunito Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "Space Mono", ui-monospace, Menlo, monospace;
@@ -405,6 +406,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .lb-name em { font-style: normal; font-family: var(--f-mono); font-size: 10.5px; color: var(--charm); border: 1px solid rgba(242,184,75,.5); border-radius: 99px; padding: 0 6px; margin-left: 6px; }
 .lb-row.champ { box-shadow: inset 3px 0 0 var(--charm); }
 .lb-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; }
+.charm[data-type="cursed"] { background: repeating-linear-gradient(135deg, rgba(224,86,107,.1) 0 2px, transparent 2px 11px), var(--room-2); }
+.fx-shard { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 53; width: 12px; height: 16px; background: linear-gradient(135deg, #f4fbff, #9fd3ff); clip-path: polygon(50% 0, 100% 100%, 0 75%); }
+.fx-flame.devil { background: radial-gradient(circle at 50% 75%, #ffe0c4 0 15%, #ff5a3c 45%, #8a0f2a 80%); box-shadow: 0 0 16px 4px rgba(224,86,107,.6); }
 .lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -494,7 +498,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .steps li::before { counter-increment: step; content: counter(step); font-family: var(--f-display); font-size: 30px; color: var(--charm); line-height: 1; }
 .steps b { font-size: 16px; }
 .steps p { color: var(--muted); font-size: 14px; }
-.type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .type-card { background: var(--room-2); border: 1px solid var(--line); border-top: 4px solid var(--tc); border-radius: 16px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
 .type-card .ty { font-family: var(--f-display); font-size: 18px; color: var(--tc); }
 .type-card p { color: var(--muted); font-size: 13.5px; }
@@ -789,6 +793,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     play:   { label: "Play style", color: "var(--fx-water)" },
     grow:   { label: "Grows", color: "var(--fx-green)" },
     combo:  { label: "Combo", color: "var(--fx-pink)" },
+    cursed: { label: "Cursed", color: "var(--fx-curse)" },
   };
   const CHARMS = {
     pairpal:  { name: "Pair Pal", g: "II", type: "payout", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
@@ -808,6 +813,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     streak:   { name: "Hot Streak", g: "▲", type: "grow", price: 55, desc: "+10 for each win in a row. Resets when you lose.", run: x => x.win && x.streak > 0 && { add: 10 * x.streak } },
     echo:     { name: "Echo", g: "↻", type: "combo", price: 70, desc: "The charm to its left triggers twice. Order matters.", run: () => null },
     peek:     { name: "Peek", g: "◉", type: "play", price: 50, desc: "Bet on the flop to see one hole card of a rival still in the hand.", run: () => null },
+    bigpot:   { name: "Big Pot Energy", g: "$$", type: "mult", price: 85, desc: "Win a pot bigger than 200: ×1.5", run: x => x.win && x.pot > 200 && { mult: 1.5 } },
+    crowd:    { name: "Crowd Pleaser", g: "★", type: "payout", price: 55, modes: ["table"], desc: "Win a showdown against 2 or more rivals: +60", run: x => x.win && !x.byFold && x.rivalsShown >= 2 && { add: 60 } },
+    piggy:    { name: "Piggy Bank", g: "◎", type: "grow", price: 50, desc: "Saves +5 every hand. Pays out everything saved when you win.", run: x => x.win && x.piggy > 0 && { add: x.piggy, emptyPiggy: true } },
+    second:   { name: "Second Chance", g: "⇄", type: "play", price: 60, desc: "Once per table, after the flop, swap one of your hole cards for a new one.", run: () => null },
+    bracelet: { name: "Charm Bracelet", g: "∞", type: "combo", price: 65, desc: "+15 for each other charm that fired this hand. Pays after the others.", run: () => null },
+    glass:    { name: "Glass Charm", g: "◇", type: "cursed", price: 70, desc: "Wins pay ×3, but each time it fires there's a 1 in 5 chance it shatters for good.", run: x => x.win && { mult: 3, shatter: Math.random() < .2 } },
+    devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 30 chips.", run: x => x.win ? { mult: 2 } : (x.lostShowdown || x.youFold) && { add: -30 } },
   };
   const MAX_CHARMS = 5;
 
@@ -869,7 +881,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   let G, H;
   function newRun(mode) {
     mode = mode || (G && G.mode) || "table";
-    G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, raises: 0, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
+    G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, raises: 0, piggy: 0, secondUsed: false, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
     G.target = targetFor(0, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -899,7 +911,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Deal round the table twice, burn a card before the flop, turn and river.
     for (let r = 0; r < 2; r++) { you.push(d[k++]); opps.forEach(o => o.cards.push(d[k++])); }
     k++; const board = [d[k++], d[k++], d[k++]]; k++; board.push(d[k++]); k++; board.push(d[k++]);
-    H = { you, opps, board, street: 0, pot: ANTE * (1 + opps.length), facing: 0, matched: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set(), prevMove: null, moveThis: null };
+    // The cards nobody has been dealt (Second Chance draws from these).
+    const deck = d.slice(k);
+    H = { you, opps, board, street: 0, pot: ANTE * (1 + opps.length), deck, facing: 0, matched: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set(), prevMove: null, moveThis: null };
     // Augustus decides before the flop whether this hand is worth his time. If it is, he's in to the end.
     opps.forEach(o => { if (R(o).aristocrat) o.commit = strength(o) >= .62; });
     G.bank -= ANTE;
@@ -1114,10 +1128,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Win streak (for Hot Streak): wins add one, any loss resets, a split changes nothing.
     if (win) G.streak++;
     else if (!split) G.streak = 0;
+    // Piggy Bank saves 5 every hand, before it gets the chance to pay out.
+    if (G.charms.includes("piggy")) G.piggy = (G.piggy || 0) + 5;
     // River Rat: did the river card improve your hand category?
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
       win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved, overbet: !!H.overbet,
+      youFold: !!youFold, pot: H.pot, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,
@@ -1139,17 +1156,25 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (r.mult) { lines.push([name, "×" + r.mult, "ch mult", key]); mult *= r.mult; }
       if (r.levelUp) { G.lv[1] += r.levelUp; lines.push(["Pair levels up", "Lv." + G.lv[1], "ch lvl", key]); }
     };
-    G.charms.forEach((id, i) => {
-      const r = CHARMS[id].run(ctx);
-      if (!r) return;
+    const fire = (id, r) => {
       fired.push([id, r]);
       pay(id, CHARMS[id].name, r);
+      if (r.shatter) { G.shatterGlass = true; lines.push(["Glass Charm shatters!", "gone", "ch neg", id]); }
+      const i = G.charms.indexOf(id);
       if (G.charms[i + 1] === "echo") {
         fired.push(["echo", r, id]);
         pay("echo", `Echo: ${CHARMS[id].name}`, r);
       }
-    });
-    const payout = Math.round((total + flat) * mult);
+    };
+    G.charms.forEach(id => { const r = CHARMS[id].run(ctx); if (r) fire(id, r); });
+    // Charm Bracelet counts every other charm that fired, so it pays last.
+    if (G.charms.includes("bracelet")) {
+      const others = new Set(fired.map(f => f[0]).filter(id => id !== "bracelet")).size;
+      if (others) fire("bracelet", { add: 15 * others });
+    }
+    if (fired.some(f => f[1].emptyPiggy)) G.piggy = 0;
+    // A loss can cost chips (Devil's Deal), but never more than you have.
+    const payout = Math.max(-G.bank, Math.round((total + flat) * mult));
     G.bank += payout;
     const net = G.bank - H.startBank;
 
@@ -1267,6 +1292,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
 
   function afterHand() {
+    // A Glass Charm that shattered last hand is gone now.
+    if (G.shatterGlass) { G.charms = G.charms.filter(id => id !== "glass"); G.shatterGlass = false; }
     const won = G.bank - G.start;
     if (won >= G.target) {
       if (G.t === NUM_TABLES - 1) return endScreen(true);
@@ -1281,7 +1308,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // ---------- Shop ----------
   function rollCharms() {
     const owned = new Set(G.charms);
-    const pool = Object.keys(CHARMS).filter(k => !owned.has(k));
+    const pool = Object.keys(CHARMS).filter(k => !owned.has(k) && (!CHARMS[k].modes || CHARMS[k].modes.includes(G.mode)));
     const pick = [];
     while (pick.length < 3 && pool.length) pick.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
     return pick.map(id => ({ id, sold: false }));
@@ -1383,7 +1410,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     renderShop();
   }
   function nextTable() {
-    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0; G.raises = 0;
+    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0; G.raises = 0; G.secondUsed = false;
     G.target = targetFor(G.t, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -1780,6 +1807,129 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       glowCard(card, "var(--fx-water)", 300);
       callout("Peek!", { x: p.x, y: p.y - 80 }, "var(--fx-water)", 200);
     },
+    // Big Pot Energy: the pot swells and coins spiral out of it.
+    bigpot(r) {
+      const p = potPt();
+      $("pot").parentElement.animate([{ scale: "1" }, { scale: "1.7", offset: .3 }, { scale: "1.4", offset: .6 }, { scale: "1" }], { duration: 1000, easing: "cubic-bezier(.3,1.5,.5,1)" });
+      for (let i = 0; i < 3; i++) ring(p, "var(--fx-purple)", i * 140, 3 + i);
+      for (let i = 0; i < 14; i++) {
+        const a0 = (i / 14) * Math.PI * 2;
+        const c = fx("fx-chip");
+        play(c, [
+          { transform: at(c, p.x, p.y, "scale(.4)"), opacity: 0 },
+          { transform: at(c, p.x + Math.cos(a0 + 1) * 60, p.y + Math.sin(a0 + 1) * 40, "scale(1)"), opacity: 1, offset: .4 },
+          { transform: at(c, p.x + Math.cos(a0 + 2.4) * 150, p.y + Math.sin(a0 + 2.4) * 90, "scale(.6)"), opacity: 0 },
+        ], { duration: 1000, delay: 120 + i * 25, easing: "ease-out" });
+      }
+      callout(`BIG POT ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "var(--fx-purple)", 250);
+    },
+    // Crowd Pleaser: every rival you beat at showdown sends you a star.
+    crowd(r) {
+      const target = pt($("you"));
+      [...document.querySelectorAll("#opps .oseat:not(.folded)")].forEach((seat, i) => {
+        const av = seat.querySelector(".avatar");
+        av.animate([{ translate: "0 0" }, { translate: "0 -10px" }, { translate: "0 0" }], { duration: 420, delay: i * 120, easing: "ease-out" });
+        const s = pt(av), star = fx("fx-call", "★", { color: "var(--charm)" });
+        play(star, [
+          { transform: at(star, s.x, s.y, "scale(.5) rotate(0deg)"), opacity: 0 },
+          { transform: at(star, (s.x + target.x) / 2, Math.min(s.y, target.y) - 40, "scale(1.4) rotate(180deg)"), opacity: 1, offset: .45 },
+          { transform: at(star, target.x, target.y, "scale(.6) rotate(360deg)"), opacity: 0 },
+        ], { duration: 900, delay: 150 + i * 140, easing: "cubic-bezier(.4,0,.3,1)" });
+      });
+      ring(target, "var(--charm)", 700, 3.5);
+      callout(`Crowd Pleaser ${bonusText(r)}`, { x: target.x, y: target.y - 90 }, "var(--charm)", 650);
+    },
+    // Piggy Bank: the saved coins pour out of its rack tile into the pot.
+    piggy(r) {
+      const tile = rackTile("piggy"), p = potPt();
+      if (tile) {
+        tile.animate([{ rotate: "0deg" }, { rotate: "-6deg" }, { rotate: "6deg" }, { rotate: "-4deg" }, { rotate: "0deg" }], { duration: 500 });
+        const s = pt(tile.querySelector(".g"));
+        const n = Math.min(16, 4 + Math.round(r.add / 10));
+        for (let i = 0; i < n; i++) {
+          const c = fx("fx-chip"), mx = (s.x + p.x) / 2 + (Math.random() - .5) * 120, my = Math.min(s.y, p.y) - 40 - Math.random() * 60;
+          play(c, [
+            { transform: at(c, s.x, s.y, "scale(.5)"), opacity: 0 },
+            { transform: at(c, mx, my, "scale(1)"), opacity: 1, offset: .45 },
+            { transform: at(c, p.x, p.y, "scale(.6)"), opacity: 0 },
+          ], { duration: 800, delay: 250 + i * 45, easing: "cubic-bezier(.4,0,.3,1)" });
+        }
+      }
+      callout(`Piggy Bank ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "var(--fx-green)", 500);
+    },
+    // Second Chance: swirling arrows over the swapped card.
+    second(i) {
+      const card = document.querySelectorAll("#you .card")[i];
+      if (!card) return;
+      const p = pt(card);
+      const sym = fx("fx-call big", "⇄", { color: "var(--fx-water)" });
+      play(sym, [
+        { transform: at(sym, p.x, p.y, "scale(.3) rotate(-180deg)"), opacity: 0 },
+        { transform: at(sym, p.x, p.y, "scale(1) rotate(0deg)"), opacity: .9, offset: .4 },
+        { transform: at(sym, p.x, p.y - 30, "scale(.8) rotate(90deg)"), opacity: 0 },
+      ], { duration: 900 });
+      ring(p, "var(--fx-water)", 200, 3);
+      glowCard(card, "var(--fx-water)", 300);
+      callout("Second Chance!", { x: p.x, y: p.y - 90 }, "var(--fx-water)", 250);
+    },
+    // Charm Bracelet: a bead flies from every charm that fired and threads onto the bracelet.
+    bracelet(r) {
+      const home = rackTile("bracelet");
+      if (!home) return;
+      const h = pt(home.querySelector(".g"));
+      [...document.querySelectorAll("#rack .charm.fire")].filter(t => t !== home).forEach((t, i) => {
+        const s = pt(t.querySelector(".g"));
+        const bead = fx("fx-orb", "", { background: "var(--fx-pink)", boxShadow: "0 0 12px 3px var(--fx-pink)" });
+        play(bead, [
+          { transform: at(bead, s.x, s.y, "scale(.4)"), opacity: 0 },
+          { transform: at(bead, (s.x + h.x) / 2, Math.min(s.y, h.y) - 50, "scale(1.2)"), opacity: 1, offset: .5 },
+          { transform: at(bead, h.x, h.y, "scale(.7)"), opacity: 0 },
+        ], { duration: 700, delay: i * 120, easing: "cubic-bezier(.4,0,.3,1)" });
+      });
+      ring(h, "var(--fx-pink)", 650, 2.5);
+      const p = potPt();
+      callout(`Charm Bracelet ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "var(--fx-pink)", 600);
+    },
+    // Glass Charm: a prism shimmer, or if it breaks, shards burst off the rack.
+    glass(r) {
+      const p = potPt();
+      ["#e8f6ff", "var(--fx-water)", "var(--fx-purple)"].forEach((c, i) => ring(p, c, i * 110, 2.5 + i));
+      callout(`Glass ${bonusText(r)}`, { x: p.x, y: p.y - 80 }, "#e8f6ff", 200);
+      if (!r.shatter) return;
+      const tile = rackTile("glass");
+      const s = tile ? pt(tile.querySelector(".g")) : p;
+      for (let i = 0; i < 16; i++) {
+        const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 110;
+        const sh = fx("fx-shard");
+        play(sh, [
+          { transform: at(sh, s.x, s.y, "rotate(0deg) scale(1)"), opacity: 1 },
+          { transform: at(sh, s.x + Math.cos(a) * d, s.y + Math.sin(a) * d + 60, `rotate(${(Math.random() - .5) * 720}deg) scale(.6)`), opacity: 0 },
+        ], { duration: 900 + Math.random() * 300, delay: 450, easing: "cubic-bezier(.1,.7,.3,1)" });
+      }
+      if (tile) tile.animate([{ opacity: 1, filter: "none" }, { opacity: .35, filter: "grayscale(1)" }], { duration: 400, delay: 450, fill: "forwards" });
+      callout("SHATTERED", { x: s.x, y: s.y + 50 }, "var(--fx-curse)", 500);
+    },
+    // Devil's Deal: hellfire under your cards on a win, a red flash when it takes its cut.
+    devil(r) {
+      const you = pt($("you"));
+      if (r.add < 0) {
+        const flash = fx("fx-flash", "", { background: "var(--fx-curse)" });
+        play(flash, [{ opacity: 0 }, { opacity: .25, offset: .2 }, { opacity: 0 }], { duration: 500 });
+        const bank = pt($("s-bank"));
+        callout(`Devil's Deal ${r.add}`, { x: bank.x, y: bank.y + 40 }, "var(--fx-curse)", 100);
+        return;
+      }
+      for (let i = 0; i < 9; i++) {
+        const x = you.x + (i - 4) * 22;
+        const f = fx("fx-flame devil");
+        play(f, [
+          { transform: at(f, x, you.y + 40, "scale(.2)"), opacity: 0 },
+          { transform: at(f, x, you.y - 10 - (i % 3) * 12, "scale(1.2)"), opacity: 1, offset: .4 },
+          { transform: at(f, x, you.y - 60, "scale(.4)"), opacity: 0 },
+        ], { duration: 900, delay: i * 50 });
+      }
+      callout(`DEVIL'S DEAL ${bonusText(r)}`, { x: you.x, y: you.y - 90 }, "var(--fx-curse)", 300);
+    },
   };
   const rackTile = (id) => [...document.querySelectorAll("#rack .charm")].find(t => t.dataset.id === id);
   // Pop a rack tile outside the payout sequence (used by Peek).
@@ -1908,6 +2058,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       a.append(note);
       return;
     }
+    // Second Chance: pick which hole card to swap, or keep both.
+    if (H.swapPick) {
+      H.you.forEach((c, i) => add(`Swap ${rt(c.r)}${c.s}`, String(i + 1), () => swapCard(i), "btn alt"));
+      add("Keep both", "s", () => { H.swapPick = false; say("You keep your cards."); renderAll(); }, "btn ghost");
+      return;
+    }
     const b = BETS[H.street];
     const peekHint = H.street === 1 && G.charms.includes("peek") && H.peek === undefined;
     // Bet sizing. Not facing a bet: how much to bet (at least the street's minimum).
@@ -1947,6 +2103,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         act("shove");
       }, confirm ? "btn allin confirm" : "btn allin-ghost");
     }
+    // Second Chance is available once per table, from the flop on.
+    if (G.charms.includes("second") && !G.secondUsed && H.street >= 1 && H.deck && H.deck.length) {
+      add("Swap a card", "s", () => { H.swapPick = true; say("Second Chance: pick one of your hole cards to swap for a new one."); renderAll(); }, "btn ghost swapbtn");
+    }
+  }
+  function swapCard(i) {
+    const old = H.you[i];
+    H.you[i] = H.deck.shift();
+    G.secondUsed = true; H.swapPick = false;
+    H.seen.delete("y" + i);
+    say(`Second Chance: your ${rt(old.r)}${old.s} becomes the ${rt(H.you[i].r)}${H.you[i].s}.`);
+    renderAll();
+    pulseCharm("second");
+    if (!reduceMotion) CHARM_FX.second(i);
   }
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
@@ -1988,6 +2158,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (id === "streak") badge = G.streak ? `${G.streak} in a row` : "No streak";
       if (id === "echo") { const left = G.charms[i - 1]; note = left ? `Doubles ${CHARMS[left].name}` : "Nothing to its left yet. Move it right of a charm."; }
       if (id === "peek" && H && H.peek !== undefined) badge = "Peeking";
+      if (id === "piggy") badge = `${G.piggy || 0} saved`;
+      if (id === "second") badge = G.secondUsed ? "Used this table" : "Ready";
+      if (id === "glass") badge = G.shatterGlass ? "Shattered" : "Fragile";
+      if (id === "crowd" && G.mode === "duel") badge = "4-player only";
+      d.dataset.type = c.type;
       d.title = c.desc;
       d.innerHTML = `<span class="g">${c.g}</span><div><span class="ty">${ty.label}</span><b>${c.name}</b><small>${note}</small></div>${badge ? `<span class="badge">${badge}</span>` : ""}`;
       r.append(d);
@@ -2041,7 +2216,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const d = document.createElement("div");
       d.className = "ln " + cls;
       d.style.animationDelay = (id ? fxAt[id] / 1000 : i * 0.12) + "s";
-      d.innerHTML = `<span>${k}</span><span>${typeof v === "number" ? "+" + Math.round(v) : v}</span>`;
+      d.innerHTML = `<span>${k}</span><span>${typeof v === "number" ? (v < 0 ? "−" + Math.abs(Math.round(v)) : "+" + Math.round(v)) : v}</span>`;
+      if (typeof v === "number" && v < 0) d.classList.add("neg");
       r.append(d);
     });
     const t = document.createElement("div");
@@ -2487,6 +2663,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   // ---------- Home page ----------
   const TYPE_BLURB = {
+    cursed: "Huge upside, with a real cost.",
     payout: "Flat bonus chips when their condition hits.",
     mult: "Multiply the whole payout. Rare and huge.",
     play: "Change how you play the hand.",
