@@ -2329,14 +2329,23 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     $("case-actions").innerHTML = "";
     // Fill the reel with random rolls from the same case, and plant the prize near the end.
     const ids = Array.from({ length: REEL_LEN }, (_, i) => i === WIN_AT ? prize : rollCase(key));
+    // Near miss: when the prize is a Common, the tile just before it is a Legendary from this case,
+    // and the reel stops a hair past it. The prize itself was already rolled above, so the odds are unchanged.
+    const nearMiss = COSMETICS[prize].rarity === "common";
+    if (nearMiss) {
+      const legends = caseItems(key).filter(id => COSMETICS[id].rarity === "legendary");
+      if (legends.length) ids[WIN_AT - 1] = legends[Math.floor(Math.random() * legends.length)];
+    }
     const reel = $("reel");
     reel.innerHTML = ids.map(reelTile).join("");
     const win = $("reel-window").clientWidth;
-    const jitter = (Math.random() - .5) * (TILE_W * .7);
+    // jitter is how far the marker ends up from the prize tile's centre (negative = toward its left edge).
+    // A near miss stops 4 to 14px inside the left edge, right after the Legendary slides past the marker.
+    const jitter = nearMiss ? -(TILE_W / 2 - (4 + Math.random() * 10)) : (Math.random() - .5) * (TILE_W * .7);
     const endX = -(WIN_AT * (TILE_W + TILE_GAP) + TILE_W / 2 - win / 2 + jitter);
     const done = () => revealPrize(key, prize, dupe);
     if (reduceMotion) { reel.style.transform = `translateX(${endX}px)`; done(); return; }
-    const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration: 5200, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
+    const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration: nearMiss ? 6200 : 5200, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
     spin.onfinish = done;
     renderWallets();
   }
