@@ -28,7 +28,8 @@ Sixteen rivals, each with their own playstyle, including Augustus Primack (folds
 - Beat all 8 tables to win.
 - All in (`A`, press twice) pushes every chip. Opponents only call with strong hands, and losing one ends your run.
 - A big stack raises the table target to half your chips minus 60, if that beats the base target.
-- Keys: `B` bet, `C` check or call, `F` fold, `A` all in, `Enter` continue.
+- Choose your bet size with the slider or the Min, ½ pot, ¾ pot and Pot picks, and raise when a rival bets into you. Bigger bets make rivals fold more, but they catch on if you keep overbetting.
+- Keys: `B` bet, `C` check or call, `R` raise, arrow keys bet size, `F` fold, `A` all in, `Enter` continue.
 
 ## Charm types
 - **Payout**: flat bonus chips (Pair Pal, Underdog, Pocket Rockets...)

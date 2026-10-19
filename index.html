@@ -407,6 +407,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Bet sizing */
+.sizer { flex-basis: 100%; display: grid; gap: 8px; justify-items: center; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,.22); max-width: 520px; margin: 0 auto 2px; }
+.size-picks { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.size-pick { display: grid; justify-items: center; gap: 0; min-width: 64px; padding: 5px 10px; border-radius: 10px; border: 1px solid rgba(236,230,218,.25); background: transparent; color: #d9e8dc; font-size: 11.5px; line-height: 1.2; }
+.size-pick b { font-family: var(--f-mono); font-size: 14px; color: var(--text); }
+.size-pick:hover { border-color: var(--charm); }
+.size-pick.on { background: var(--charm); border-color: var(--charm); color: var(--charm-ink); }
+.size-pick.on b { color: var(--charm-ink); }
+.size-slider { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; width: 100%; }
+.size-slider input { width: 100%; accent-color: var(--charm); }
+.size-slider output { min-width: 44px; text-align: right; color: var(--charm); font-weight: 700; font-size: 15px; }
 .run-rewards { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .reward { display: grid; padding: 8px 14px; border-radius: 12px; background: rgba(242,184,75,.12); border: 1px solid rgba(242,184,75,.45); color: var(--charm); font-family: var(--f-display); font-size: 20px; }
 .reward small { font-family: var(--f-body); font-size: 12px; color: var(--muted); }
@@ -623,7 +635,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   <section class="home-sec" id="how">
     <div class="home-head"><p class="label">How a run works</p><h2>Four steps, eight tables, one run.</h2></div>
     <ol class="steps">
-      <li><b>Play the hand</b><p>Two hole cards each, five on the board. You act first: bet, check, fold or go all in, street by street.</p></li>
+      <li><b>Play the hand</b><p>Two hole cards each, five on the board. You act first: check, bet any amount, raise, fold or go all in.</p></li>
       <li><b>Charms pay out</b><p>Win and your charms trigger left to right, each with its own effect.</p></li>
       <li><b>Shop between tables</b><p>Buy, sell and reorder charms. Level up the hands you like winning with.</p></li>
       <li><b>Climb the casino</b><p>Hit each table's chip target in 6 hands. Miss it and the run ends.</p></li>
@@ -641,7 +653,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </section>
 
   <footer class="home-foot">
-    <span>Keys: <kbd>B</kbd> bet · <kbd>C</kbd> check or call · <kbd>F</kbd> fold · <kbd>A</kbd> all in · <kbd>↵</kbd> continue</span>
+    <span>Keys: <kbd>B</kbd> bet · <kbd>C</kbd> check or call · <kbd>F</kbd> fold · <kbd>R</kbd> raise · <kbd>↑</kbd><kbd>↓</kbd> bet size · <kbd>A</kbd> all in · <kbd>↵</kbd> continue</span>
     <a href="https://github.com/Oksem42/charmed-holdem">Source on GitHub</a>
   </footer>
 </main>
@@ -715,7 +727,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends. A big stack raises the target: it becomes half your chips minus 60 if that beats the table's base.</p>
         <p><b>All in</b> pushes every chip. Opponents only call with strong hands, and losing one ends your run.</p>
         <p><b>Between tables</b> buy, sell and reorder charms, and level up hands. Beat all 8 tables to win.</p>
-        <p><b>Keys:</b> <kbd>B</kbd> bet, <kbd>C</kbd> check or call, <kbd>F</kbd> fold, <kbd>A</kbd> all in (press twice), <kbd>↵</kbd> continue.</p>
+        <p><b>Keys:</b> <kbd>B</kbd> bet, <kbd>C</kbd> check or call, <kbd>F</kbd> fold, <kbd>R</kbd> raise, <kbd>↑</kbd><kbd>↓</kbd> bet size, <kbd>A</kbd> all in (press twice), <kbd>↵</kbd> continue.</p>
       </div>
     </aside>
   </div>
@@ -780,7 +792,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const CHARMS = {
     pairpal:  { name: "Pair Pal", g: "II", type: "payout", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
     heart:    { name: "Heartbreaker", g: "♥", type: "payout", price: 50, desc: "+15 for each ♥ in your winning hand", run: x => { if (!x.win || !x.five) return; const n = x.five.filter(c => c.s === "♥").length; return n && { add: 15 * n }; } },
-    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded to a bet (not an all in): +50", run: x => x.win && x.byFold && !x.shoved && { add: 50 } },
+    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded to a bet of up to the pot (not an overbet or all in): +50", run: x => x.win && x.byFold && !x.shoved && !x.overbet && { add: 50 } },
     pocket:   { name: "Pocket Rockets", g: "PP", type: "payout", price: 60, desc: "Win holding a pocket pair: +150 and Pair levels up", run: x => x.win && x.hole[0].r === x.hole[1].r && { add: 150, levelUp: 1 } },
     river:    { name: "River Rat", g: "~", type: "payout", price: 60, desc: "Win after the river improves your hand: +70", run: x => x.win && x.riverUp && { add: 70 } },
     under:    { name: "Underdog", g: "7", type: "payout", price: 45, desc: "Win with both hole cards 7 or lower: +70", run: x => x.win && x.hole.every(c => c.r <= 7) && { add: 70 } },
@@ -856,7 +868,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   let G, H;
   function newRun(mode) {
     mode = mode || (G && G.mode) || "table";
-    G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
+    G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, raises: 0, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
     G.target = targetFor(0, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -942,8 +954,16 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (r.trap && s >= .8) return true;
     if (r.chaser && hasDraw(o)) return true;
     if (r.odds) return s + Math.random() * .15 > amt / (H.pot + amt) + .3;
-    if (r.rookie) return s + Math.random() * .25 > .45;
-    return s + Math.random() * .3 + r.p.call + (tilted(o) ? .15 : 0) > .42;
+    const size = sizePressure(amt);
+    if (r.rookie) return s + Math.random() * .25 > .45 + size;
+    return s + Math.random() * .3 + r.p.call + (tilted(o) ? .15 : 0) > .42 + size;
+  }
+  // Bigger bets make weak hands fold: a min bet adds no pressure, a pot-sized bet adds a lot.
+  // Rivals catch on to repeated big bets at a table, which takes some of that pressure away again.
+  function sizePressure(amt) {
+    const before = Math.max(1, H.pot - amt);
+    const pressure = Math.min(.35, Math.max(0, amt / before - .25) * .35);
+    return Math.max(0, pressure - Math.min(.35, G.raises * .08));
   }
   // Calling a shove risks a lot, so rivals need a strong hand for the first one. Bigger shoves make them tighter.
   // They remember: every shove you've made at this table makes them call the next one with a weaker hand.
@@ -965,7 +985,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   const tableTalk = () => H.opps.filter(o => o.act).map(o => `${R(o).name} ${o.act.toLowerCase()}`).join(" · ");
 
-  function act(kind) {
+  function act(kind, size) {
     const b = BETS[H.street];
     H.opps.forEach(o => { if (!o.folded) o.act = ""; });
     if (kind === "fold") return finish({ youFold: true });
@@ -994,8 +1014,28 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       say(`You shove ${amt}. <b>${listNames(callers.map(o => R(o).name))} ${callers.length > 1 ? "call" : "calls"}${seen ? ". They've seen your shoves" : ""}!</b>`);
       return goAllIn();
     }
+    if (kind === "raise") {
+      // Raise: call the bet and put in more. Everyone still in decides on the extra.
+      const total = Math.max(H.facing * 2, Math.round(size || 0));
+      if (total >= G.bank) return act("shove");
+      const extra = total - H.facing;
+      if (extra > H.pot + H.facing) H.overbet = true;
+      G.bank -= total; H.pot += total; H.myBets++; H.facing = 0; H.moveThis = "bet";
+      respond(extra, calls);
+      G.raises++;
+      if (!live().length) return finish({ allFold: true });
+      say(`You raise to ${total}. ${tableTalk()}.`);
+      return nextStreet();
+    }
     if (kind === "bet") {
-      const short = G.bank <= b, amt = short ? G.bank : b;
+      const short = G.bank <= b;
+      // You choose the size: at least the street's minimum, and a bet of everything you have is an all in.
+      const want = short ? G.bank : Math.max(b, Math.round(size || b));
+      if (!short && want >= G.bank) return act("shove");
+      const amt = want;
+      if (amt > b * 1.5) G.raises++;
+      // An overbet (more than the pot) doesn't count for Bluff Master.
+      if (amt > H.pot) H.overbet = true;
       G.bank -= amt; H.pot += amt; H.myBets++; H.moveThis = "bet";
       // Peek: betting the flop reveals one hole card of a rival still in the hand.
       if (!short && H.street === 1 && G.charms.includes("peek") && H.peek === undefined) {
@@ -1076,7 +1116,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // River Rat: did the river card improve your hand category?
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
-      win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved,
+      win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved, overbet: !!H.overbet,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,
@@ -1342,7 +1382,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     renderShop();
   }
   function nextTable() {
-    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0;
+    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0; G.raises = 0;
     G.target = targetFor(G.t, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -1815,6 +1855,34 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     $("you-hn").textContent = mine ? nameOf(mine.score) : "";
     $("pot").textContent = H.pot;
   }
+  // The bet-size picker: quick picks based on the pot, plus a slider for any amount in between.
+  function buildSizer(min, max, labelFn) {
+    const wrap = document.createElement("div");
+    wrap.className = "sizer";
+    const facing = H.facing;
+    // Pot-based picks. When raising, the pot counts your call first, the way real raises are sized.
+    const potAfterCall = H.pot + facing;
+    const round5 = (v) => Math.round(v / 5) * 5;
+    const pick = (f) => Math.min(max, Math.max(min, round5(facing + potAfterCall * f)));
+    const picks = [["Min", min], ["½ pot", pick(.5)], ["¾ pot", pick(.75)], ["Pot", pick(1)]];
+    wrap.innerHTML = `
+      <div class="size-picks">${picks.map(([l, v]) => `<button type="button" class="size-pick${H.size === v ? " on" : ""}" data-size="${v}">${l}<b>${v}</b></button>`).join("")}</div>
+      <label class="size-slider" for="bet-size"><span class="label">${facing ? "Raise to" : "Bet"}</span>
+        <input type="range" id="bet-size" min="${min}" max="${max}" step="1" value="${H.size}" aria-label="${facing ? "Raise to" : "Bet amount"}">
+        <output id="bet-size-out" class="mono">${H.size}</output></label>`;
+    const range = wrap.querySelector("input"), out = wrap.querySelector("output");
+    const update = (v) => {
+      H.size = Math.min(max, Math.max(min, Math.round(v)));
+      range.value = H.size; out.textContent = H.size;
+      wrap.querySelectorAll(".size-pick").forEach(p => p.classList.toggle("on", +p.dataset.size === H.size));
+      const btn = document.querySelector("#actions .sizebtn span");
+      if (btn) btn.textContent = labelFn();
+    };
+    range.addEventListener("input", () => update(+range.value));
+    wrap.querySelectorAll(".size-pick").forEach(p => p.addEventListener("click", () => update(+p.dataset.size)));
+    wrap.adjust = (d) => update(H.size + d);
+    return wrap;
+  }
   function renderActions() {
     const a = $("actions");
     a.replaceChildren();
@@ -1841,13 +1909,24 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
     const b = BETS[H.street];
     const peekHint = H.street === 1 && G.charms.includes("peek") && H.peek === undefined;
-    if (H.facing) {
+    // Bet sizing. Not facing a bet: how much to bet (at least the street's minimum).
+    // Facing a bet: the total to raise to (at least double their bet). Going all in stays on its own button.
+    const facing = H.facing;
+    const minSize = facing ? facing * 2 : b, maxSize = G.bank - 1;
+    const canSize = maxSize >= minSize;
+    const sizeKey = `${H.street}:${facing}`;
+    if (H.sizeKey !== sizeKey) { H.sizeKey = sizeKey; H.size = minSize; }
+    H.size = Math.min(Math.max(H.size || minSize, minSize), Math.max(minSize, maxSize));
+    const sizeLabel = () => facing ? `Raise to ${H.size}` : peekHint ? `Bet ${H.size} · Peek` : `Bet ${H.size}`;
+    if (canSize) a.append(buildSizer(minSize, maxSize, sizeLabel));
+    if (facing) {
       // Can't cover the call? Calling puts you all in for what you have.
-      add(G.bank < H.facing ? `All in ${G.bank}` : `Call ${H.facing}`, "c", () => act("call"), G.bank < H.facing ? "btn allin" : "btn", G.bank <= 0);
+      add(G.bank < facing ? `All in ${G.bank}` : `Call ${facing}`, "c", () => act("call"), G.bank < facing ? "btn allin" : "btn", G.bank <= 0);
+      if (canSize) add(sizeLabel(), "r", () => act("raise", H.size), "btn alt sizebtn");
       add("Fold", "f", () => act("fold"), "btn ghost");
     } else {
       const short = G.bank <= b;
-      add(short ? `All in ${G.bank}` : peekHint ? `Bet ${b} · Peek` : `Bet ${b}`, "b", () => act("bet"), short ? "btn allin" : "btn", G.bank <= 0);
+      add(short ? `All in ${G.bank}` : sizeLabel(), "b", () => act("bet", H.size), short ? "btn allin" : "btn sizebtn", G.bank <= 0);
       add("Check", "c", () => act("check"), "btn alt");
       add("Fold", "f", () => act("fold"), "btn ghost");
     }
@@ -1869,7 +1948,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
   }
   document.addEventListener("keydown", (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input, textarea")) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (!$("home").hidden) {
       if (!$("case-modal").hidden) { if (key === "Escape" && !$("prize").hidden) closeCase(); return; }
@@ -1881,6 +1960,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       return;
     }
     if (key === "Enter" && e.target.closest("button")) return;
+    // Arrow keys nudge the bet size by 5 (the slider handles its own arrows when it has focus).
+    const sizer = document.querySelector("#actions .sizer");
+    if (sizer && /^Arrow(Up|Down|Left|Right)$/.test(key) && !e.target.closest("input")) {
+      e.preventDefault();
+      sizer.adjust(key === "ArrowUp" || key === "ArrowRight" ? 5 : -5);
+      return;
+    }
     const btn = [...document.querySelectorAll("#actions button")].find(b => b.dataset.key === key && !b.disabled);
     if (btn) { e.preventDefault(); btn.click(); }
   });
