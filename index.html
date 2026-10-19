@@ -404,6 +404,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .lb-name em { font-style: normal; font-family: var(--f-mono); font-size: 10.5px; color: var(--charm); border: 1px solid rgba(242,184,75,.5); border-radius: 99px; padding: 0 6px; margin-left: 6px; }
 .lb-row.champ { box-shadow: inset 3px 0 0 var(--charm); }
 .lb-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; }
+.lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
+.lb-row.me .lb-name { color: var(--charm); }
+.board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
 .run-rewards { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .reward { display: grid; padding: 8px 14px; border-radius: 12px; background: rgba(242,184,75,.12); border: 1px solid rgba(242,184,75,.45); color: var(--charm); font-family: var(--f-display); font-size: 20px; }
 .reward small { font-family: var(--f-body); font-size: 12px; color: var(--muted); }
@@ -608,8 +611,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   <section class="home-sec" id="leaderboard">
     <div class="home-head sec-split">
-      <div><p class="label">Leaderboard</p><h2>Best runs.</h2><p class="hint">Ranked by tables cleared, then chips. Saved on this device.</p></div>
-      <div class="seg" role="group" aria-label="Leaderboard mode"><button class="seg-btn" data-board="table" aria-pressed="true">4-player table</button><button class="seg-btn" data-board="duel" aria-pressed="false">Heads-up</button></div>
+      <div><p class="label">Leaderboard</p><h2>Best runs.</h2><p class="hint" id="board-note">Ranked by tables cleared, then chips. Saved on this device.</p></div>
+      <div class="board-toggles">
+        <div class="seg" role="group" aria-label="Leaderboard scope" id="board-scope" hidden><button class="seg-btn" data-scope="online" aria-pressed="true">Everyone</button><button class="seg-btn" data-scope="device" aria-pressed="false">This device</button></div>
+        <div class="seg" role="group" aria-label="Leaderboard mode"><button class="seg-btn" data-board="table" aria-pressed="true">4-player table</button><button class="seg-btn" data-board="duel" aria-pressed="false">Heads-up</button></div>
+      </div>
     </div>
     <div class="board-list" id="board-list"></div>
   </section>
@@ -1352,7 +1358,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       addTokens(G.recorded.tokens);
     }
     const { tokens, rank } = G.recorded;
-    const rewards = `<div class="run-rewards"><span class="reward">◈ +${tokens} tokens<small>for the chips you kept${victory ? " and beating the casino" : ""}</small></span>${rank ? `<span class="reward rank">#${rank}<small>on your ${MODES[G.mode].label.toLowerCase()} leaderboard</small></span>` : ""}<span class="hint">Spend tokens on cases from the home page.</span></div>`;
+    const rewards = `<div class="run-rewards"><span class="reward">◈ +${tokens} tokens<small>for the chips you kept${victory ? " and beating the casino" : ""}</small></span>${rank ? `<span class="reward rank">#${rank}<small>on your ${MODES[G.mode].label.toLowerCase()} leaderboard</small></span>` : ""}<span class="hint">Spend tokens on cases from the home page.</span><span class="hint" id="online-note"></span></div>`;
     s.classList.add("enter");
     s.innerHTML = victory
       ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables of ${MODES[G.mode].label} beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div>${rewards}<div class="shop-foot"><button class="btn" id="again">Play again</button><button class="btn ghost" id="to-home">Home</button></div>`
@@ -2180,6 +2186,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function recordRun(victory) {
     const entry = { name: P.name || "Player", mode: G.mode, tables: victory ? NUM_TABLES : G.t, victory, chips: G.bank, charms: G.charms.length, at: Date.now() };
     P.board.push(entry);
+    // Share the run online too (if set up). The end screen says whether it went through.
+    submitOnline(entry).then(ok => { const el = document.getElementById("online-note"); if (el) el.textContent = ok ? "Posted to the online leaderboard." : onlineOn() ? "Couldn't reach the online leaderboard. This run is saved on this device." : ""; if (ok) delete onlineCache[entry.mode]; });
     const mine = P.board.filter(e => e.mode === G.mode).sort(rankSort);
     const rank = mine.indexOf(entry) + 1;
     // Keep the 10 best runs per mode.
@@ -2307,22 +2315,75 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }));
   }
 
-  let boardMode = "table";
-  function renderBoard() {
-    document.querySelectorAll("[data-board]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.board === boardMode)));
-    const rows = P.board.filter(e => e.mode === boardMode).sort(rankSort);
-    $("board-list").innerHTML = rows.length ? `<div class="lb-row lb-head"><span>#</span><span>Player</span><span>Tables</span><span>Chips</span><span>Date</span></div>` + rows.map((e, i) => `
-      <div class="lb-row${e.victory ? " champ" : ""}${i === 0 ? " first" : ""}">
+  // ---------- Online leaderboard (Supabase) ----------
+  // Paste your Supabase Project URL and publishable (anon) key here to share the leaderboard between players.
+  // The publishable key is meant to be public: the database's row level security decides what it can do.
+  // Left empty, the leaderboard only shows runs saved on this device.
+  const ONLINE = { url: "", key: "" };
+  const onlineOn = () => !!(ONLINE.url && ONLINE.key);
+  function onlineHeaders(extra) {
+    const h = Object.assign({ apikey: ONLINE.key, "Content-Type": "application/json" }, extra || {});
+    // Legacy anon keys are JWTs and also go in the Authorization header; new publishable keys don't.
+    if (ONLINE.key.startsWith("eyJ")) h.Authorization = "Bearer " + ONLINE.key;
+    return h;
+  }
+  async function submitOnline(entry) {
+    if (!onlineOn()) return false;
+    try {
+      const res = await fetch(`${ONLINE.url.replace(/\/$/, "")}/rest/v1/scores`, {
+        method: "POST",
+        headers: onlineHeaders({ Prefer: "return=minimal" }),
+        body: JSON.stringify({ name: entry.name, mode: entry.mode, tables: entry.tables, victory: entry.victory, chips: Math.min(entry.chips, 100000), charms: entry.charms }),
+      });
+      return res.ok;
+    } catch (e) { return false; }
+  }
+  const onlineCache = {};
+  async function fetchOnline(mode) {
+    const q = `select=name,tables,victory,chips,created_at&mode=eq.${mode}&order=tables.desc,chips.desc,created_at.asc&limit=10`;
+    const res = await fetch(`${ONLINE.url.replace(/\/$/, "")}/rest/v1/scores?${q}`, { headers: onlineHeaders() });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return (await res.json()).map(r => ({ name: r.name, tables: r.tables, victory: r.victory, chips: r.chips, at: Date.parse(r.created_at) }));
+  }
+
+  let boardMode = "table", boardScope = onlineOn() ? "online" : "device";
+  function boardRows(rows) {
+    return `<div class="lb-row lb-head"><span>#</span><span>Player</span><span>Tables</span><span>Chips</span><span>Date</span></div>` + rows.map((e, i) => `
+      <div class="lb-row${e.victory ? " champ" : ""}${i === 0 ? " first" : ""}${e.name === P.name ? " me" : ""}">
         <span class="lb-rank">${i + 1}</span>
         <span class="lb-name">${escapeHtml(e.name)}${e.victory ? ` <em>Beat the casino</em>` : ""}</span>
         <span>${e.tables} / ${NUM_TABLES}</span>
         <span class="mono">${e.chips.toLocaleString("en-US")}</span>
         <span class="hint">${new Date(e.at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
-      </div>`).join("")
-      : `<p class="hint lb-empty">No ${MODES[boardMode].label.toLowerCase()} runs yet. Finish a run to get on the board.</p>`;
+      </div>`).join("");
+  }
+  async function renderBoard() {
+    document.querySelectorAll("[data-board]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.board === boardMode)));
+    document.querySelectorAll("[data-scope]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.scope === boardScope)));
+    $("board-scope").hidden = !onlineOn();
+    $("board-note").textContent = onlineOn() ? "Ranked by tables cleared, then chips. Everyone shows all players' best runs." : "Ranked by tables cleared, then chips. Saved on this device.";
+    const empty = (where) => `<p class="hint lb-empty">No ${MODES[boardMode].label.toLowerCase()} runs ${where} yet. Finish a run to get on the board.</p>`;
+    if (boardScope === "device" || !onlineOn()) {
+      const rows = P.board.filter(e => e.mode === boardMode).sort(rankSort);
+      $("board-list").innerHTML = rows.length ? boardRows(rows) : empty("on this device");
+      return;
+    }
+    const mode = boardMode;
+    if (onlineCache[mode]) $("board-list").innerHTML = onlineCache[mode].length ? boardRows(onlineCache[mode]) : empty("online");
+    else $("board-list").innerHTML = `<p class="hint lb-empty">Loading the online leaderboard…</p>`;
+    try {
+      const rows = await fetchOnline(mode);
+      onlineCache[mode] = rows;
+      if (boardMode === mode && boardScope === "online") $("board-list").innerHTML = rows.length ? boardRows(rows) : empty("online");
+    } catch (e) {
+      if (boardMode !== mode || boardScope !== "online") return;
+      const rows = P.board.filter(r => r.mode === mode).sort(rankSort);
+      $("board-list").innerHTML = `<p class="hint lb-empty lb-error">Couldn't reach the online leaderboard, so this shows runs from this device instead.</p>` + (rows.length ? boardRows(rows) : "");
+    }
   }
   const escapeHtml = (s) => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   document.querySelectorAll("[data-board]").forEach(b => b.addEventListener("click", () => { boardMode = b.dataset.board; renderBoard(); }));
+  document.querySelectorAll("[data-scope]").forEach(b => b.addEventListener("click", () => { boardScope = b.dataset.scope; renderBoard(); }));
   $("player-name").value = P.name;
   $("player-name").addEventListener("change", () => { P.name = $("player-name").value.trim().slice(0, 18) || "Player"; $("player-name").value = P.name; saveProfile(); });
   $("case-modal").addEventListener("click", (e) => { if (e.target === $("case-modal") && !$("prize").hidden) closeCase(); });

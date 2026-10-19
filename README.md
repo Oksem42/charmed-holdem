@@ -19,6 +19,7 @@ Sixteen rivals, each with their own playstyle, including Augustus Primack (folds
 - Equip your unlocks in the Collection. Three table themes are free.
 - Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
 - The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
+- Optional online leaderboard: run `supabase-setup.sql` in a Supabase project, then put the Project URL and publishable key in the `ONLINE` setting in `index.html`.
 
 ## How to play
 - Each hand costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.
