@@ -270,7 +270,54 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .fx-arrow b { position: absolute; right: -14px; top: -10px; width: 0; height: 0; border-left: 20px solid var(--fx-water); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
 .fx-orb { width: 18px; height: 18px; border-radius: 50%; }
 
+/* ---------- Rival seats ---------- */
+.opps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: start; }
+.opps.solo { grid-template-columns: minmax(0, 420px); justify-content: center; }
+.oseat { display: grid; justify-items: center; gap: 6px; padding: 8px 6px 6px; border-radius: 16px; transition: background .25s ease, opacity .25s ease; min-width: 0; }
+.oseat .persona { max-width: 100%; padding-right: 10px; }
+.oseat .persona > div { min-width: 0; }
+.oseat .persona b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oseat .persona small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11px; }
+.opps.solo .oseat .persona b { font-size: 14px; }
+.opps.solo .oseat .persona small { -webkit-line-clamp: 3; font-size: 12px; }
+.opps:not(.solo) .oseat .card { --w: 50px; width: 50px; }
+.opps:not(.solo) .oseat .card .p { font-size: 22px; }
+.opps:not(.solo) .oseat .card .c { font-size: 12px; }
+.oseat .cards { min-height: 74px; gap: 5px; }
+.o-act { min-height: 20px; font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .04em; color: #e7d8a8; text-align: center; }
+.oseat.folded { opacity: .45; }
+.oseat.folded .o-act { color: var(--lose); }
+.oseat.winner { background: rgba(242,184,75,.14); box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5); }
+.oseat.winner .o-act { color: var(--charm); font-weight: 700; }
+.oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
+.mode-chip { display: inline-block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 1px 8px; border-radius: 99px; border: 1px solid rgba(242,184,75,.5); color: var(--charm); margin-right: 6px; }
+.shove-note { text-transform: none; letter-spacing: 0; color: var(--lose); font-family: var(--f-body); font-size: 12.5px; margin-left: 6px; }
+
 /* ---------- Home page ---------- */
+.modes { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
+.mode-card { background: var(--room-2); border: 1px solid var(--line); border-radius: 20px; padding: 20px; display: grid; grid-template-columns: auto 1fr; gap: 14px 18px; align-items: start; min-width: 0; }
+.mode-card.main { border-color: rgba(242,184,75,.45); background: linear-gradient(135deg, rgba(242,184,75,.1), var(--room-2) 60%); }
+.mode-card .ty { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--charm); }
+.mode-card h3 { font-family: var(--f-display); font-size: 24px; margin: 2px 0 6px; }
+.mode-card p { color: var(--muted); font-size: 14px; }
+.mode-card ul { margin: 10px 0 0; padding-left: 18px; color: var(--text); font-size: 13.5px; display: grid; gap: 3px; }
+.mode-card .btn { grid-column: 1 / -1; justify-self: start; }
+.mode-copy { min-width: 0; }
+.seat-pic { position: relative; width: 92px; height: 70px; border-radius: 50%; background: radial-gradient(ellipse at 50% 45%, var(--baize), var(--baize-dark)); border: 5px solid var(--rail); }
+.seat-pic i { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--stock); border: 2px solid var(--room); }
+.seat-pic i:nth-child(1) { left: 6px; top: 10px; } .seat-pic i:nth-child(2) { left: 34px; top: -9px; } .seat-pic i:nth-child(3) { right: 6px; top: 10px; }
+.seat-pic i.you { left: 34px; top: auto; bottom: -9px; background: var(--charm); }
+.seat-pic.duo i:nth-child(1) { left: 34px; top: -9px; }
+.roster { display: grid; gap: 18px; }
+.tier { display: grid; gap: 8px; }
+.tier .label span { text-transform: none; letter-spacing: 0; }
+.tier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.roster .rival { grid-template-columns: auto 1fr; }
+.tier-0 .avatar { background: var(--fx-green); }
+.tier-1 .avatar { background: var(--fx-water); }
+.tier-2 .avatar { background: var(--fx-purple); }
+.tier-3 .avatar { background: var(--charm); }
+.rival.star { border-color: rgba(199,156,255,.6); box-shadow: 0 0 24px -10px var(--fx-purple); }
 .home { max-width: 1120px; margin: 0 auto; padding-block: 28px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 72px; }
 .home-hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; padding-top: 24px; }
 .hero-copy { display: grid; gap: 18px; align-content: center; min-width: 0; }
@@ -324,6 +371,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
 @media (max-width: 900px) {
   .home-hero { grid-template-columns: 1fr; }
+  .modes { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr 1fr; }
   .type-grid { grid-template-columns: repeat(2, 1fr); }
   .lineup { grid-template-columns: 1fr; }
@@ -332,6 +380,17 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 }
 @media (max-width: 560px) {
   .home { gap: 52px; }
+  .mode-card { grid-template-columns: 1fr; }
+  .opps:not(.solo) { gap: 4px; }
+  .opps:not(.solo) .oseat { padding: 6px 2px; }
+  .opps:not(.solo) .oseat .persona { flex-direction: column; text-align: center; padding: 6px; border-radius: 14px; gap: 4px; }
+  .opps:not(.solo) .oseat .persona small { display: none; }
+  .opps:not(.solo) .oseat .persona b { font-size: 11.5px; white-space: normal; }
+  .opps:not(.solo) .oseat .card { --w: 38px; width: 38px; }
+  .opps:not(.solo) .oseat .card .p { font-size: 17px; }
+  .opps:not(.solo) .oseat .card .c { font-size: 10px; top: 3px; left: 4px; }
+  .oseat .cards { min-height: 56px; gap: 3px; }
+  .o-act { font-size: 10.5px; }
   .steps, .type-grid { grid-template-columns: 1fr; }
   .fan .card { --w: 58px; width: 58px; margin-left: -29px; }
   .fan .card .p { font-size: 24px; }
@@ -355,11 +414,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     <div class="hero-copy">
       <p class="label">A Texas Hold'em roguelike</p>
       <h1 class="home-title">Charmed <span>Hold'em</span></h1>
-      <p class="home-tag">Real Hold'em against eight tables of rivals. Win hands, collect charms that pay out in their own wild ways, and build a combo that breaks the casino.</p>
+      <p class="home-tag">Real Hold'em at a four-player table. Win hands, collect charms that pay out in their own wild ways, and build a combo that breaks the casino.</p>
       <div class="home-cta">
         <button class="btn big act" id="play-btn"><span>Play</span><kbd>↵</kbd></button>
-        <button class="btn alt big" id="new-btn" hidden>New run</button>
-        <a class="btn ghost big" href="#how">How it works</a>
+        <button class="btn alt big" id="new-btn" hidden>New table run</button>
+        <a class="btn ghost big" href="#modes">Game modes</a>
       </div>
       <p class="hint" id="run-note"></p>
     </div>
@@ -372,10 +431,37 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     </div>
   </section>
 
+  <section class="home-sec" id="modes">
+    <div class="home-head"><p class="label">Game modes</p><h2>Pick your table.</h2></div>
+    <div class="modes">
+      <div class="mode-card main">
+        <div class="seat-pic" aria-hidden="true"><i></i><i></i><i></i><i class="you"></i></div>
+        <div class="mode-copy">
+          <span class="ty">Main mode</span>
+          <h3>4-player table</h3>
+          <p>You and three rivals at every table. Bigger pots, more people to read, and more ways to get outplayed.</p>
+          <ul><li>Three rivals per table, eight tables</li><li>Rivals fold, bet and call around you</li><li>The House waits at the final table</li></ul>
+        </div>
+        <button class="btn" data-mode="table">Play the table</button>
+      </div>
+      <div class="mode-card">
+        <div class="seat-pic duo" aria-hidden="true"><i></i><i class="you"></i></div>
+        <div class="mode-copy">
+          <span class="ty">Second mode</span>
+          <h3>Heads-up duel</h3>
+          <p>One rival per table. Every hand is you against them, so reading their style is everything.</p>
+          <ul><li>One rival per table, eight tables</li><li>Same charms, shop and all in</li><li>The House waits at the final table</li></ul>
+        </div>
+        <button class="btn alt" data-mode="duel">Play heads-up</button>
+      </div>
+    </div>
+    <p class="hint" id="mode-warn" hidden>Starting a new run ends the one in progress.</p>
+  </section>
+
   <section class="home-sec" id="how">
     <div class="home-head"><p class="label">How a run works</p><h2>Four steps, eight tables, one run.</h2></div>
     <ol class="steps">
-      <li><b>Play the hand</b><p>Two hole cards, five on the board. Bet, check, fold or go all in, street by street.</p></li>
+      <li><b>Play the hand</b><p>Two hole cards each, five on the board. You act first: bet, check, fold or go all in, street by street.</p></li>
       <li><b>Charms pay out</b><p>Win and your charms trigger left to right, each with its own effect.</p></li>
       <li><b>Shop between tables</b><p>Buy, sell and reorder charms. Level up the hands you like winning with.</p></li>
       <li><b>Climb the casino</b><p>Hit each table's chip target in 6 hands. Miss it and the run ends.</p></li>
@@ -388,8 +474,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </section>
 
   <section class="home-sec">
-    <div class="home-head"><p class="label">The casino</p><h2>Eight tables. Eight rivals.</h2></div>
-    <div class="lineup" id="home-lineup"></div>
+    <div class="home-head"><p class="label">The casino</p><h2>Sixteen rivals. No two play alike.</h2><p class="hint">Each run seats rivals by difficulty: easy ones early, tough ones later, and The House at the last table.</p></div>
+    <div class="roster" id="home-lineup"></div>
   </section>
 
   <footer class="home-foot">
@@ -402,7 +488,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   <header class="top">
     <div class="brand">
       <h1>Charmed <span>Hold'em</span></h1>
-      <p>Play Texas Hold'em. Win hands, collect charms that pay bonuses, and level up your favourite hands.</p>
+      <p><span class="mode-chip" id="mode-chip">4-player table</span> Win hands, collect charms that pay bonuses, and level up your favourite hands.</p>
     </div>
     <div class="stats">
       <button class="btn ghost sm home-link" id="home-btn">← Home</button>
@@ -414,7 +500,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   <div class="goal">
     <div class="goal-row">
-      <span class="label">Table goal</span>
+      <span class="label">Table goal <span class="shove-note" id="shove-note"></span></span>
       <span class="mono">Won <b id="g-now">+0</b> of <b id="g-target">+60</b></span>
     </div>
     <div class="bar"><i id="g-bar"></i></div>
@@ -427,11 +513,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   <div class="main">
     <div class="table" id="table">
-      <div class="seat opp-seat">
-        <div class="persona"><span class="avatar" id="opp-av">D</span><div><b id="opp-who">Dunkin Badecher</b><small id="opp-quirk">Plays it straight.</small></div></div>
-        <div class="cards" id="opp"></div>
-        <span class="hn" id="opp-hn"></span>
-      </div>
+      <div class="opps" id="opps"></div>
       <div class="felt-mid">
         <div class="cards" id="board"></div>
         <div class="mid-row"><div class="streets" id="streets"></div><div class="pot">Pot <b id="pot">0</b></div></div>
@@ -458,7 +540,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <div class="panel how">
         <h2 style="color:var(--text)">How to play</h2>
         <p><b>Each hand</b> costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.</p>
-        <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends. A big stack raises the target: it becomes half your chips minus 50 if that beats the table's base.</p>
+        <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends. A big stack raises the target: it becomes half your chips minus 60 if that beats the table's base.</p>
         <p><b>All in</b> pushes every chip. Opponents only call with strong hands, and losing one ends your run.</p>
         <p><b>Between tables</b> buy, sell and reorder charms, and level up hands. Beat all 8 tables to win.</p>
         <p><b>Keys:</b> <kbd>B</kbd> bet, <kbd>C</kbd> check or call, <kbd>F</kbd> fold, <kbd>A</kbd> all in (press twice), <kbd>↵</kbd> continue.</p>
@@ -540,30 +622,69 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     trips:    { name: "Third Wheel", g: "III", type: "payout", price: 55, desc: "Win with Three of a Kind or a Full House: +75", run: x => x.win && (x.cat === 3 || x.cat === 6) && { add: 75 } },
     streak:   { name: "Hot Streak", g: "▲", type: "grow", price: 55, desc: "+10 for each win in a row. Resets when you lose.", run: x => x.win && x.streak > 0 && { add: 10 * x.streak } },
     echo:     { name: "Echo", g: "↻", type: "combo", price: 70, desc: "The charm to its left triggers twice. Order matters.", run: () => null },
-    peek:     { name: "Peek", g: "◉", type: "play", price: 50, desc: "Bet on the flop to see one of your opponent's cards.", run: () => null },
+    peek:     { name: "Peek", g: "◉", type: "play", price: 50, desc: "Bet on the flop to see one hole card of a rival still in the hand.", run: () => null },
   };
   const MAX_CHARMS = 5;
 
-  // ---------- Opponents ----------
-  const TABLES = [
-    { name: "Dunkin Badecher", quirk: "Plays it straight.",            target: 60,  call: 0,    bet: 0,    bluff: .08, shove: 0 },
-    { name: "Big Lou",    quirk: "Calls almost anything.",        target: 100, call: .25,  bet: 0,    bluff: .05, shove: -.14 },
-    { name: "The Rock",   quirk: "Folds unless strong.",          target: 140, call: -.2,  bet: -.1,  bluff: .02, shove: .12 },
-    { name: "Maniac Mel", quirk: "Bets a lot. Bluffs a lot.",     target: 200, call: .1,   bet: .2,   bluff: .35, shove: -.08 },
-    { name: "Doc",        quirk: "Balanced and careful.",         target: 270, call: 0,    bet: 0,    bluff: .1, shove: .04 },
-    { name: "The Wall",   quirk: "Never folds after the flop.",   target: 360, call: 0,    bet: 0,    bluff: .1, wall: true },
-    { name: "Vegas Vi",   quirk: "Bets big hands, rarely bluffs.", target: 470, call: .05, bet: .1,   bluff: .03, shove: .06 },
-    { name: "The House",  quirk: "Final table. Never folds.",     target: 600, call: 0,    bet: .1,   bluff: .15, wall: true },
-  ];
+  // ---------- Rivals ----------
+  // Every rival has a playstyle. p holds their basic tendencies; the flags switch on special behaviour in the AI below.
+  const RIVALS = {
+    rae:      { name: "Rookie Rae", tier: 0, style: "New to poker. Only bets good hands, so she's easy to read.", rookie: true, p: { call: 0, bet: 0, bluff: 0, shove: .05 } },
+    dunkin:   { name: "Dunkin Badecher", tier: 0, style: "Plays it straight.", p: { call: 0, bet: 0, bluff: .08, shove: 0 } },
+    lou:      { name: "Big Lou", tier: 0, style: "Calls almost anything.", p: { call: .25, bet: 0, bluff: .05, shove: -.14 } },
+    cole:     { name: "Copycat Cole", tier: 0, style: "Copies you. Bets after you bet, checks after you check.", mimic: true, p: { call: .05, bet: 0, bluff: 0, shove: 0 } },
+    rock:     { name: "The Rock", tier: 1, style: "Folds unless strong.", p: { call: -.2, bet: -.1, bluff: .02, shove: .12 } },
+    mel:      { name: "Maniac Mel", tier: 1, style: "Bets a lot. Bluffs a lot.", p: { call: .1, bet: .2, bluff: .35, shove: -.08 } },
+    doc:      { name: "Doc", tier: 1, style: "Balanced and careful.", p: { call: 0, bet: 0, bluff: .1, shove: .04 } },
+    lenny:    { name: "Lucky Lenny", tier: 1, style: "Chases every flush and straight draw to the river.", chaser: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 } },
+    tina:     { name: "Tilted Tina", tier: 1, style: "Goes wild for two hands after she loses a pot.", tilt: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 } },
+    wall:     { name: "The Wall", tier: 2, style: "Never folds after the flop.", wall: true, p: { call: 0, bet: 0, bluff: .1, shove: 0 } },
+    vi:       { name: "Vegas Vi", tier: 2, style: "Bets big hands, rarely bluffs.", p: { call: .05, bet: .1, bluff: .03, shove: .06 } },
+    sadie:    { name: "Sly Sadie", tier: 2, style: "A trapper. Checks her monster hands and lets you bet into her.", trap: true, p: { call: 0, bet: -.05, bluff: .05, shove: .02 } },
+    moe:      { name: "Midnight Moe", tier: 2, style: "Silent all hand, then bluffs the river.", riverBluff: true, p: { call: 0, bet: -.05, bluff: 0, shove: .04 } },
+    pip:      { name: "Professor Pip", tier: 2, style: "Only calls when the pot odds are right. Hates big bets.", odds: true, p: { call: 0, bet: 0, bluff: .08, shove: .1 } },
+    augustus: { name: "Augustus Primack", tier: 2, style: "Old money. Folds most hands, but when he plays he bets every street and never backs down.", aristocrat: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 } },
+    house:    { name: "The House", tier: 3, style: "The final boss. Never folds after the flop.", wall: true, p: { call: 0, bet: .1, bluff: .15, shove: 0 } },
+  };
+  const TIER_NAMES = ["Easy", "Tricky", "Tough", "Boss"];
+  const NUM_TABLES = 8;
+  const TABLE_TIERS = [0, 0, 1, 1, 1, 2, 2, 3];
+  const MODES = {
+    // More rivals means fewer pots won, so the 4-player targets are about 25% lower (tuned by simulation).
+    table: { name: "Table", label: "4-player table", seats: 3, targets: [45, 75, 105, 150, 200, 270, 350, 450] },
+    duel:  { name: "Heads-up", label: "Heads-up duel", seats: 1, targets: [60, 100, 140, 200, 270, 360, 470, 600] },
+  };
   const HANDS_PER_TABLE = 6, ANTE = 10, BETS = [10, 10, 20, 20];
-  // A table's target is its base, or half the chips you sit down with minus 50, if that's higher.
+  // A table's target is its base, or half the chips you sit down with minus 60, if that's higher.
   // Normal play never reaches the second number; doubling up with a lucky shove does, so it can't clear several tables at once.
-  const targetFor = (t, stack) => Math.max(TABLES[t].target, Math.round((stack / 2 - 50) / 10) * 10);
+  const targetFor = (t, stack) => Math.max(MODES[G.mode].targets[t], Math.round((stack / 2 - 60) / 10) * 10);
+  const initials = (name) => name.replace(/^The /, "").split(" ").map(w => w[0]).join("").slice(0, 2);
+
+  // Seat the rivals for a whole run: easier rivals early, tougher ones later, The House at the last table.
+  function buildLineup(seats) {
+    const used = new Set(), lineup = [];
+    for (let t = 0; t < NUM_TABLES; t++) {
+      const tier = TABLE_TIERS[t], here = [];
+      if (tier === 3) here.push("house");
+      const poolTier = Math.min(tier, 2);
+      while (here.length < seats) {
+        let pool = Object.keys(RIVALS).filter(id => RIVALS[id].tier === poolTier && !here.includes(id));
+        const fresh = pool.filter(id => !used.has(id));
+        if (fresh.length) pool = fresh;
+        const id = pool[Math.floor(Math.random() * pool.length)];
+        here.push(id); used.add(id);
+      }
+      lineup.push(here);
+    }
+    return lineup;
+  }
+  const listNames = (names) => names.length < 2 ? names.join("") : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
 
   // ---------- State ----------
   let G, H;
-  function newRun() {
-    G = { t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0 };
+  function newRun(mode) {
+    mode = mode || (G && G.mode) || "table";
+    G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
     G.target = targetFor(0, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -582,109 +703,159 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
 
   // ---------- Hand flow ----------
+  const R = (o) => RIVALS[o.id];
+  const live = () => H.opps.filter(o => !o.folded);
+  const tilted = (o) => (G.tilt[o.id] || 0) > 0;
   function deal() {
     const d = shuffle();
-    H = { you: [d[0], d[2]], opp: [d[1], d[3]], board: [d[5], d[6], d[7], d[9], d[11]], street: 0, pot: ANTE * 2, facing: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set() };
+    let k = 0;
+    const opps = G.lineup[G.t].map(id => ({ id, cards: [], folded: false, act: "", put: 0 }));
+    const you = [];
+    // Deal round the table twice, burn a card before the flop, turn and river.
+    for (let r = 0; r < 2; r++) { you.push(d[k++]); opps.forEach(o => o.cards.push(d[k++])); }
+    k++; const board = [d[k++], d[k++], d[k++]]; k++; board.push(d[k++]); k++; board.push(d[k++]);
+    H = { you, opps, board, street: 0, pot: ANTE * (1 + opps.length), facing: 0, matched: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set(), prevMove: null, moveThis: null };
+    // Augustus decides before the flop whether this hand is worth his time. If it is, he's in to the end.
+    opps.forEach(o => { if (R(o).aristocrat) o.commit = strength(o) >= .62; });
     G.bank -= ANTE;
     if (G.bank === 0) { say("Your ante was your last 10 chips, so you're all in."); return goAllIn(); }
-    say("Your move. Bet to build the pot, or check to see the next card cheaply.");
+    say(opps.length > 1 ? "Your move. You act first each street." : "Your move. Bet to build the pot, or check to see the next card cheaply.");
     renderAll();
   }
   const shown = () => [0, 3, 4, 5][H.street];
   const visible = (hole) => [...hole, ...H.board.slice(0, shown())];
 
-  function oppStrength() {
-    const t = TABLES[G.t];
+  // How good a rival's hand looks to them right now, from 0 (nothing) to 1 (the nuts).
+  function strength(o) {
     if (H.street === 0) {
-      const [a, b] = H.opp;
+      const [a, b] = o.cards;
       let s = a.r === b.r ? .55 + a.r / 45 : (a.r + b.r) / 42;
       if (a.s === b.s) s += .05;
       return Math.min(s, 1);
     }
-    const mine = best(visible(H.opp));
+    const mine = best(visible(o.cards));
     const boardOnly = shown() >= 5 ? best(H.board) : null;
     let s = [.15, .45, .6, .72, .8, .85, .93, .97, 1][mine.cat];
-    if (mine.cat === 0) s += Math.max(...H.opp.map(c => c.r)) / 70;
+    if (mine.cat === 0) s += Math.max(...o.cards.map(c => c.r)) / 70;
     if (boardOnly && boardOnly.cat === mine.cat) s -= .2;
-    return s + t.call * 0;
+    return s;
   }
-  function oppWantsBet() {
-    const t = TABLES[G.t];
-    return oppStrength() + Math.random() * .25 + t.bet > .66 || Math.random() < t.bluff;
+  // Four to a flush or four in a row, with cards still to come.
+  function hasDraw(o) {
+    if (H.street === 0 || H.street === 3) return false;
+    const cs = visible(o.cards), suits = {};
+    cs.forEach(c => suits[c.s] = (suits[c.s] || 0) + 1);
+    if (Object.values(suits).some(n => n >= 4)) return true;
+    const rs = new Set(cs.map(c => c.r)); if (rs.has(14)) rs.add(1);
+    for (let lo = 1; lo <= 11; lo++) if ([0, 1, 2, 3].every(i => rs.has(lo + i))) return true;
+    return false;
   }
-  function oppCalls() {
-    const t = TABLES[G.t];
-    if (t.wall && H.street >= 1) return true;
-    return oppStrength() + Math.random() * .3 + t.call > .42;
+  function wantsBet(o) {
+    const r = R(o), p = r.p, s = strength(o);
+    if (r.aristocrat) return o.commit;
+    if (r.trap && s >= .8) return false;
+    if (r.rookie) return s > .6 && Math.random() < .85;
+    if (r.mimic) return H.prevMove === "bet" ? Math.random() < .75 || s > .6 : s + Math.random() * .2 > .8;
+    let bet = p.bet, bluff = p.bluff;
+    if (tilted(o)) { bet += .25; bluff += .3; }
+    if (r.riverBluff) bluff = H.street === 3 ? .45 : 0;
+    return s + Math.random() * .25 + bet > .66 || Math.random() < bluff;
   }
-  // Calling a shove risks a lot, so opponents need a strong hand for the first one. Bigger shoves make them tighter.
+  function calls(o, amt) {
+    const r = R(o), s = strength(o);
+    if (r.wall && H.street >= 1) return true;
+    if (r.aristocrat) return o.commit;
+    if (r.trap && s >= .8) return true;
+    if (r.chaser && hasDraw(o)) return true;
+    if (r.odds) return s + Math.random() * .15 > amt / (H.pot + amt) + .3;
+    if (r.rookie) return s + Math.random() * .25 > .45;
+    return s + Math.random() * .3 + r.p.call + (tilted(o) ? .15 : 0) > .42;
+  }
+  // Calling a shove risks a lot, so rivals need a strong hand for the first one. Bigger shoves make them tighter.
   // They remember: every shove you've made at this table makes them call the next one with a weaker hand.
-  function oppCallsShove(amt) {
-    const t = TABLES[G.t];
-    if (t.wall && H.street >= 1) return true;
+  function callsShove(o, amt, seen) {
+    const r = R(o), s = strength(o);
+    if (r.wall && H.street >= 1) return true;
+    if (r.aristocrat) return o.commit && s >= .7;
     const sizePenalty = Math.min(.12, amt / 2500);
-    const suspicion = Math.min(.45, G.shoves * .15);
-    return oppStrength() + Math.random() * .2 > .62 + (t.shove || 0) + sizePenalty - suspicion;
+    const suspicion = Math.min(.45, seen * .15);
+    return s + Math.random() * .2 + (tilted(o) ? .15 : 0) > .62 + (r.p.shove || 0) + sizePenalty - suspicion;
   }
+  // Every rival still in (except the one who bet) calls or folds to a bet of amt.
+  function respond(amt, decide, except) {
+    live().forEach(o => {
+      if (o === except) return;
+      if (decide(o, amt)) { H.pot += amt; o.put += amt; o.act = "Calls"; }
+      else { o.folded = true; o.act = "Folds"; }
+    });
+  }
+  const tableTalk = () => H.opps.filter(o => o.act).map(o => `${R(o).name} ${o.act.toLowerCase()}`).join(" · ");
 
   function act(kind) {
     const b = BETS[H.street];
-    if (kind === "fold") { return finish({ fold: "you" }); }
+    H.opps.forEach(o => { if (!o.folded) o.act = ""; });
+    if (kind === "fold") return finish({ youFold: true });
     if (kind === "call") {
-      // Short of the full call: go all in, and the opponent's unmatched chips go back to them.
+      // Short of the full call: go all in. Chips you can't match go back to whoever put them in.
       const amt = Math.min(H.facing, G.bank);
       if (amt < H.facing) {
-        H.pot -= H.facing - amt;
-        say(`You're all in for ${amt}. ${TABLES[G.t].name} takes back the ${H.facing - amt} you can't match.`);
+        const back = (H.facing - amt) * H.matched;
+        H.pot -= back;
+        say(`You're all in for ${amt}. The ${back} chips you can't match go back.`);
       } else say(`You call ${amt}.`);
-      G.bank -= amt; H.pot += amt; H.facing = 0;
+      G.bank -= amt; H.pot += amt; H.facing = 0; H.moveThis = "call";
       if (G.bank === 0) return goAllIn();
       return nextStreet();
     }
     if (kind === "shove") {
-      // Voluntary all in: push every chip. If they're betting, you call and raise the rest.
-      const amt = G.bank, name = TABLES[G.t].name;
-      const extra = amt - H.facing;
-      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0; H.shoved = true;
+      // Voluntary all in: push every chip. If someone bet, you call and raise the rest.
+      const amt = G.bank, extra = amt - H.facing;
+      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0; H.shoved = true; H.moveThis = "bet";
       if (extra <= 0) { say(`You're all in for ${amt}.`); return goAllIn(); }
-      const calls = oppCallsShove(extra);
+      const seen = G.shoves;
       G.shoves++;
-      if (calls) { H.pot += extra; say(`You shove ${amt}. <b>${name} ${G.shoves > 1 ? "has seen enough shoves and calls!" : "calls!"}</b>`); return goAllIn(); }
-      return finish({ fold: "opp" });
-    }
-    if (kind === "bet" && G.bank <= b) {
-      // Not enough for a full bet: shove what's left. They call or fold as usual.
-      const amt = G.bank;
-      G.bank = 0; H.pot += amt; H.myBets++;
-      if (oppCalls()) { H.pot += amt; say(`You go all in for ${amt}. ${TABLES[G.t].name} calls.`); return goAllIn(); }
-      return finish({ fold: "opp" });
+      respond(extra, (o, a) => callsShove(o, a, seen));
+      const callers = live();
+      if (!callers.length) return finish({ allFold: true });
+      say(`You shove ${amt}. <b>${listNames(callers.map(o => R(o).name))} ${callers.length > 1 ? "call" : "calls"}${seen ? ". They've seen your shoves" : ""}!</b>`);
+      return goAllIn();
     }
     if (kind === "bet") {
-      G.bank -= b; H.pot += b; H.myBets++;
-      // Peek: betting the flop reveals one of the opponent's hole cards.
-      if (H.street === 1 && G.charms.includes("peek") && H.peek === undefined) {
-        H.peek = Math.random() < .5 ? 0 : 1;
+      const short = G.bank <= b, amt = short ? G.bank : b;
+      G.bank -= amt; H.pot += amt; H.myBets++; H.moveThis = "bet";
+      // Peek: betting the flop reveals one hole card of a rival still in the hand.
+      if (!short && H.street === 1 && G.charms.includes("peek") && H.peek === undefined) {
+        const pool = live(), o = pool[Math.floor(Math.random() * pool.length)];
+        H.peek = { o: H.opps.indexOf(o), c: Math.random() < .5 ? 0 : 1 };
         setTimeout(() => { pulseCharm("peek"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
       }
-      if (oppCalls()) { H.pot += b; say(`You bet ${b}. ${TABLES[G.t].name} calls.`); return nextStreet(); }
-      return finish({ fold: "opp" });
+      respond(amt, calls);
+      if (!live().length) return finish({ allFold: true });
+      say(`${short ? `You go all in for ${amt}.` : `You bet ${amt}.`} ${tableTalk()}.`);
+      return short ? goAllIn() : nextStreet();
     }
     if (kind === "check") {
-      if (oppWantsBet()) {
-        H.pot += b; H.facing = b;
-        say(`${TABLES[G.t].name} bets ${b}. Call or fold?`);
+      H.moveThis = "check";
+      const bettor = live().find(o => wantsBet(o));
+      if (bettor) {
+        H.pot += b; bettor.put += b; H.facing = b; bettor.act = `Bets ${b}`;
+        respond(b, calls, bettor);
+        H.matched = live().length;
+        say(`${tableTalk()}. Call ${b} or fold?`);
         return renderAll();
       }
-      say(`${TABLES[G.t].name} checks.`);
+      live().forEach(o => o.act = "Checks");
+      say(H.opps.length > 1 ? "Everyone checks." : `${R(H.opps[0]).name} checks.`);
       return nextStreet();
     }
   }
   function nextStreet() {
+    H.prevMove = H.moveThis; H.moveThis = null;
     if (H.street === 3) return finish({});
     H.street++;
     renderAll();
   }
-  // All in: no more betting. Both hands are turned face up and the rest of the board is dealt out.
+  // All in: no more betting. Every hand still in is turned face up and the rest of the board is dealt out.
   function goAllIn() {
     H.allIn = true;
     renderAll();
@@ -698,20 +869,33 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     setTimeout(step, reduceMotion ? 0 : 900);
   }
 
-  function finish({ fold }) {
+  function finish({ youFold, allFold }) {
     H.over = true;
     const lines = [];
     let win = false, byFold = false, lostShowdown = false, split = false;
     const you = best([...H.you, ...H.board]);
-    const opp = best([...H.opp, ...H.board]);
-    H.showdown = !fold;
-    H.youBest = you; H.oppBest = opp;
-    if (fold === "you") { say(`<span class="l">You fold.</span> ${TABLES[G.t].name} takes the pot.`); }
-    else if (fold === "opp") { win = true; byFold = true; }
+    H.opps.forEach(o => o.best = best([...o.cards, ...H.board]));
+    const inHand = live();
+    H.showdown = !youFold && !allFold;
+    H.youBest = you;
+    let winners = [];
+    if (allFold) { win = true; byFold = true; }
+    else if (youFold) winners = [inHand.reduce((a, o) => cmp(o.best.score, a.best.score) > 0 ? o : a)];
     else {
-      const c = cmp(you.score, opp.score);
-      if (c > 0) win = true; else if (c < 0) lostShowdown = true; else split = true;
+      // Showdown: the best five-card hand wins. Equal best hands share the pot.
+      let top = you.score;
+      inHand.forEach(o => { if (cmp(o.best.score, top) > 0) top = o.best.score; });
+      winners = inHand.filter(o => cmp(o.best.score, top) === 0);
+      const youTop = cmp(you.score, top) === 0;
+      if (youTop && !winners.length) win = true;
+      else if (youTop) split = true;
+      else lostShowdown = true;
     }
+    H.winners = winners;
+    H.winBest = win || split ? you : winners[0] && winners[0].best;
+    // Tilt wears off one hand at a time. Tina tilts for two hands after losing a pot she put chips into.
+    Object.keys(G.tilt).forEach(id => G.tilt[id] = Math.max(0, G.tilt[id] - 1));
+    H.opps.forEach(o => { if (R(o).tilt && o.put > 0 && !winners.includes(o)) G.tilt[o.id] = 2; });
     // Win streak (for Hot Streak): wins add one, any loss resets, a split changes nothing.
     if (win) G.streak++;
     else if (!split) G.streak = 0;
@@ -729,7 +913,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     let total = 0, flat = 0, mult = 1;
     const fired = [];
     if (win) { lines.push(["Pot", H.pot, ""]); total = H.pot; }
-    if (split) { lines.push(["Split pot", H.pot / 2, ""]); total = H.pot / 2; }
+    if (split) { const ways = winners.length + 1; total = Math.floor(H.pot / ways); lines.push([ways > 2 ? `Split pot (${ways} ways)` : "Split pot", total, ""]); }
     if (win && !byFold) {
       const lb = LEVEL_BASE[you.cat] * G.lv[you.cat];
       if (lb) { lines.push([`${nameOf(you.score)} Lv.${G.lv[you.cat]}`, lb, ""]); flat += lb; }
@@ -755,19 +939,26 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const net = G.bank - H.startBank;
 
     // Showdown messages name each player's best five cards, so ties and kickers make sense.
-    const opName = TABLES[G.t].name;
-    const kickerNote = you.cat === opp.cat && !split ? `<small>Same hand type, so the highest card that isn't shared decides it (the kicker).</small>` : "";
-    if (win && byFold) say(`<span class="w">${opName} folds.</span> The pot is yours.`);
-    else if (win) say(`<span class="w">You win</span> with ${nameOf(you.score)} <b class="five">${fiveText(you)}</b> over ${nameOf(opp.score)} <b class="five">${fiveText(opp)}</b>.${kickerNote}`);
-    else if (lostShowdown) say(`<span class="l">${opName} wins</span> with ${nameOf(opp.score)} <b class="five">${fiveText(opp)}</b> over your ${nameOf(you.score)} <b class="five">${fiveText(you)}</b>.${kickerNote}`);
+    const five = (b) => `<b class="five">${fiveText(b)}</b>`;
+    const strongestOpp = inHand.length ? inHand.reduce((a, o) => cmp(o.best.score, a.best.score) > 0 ? o : a) : null;
+    const rival = win ? strongestOpp : winners[0];
+    // Only mention the kicker when the main part of both hands ties (same pair, same trips...) and a side card decides it.
+    const mainLen = { 0: 1, 1: 1, 2: 2, 3: 1, 5: 1, 6: 2, 7: 1 }[you.cat];
+    const kickerDecides = rival && !split && you.cat === rival.best.cat && mainLen &&
+      you.score.slice(1, 1 + mainLen).every((v, i) => v === rival.best.score[1 + i]);
+    const kickerNote = kickerDecides ? `<small>Same ${nameOf(you.score).toLowerCase()}, so the highest card that isn't shared decides it (the kicker).</small>` : "";
+    if (allFold) say(`<span class="w">${H.opps.length > 1 ? "Everyone folds" : `${R(H.opps[0]).name} folds`}.</span> The pot is yours.`);
+    else if (youFold) say(`<span class="l">You fold.</span> ${R(winners[0]).name} takes the pot.`);
+    else if (win) say(`<span class="w">You win</span> with ${nameOf(you.score)} ${five(you)} over ${R(rival).name}'s ${nameOf(rival.best.score)} ${five(rival.best)}.${kickerNote}`);
+    else if (lostShowdown) say(`<span class="l">${listNames(winners.map(o => R(o).name))} ${winners.length > 1 ? "split the pot" : "wins"}</span> with ${nameOf(rival.best.score)} ${five(rival.best)}. You had ${nameOf(you.score)} ${five(you)}.${kickerNote}`);
     else if (split) {
       // Name the hole cards that didn't make either best five: that's usually why a tie surprises people.
-      const cardTxt = (c) => rt(c.r) + c.s;
-      const myOut = H.you.filter(c => !you.cards.includes(c)), oppOut = H.opp.filter(c => !opp.cards.includes(c));
-      const outs = [myOut.length && `your ${myOut.map(cardTxt).join(" and ")}`, oppOut.length && `their ${oppOut.map(cardTxt).join(" and ")}`].filter(Boolean);
-      const why = !myOut.length && !oppOut.length ? "Both best five cards are equal in rank."
-        : `Only your best five cards count, so ${outs.join(" and ")} ${myOut.length + oppOut.length > 1 ? "don't" : "doesn't"} play. The board's higher cards fill the hand instead.`;
-      say(`<b>Split pot.</b> You both play ${nameOf(you.score)} <b class="five">${fiveText(you)}</b>.<small>${why}</small>`);
+      const cardTxt = (c) => rt(c.r) + c.s, other = winners[0];
+      const myOut = H.you.filter(c => !you.cards.includes(c)), theirOut = other.cards.filter(c => !other.best.cards.includes(c));
+      const outs = [myOut.length && `your ${myOut.map(cardTxt).join(" and ")}`, theirOut.length && `${R(other).name}'s ${theirOut.map(cardTxt).join(" and ")}`].filter(Boolean);
+      const why = !myOut.length && !theirOut.length ? "The best five cards are equal in rank."
+        : `Only the best five cards count, so ${outs.join(" and ")} ${myOut.length + theirOut.length > 1 ? "don't" : "doesn't"} play. The board's higher cards fill the hand instead.`;
+      say(`<b>Split pot</b> with ${listNames(winners.map(o => R(o).name))}. You all play ${nameOf(you.score)} ${five(you)}.<small>${why}</small>`);
     }
 
     // Charms go off one after another, each with its own effect, then the chips roll in.
@@ -788,7 +979,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     } else if (payout > 0) {
       flyChips(4, payAt - 200);
     }
-    if (fold === "you" || lostShowdown) shake();
+    if (youFold || lostShowdown) shake();
   }
 
   // ---------- Effects ----------
@@ -862,9 +1053,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   function afterHand() {
     const won = G.bank - G.start;
-    const t = TABLES[G.t];
     if (won >= G.target) {
-      if (G.t === TABLES.length - 1) return endScreen(true);
+      if (G.t === NUM_TABLES - 1) return endScreen(true);
       return openShop();
     }
     if (G.handsLeft <= 0 || G.bank < ANTE) return endScreen(false);
@@ -893,7 +1083,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     return `<div class="top-i"><span class="g" style="--tc:${ty.color}">${c.g}</span><div><span class="ty" style="--tc:${ty.color}">${ty.label}</span><b>${c.name}</b></div></div><p>${c.desc}</p>`;
   }
   function renderShop() {
-    const t = TABLES[G.t], nx = TABLES[G.t + 1];
+    const here = listNames(G.lineup[G.t].map(id => RIVALS[id].name)), next = G.lineup[G.t + 1].map(id => RIVALS[id]);
     const s = $("screen");
     s.hidden = false;
     s.classList.toggle("enter", !G.shop.entered);
@@ -902,7 +1092,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const full = G.charms.length >= MAX_CHARMS;
     s.innerHTML = `
       <div class="shop-head">
-        <div><h2>Table ${G.t + 1} cleared</h2><p class="sub">You beat ${t.name}. Next up: <b>${nx.name}</b> (${nx.quirk.toLowerCase().replace(/\.$/, "")}). Target ${fmt(targetFor(G.t + 1, G.bank))}<span class="hint"> (the base ${fmt(nx.target)}, or half your chips minus 50, if higher)</span>.</p></div>
+        <div><h2>Table ${G.t + 1} cleared</h2><p class="sub">You beat ${here}. Next up: <b>${listNames(next.map(r => r.name))}</b>. Target ${fmt(targetFor(G.t + 1, G.bank))}<span class="hint"> (the base ${fmt(MODES[G.mode].targets[G.t + 1])}, or half your chips minus 60, if higher)</span>.</p></div>
         <div class="wallet"><span class="label">Chips</span><b>${G.bank}</b></div>
       </div>
       <section class="shop-sec">
@@ -986,14 +1176,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function endScreen(victory) {
     const s = $("screen");
     s.hidden = false;
-    const t = TABLES[G.t];
+    const names = listNames(G.lineup[G.t].map(id => RIVALS[id].name));
     s.classList.add("enter");
     s.innerHTML = victory
-      ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div><div class="shop-foot"><button class="btn" id="again">Play again</button><button class="btn ghost" id="to-home">Home</button></div>`
-      : `<div><h2>Run over</h2><p class="sub">${t.name} held you to ${fmt(G.bank - G.start)} of the ${fmt(G.target)} you needed at table ${G.t + 1}.</p></div>
+      ? `<div><h2>You broke the casino</h2><p class="sub">All 8 tables of ${MODES[G.mode].label} beaten with ${G.bank} chips and ${G.charms.length} charms.</p></div><div class="shop-foot"><button class="btn" id="again">Play again</button><button class="btn ghost" id="to-home">Home</button></div>`
+      : `<div><h2>Run over</h2><p class="sub">${names} held you to ${fmt(G.bank - G.start)} of the ${fmt(G.target)} you needed at table ${G.t + 1}.</p></div>
          <p class="label">Your charms</p><div class="shop-grid">${G.charms.map(id => `<div class="item">${charmFace(id)}</div>`).join("")}</div>
          <div class="shop-foot"><button class="btn" id="again">New run</button><button class="btn ghost" id="to-home">Home</button></div>`;
-    $("again").addEventListener("click", newRun);
+    $("again").addEventListener("click", () => newRun(G.mode));
     $("to-home").addEventListener("click", showHome);
   }
 
@@ -1087,17 +1277,22 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const p = potPt();
       callout(`Heartbreaker ${bonusText(r)}`, { x: p.x, y: p.y - 70 }, "var(--pip-red)", 300);
     },
-    // A FOLDED stamp slams onto the opponent's cards.
+    // A FOLDED stamp slams onto every rival who folded.
     bluff(r) {
-      const p = pt($("opp"));
-      const s = fx("fx-stamp", "FOLDED");
-      play(s, [
-        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(3)"), opacity: 0 },
-        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(.95)"), opacity: 1, offset: .2 },
-        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(1)"), opacity: 1, offset: .85 },
-        { transform: at(s, p.x, p.y, "rotate(-14deg) scale(1)"), opacity: 0 },
-      ], { duration: 1500, easing: "cubic-bezier(.2,.9,.3,1.2)" });
-      $("opp").animate([{ transform: "none" }, { transform: "translateY(6px)" }, { transform: "none" }], { duration: 250, delay: 260 });
+      const seats = [...document.querySelectorAll("#opps .oseat.folded .cards")];
+      if (!seats.length) seats.push($("opps"));
+      seats.forEach((seat, i) => {
+        const sp = pt(seat);
+        const s = fx("fx-stamp", "FOLDED");
+        play(s, [
+          { transform: at(s, sp.x, sp.y, "rotate(-14deg) scale(3)"), opacity: 0 },
+          { transform: at(s, sp.x, sp.y, "rotate(-14deg) scale(.95)"), opacity: 1, offset: .2 },
+          { transform: at(s, sp.x, sp.y, "rotate(-14deg) scale(1)"), opacity: 1, offset: .85 },
+          { transform: at(s, sp.x, sp.y, "rotate(-14deg) scale(1)"), opacity: 0 },
+        ], { duration: 1500, delay: i * 140, easing: "cubic-bezier(.2,.9,.3,1.2)" });
+        seat.animate([{ transform: "none" }, { transform: "translateY(6px)" }, { transform: "none" }], { duration: 250, delay: 260 + i * 140 });
+      });
+      const p = pt($("opps"));
       ["?", "!", "?"].forEach((ch, i) => {
         const q = fx("fx-call", ch, { color: "var(--charm)" });
         const a = (i - 1) * 70;
@@ -1341,7 +1536,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     },
     // Peek: an eye opens over the revealed card and a scan line sweeps it.
     peek() {
-      const card = document.querySelector(`#opp .card:nth-child(${H.peek + 1})`);
+      const card = document.querySelector(`#opps .oseat[data-i="${H.peek.o}"] .card:nth-child(${H.peek.c + 1})`);
       if (!card) return;
       const p = pt(card);
       const eye = fx("fx-eye", "◉");
@@ -1383,13 +1578,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     return el;
   }
   function renderCards() {
-    const opp = $("opp"), you = $("you"), board = $("board");
-    opp.replaceChildren(); you.replaceChildren(); board.replaceChildren();
+    const opps = $("opps"), you = $("you"), board = $("board");
+    opps.replaceChildren(); you.replaceChildren(); board.replaceChildren();
     if (!H) return;
     const sd = H.over && H.showdown;
-    let winFive = null;
-    if (sd) { const c = cmp(H.youBest.score, H.oppBest.score); winFive = c > 0 ? H.youBest.cards : c < 0 ? H.oppBest.cards : H.youBest.cards; }
-    const faceUp = sd || H.allIn;
+    const winFive = sd && H.winBest ? H.winBest.cards : null;
     const style = (c) => winFive ? { used: winFive.includes(c), dim: !winFive.includes(c) } : {};
     // Animate each card only the first time it appears in a given face-up/face-down state.
     let flipN = 0;
@@ -1402,13 +1595,32 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       el.style.setProperty("--fr", ((Math.random() - .5) * 40).toFixed(0) + "deg");
       return el;
     };
-    H.opp.forEach((c, i) => {
-      const peeked = !faceUp && H.peek === i;
-      if (peeked) { opp.append(anim(cardEl(c, { peek: true }), "o" + i + "p", "flip", 0)); return; }
-      const el = cardEl(c, faceUp ? style(c) : { down: true });
-      opp.append(faceUp ? anim(el, "o" + i + "u", "flip", .15 * flipN++) : anim(el, "o" + i, "deal", .08 + i * .16, 160));
+    // One seat per rival: who they are, their two cards, and what they just did.
+    opps.classList.toggle("solo", H.opps.length === 1);
+    const step = .32 / Math.max(1, H.opps.length);
+    H.opps.forEach((o, oi) => {
+      const r = R(o);
+      const seat = document.createElement("div");
+      const isWinner = H.over && H.winners && H.winners.includes(o);
+      seat.className = "oseat" + (o.folded ? " folded" : "") + (isWinner ? " winner" : "") + (tilted(o) ? " tilted" : "");
+      seat.dataset.i = oi;
+      seat.innerHTML = `<div class="persona"><span class="avatar">${initials(r.name)}</span><div><b>${r.name}</b><small>${r.style}</small></div></div><div class="cards"></div><span class="o-act"></span>`;
+      const cards = seat.querySelector(".cards");
+      const faceUp = (sd || H.allIn) && !o.folded;
+      o.cards.forEach((c, i) => {
+        const key = `o${oi}c${i}`;
+        if (!faceUp && H.peek && H.peek.o === oi && H.peek.c === i) { cards.append(anim(cardEl(c, { peek: true }), key + "p", "flip", 0)); return; }
+        const el = cardEl(c, faceUp ? style(c) : { down: true });
+        cards.append(faceUp ? anim(el, key + "u", "flip", .15 * flipN++) : anim(el, key, "deal", (oi + 1) * step + i * .32, 160));
+      });
+      const actEl = seat.querySelector(".o-act");
+      const label = sd && !o.folded ? nameOf(o.best.score) : o.folded ? "Folded" : o.act;
+      actEl.textContent = label || "";
+      if (isWinner) actEl.textContent = (label ? label + " · " : "") + "Wins";
+      if (tilted(o) && !H.over) actEl.textContent = (actEl.textContent ? actEl.textContent + " · " : "") + "On tilt";
+      opps.append(seat);
     });
-    H.you.forEach((c, i) => you.append(anim(cardEl(c, style(c)), "y" + i, "deal", i * .16, -200)));
+    H.you.forEach((c, i) => you.append(anim(cardEl(c, style(c)), "y" + i, "deal", i * .32, -200)));
     const n = H.over ? (H.showdown ? 5 : shown()) : shown();
     let boardN = 0;
     H.board.forEach((c, i) => {
@@ -1418,7 +1630,6 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if ($("pot").textContent !== String(H.pot)) restart($("pot").parentElement, "bump");
     const mine = best(H.over && H.showdown ? [...H.you, ...H.board] : visible(H.you));
     $("you-hn").textContent = mine ? nameOf(mine.score) : "";
-    $("opp-hn").textContent = sd ? nameOf(H.oppBest.score) : "";
     $("pot").textContent = H.pot;
   }
   function renderActions() {
@@ -1433,8 +1644,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       b.addEventListener("click", fn); a.append(b);
     };
     if (H.over) {
-      const won = G.bank - G.start, t = TABLES[G.t];
-      const label = won >= G.target ? (G.t === TABLES.length - 1 ? "Claim victory" : "Go to shop →") : (G.handsLeft <= 0 || G.bank < ANTE) ? "See result" : "Next hand";
+      const won = G.bank - G.start;
+      const label = won >= G.target ? (G.t === NUM_TABLES - 1 ? "Claim victory" : "Go to shop →") : (G.handsLeft <= 0 || G.bank < ANTE) ? "See result" : "Next hand";
       add(label, "Enter", afterHand, "btn big");
       return;
     }
@@ -1521,15 +1732,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   const STREETS = ["Preflop", "Flop", "Turn", "River"];
   function renderHud() {
-    const t = TABLES[G.t], won = G.bank - G.start;
-    $("s-table").textContent = `${G.t + 1} / ${TABLES.length}`;
+    const won = G.bank - G.start;
+    $("s-table").textContent = `${G.t + 1} / ${NUM_TABLES}`;
+    $("mode-chip").textContent = MODES[G.mode].label;
     $("s-hands").innerHTML = Array.from({ length: HANDS_PER_TABLE }, (_, i) => `<i class="${i < G.handsLeft ? "on" : ""}"></i>`).join("") + `<span class="sr">${G.handsLeft} hands left</span>`;
     const d = hudDelay; hudDelay = 0;
     tween($("s-bank"), shownBank, G.bank, n => n.toLocaleString("en-US"), d);
     shownBank = G.bank;
-    $("opp-who").textContent = t.name;
-    $("opp-av").textContent = t.name.replace(/^The /, "")[0];
-    $("opp-quirk").textContent = G.shoves >= 2 ? `Wise to your shoves (${G.shoves}). Calls them lighter now.` : G.shoves === 1 ? `${t.quirk} Remembers your shove.` : t.quirk;
+    const who = G.mode === "duel" ? "Your rival remembers" : "The table remembers";
+    $("shove-note").textContent = G.shoves >= 2 ? `${who} ${G.shoves} shoves and calls them lighter now.` : G.shoves === 1 ? `${who} your shove.` : "";
     $("streets").innerHTML = STREETS.map((s, i) => {
       const st = !H ? "" : H.over && H.showdown ? "done" : i < H.street ? "done" : i === H.street && !H.over ? "now" : "";
       return `<span class="${st}">${s}</span>`;
@@ -1595,13 +1806,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         <div class="chips">${list.map(([, c]) => `<span class="chip" title="${c.desc}"><i>${c.g}</i>${c.name}</span>`).join("")}</div>
       </div>`;
     }).join("");
-    $("home-lineup").innerHTML = TABLES.map((t, i) => `
-      <div class="rival${i === TABLES.length - 1 ? " boss" : ""}">
-        <span class="label">Table ${i + 1}</span>
-        <span class="avatar">${t.name.replace(/^The /, "")[0]}</span>
-        <div><b>${t.name}</b><small>${t.quirk}</small></div>
-        <span class="mono goal-chip">${fmt(t.target)}</span>
-      </div>`).join("");
+    // Every rival, grouped by how tough they are.
+    $("home-lineup").innerHTML = TIER_NAMES.map((tierName, tier) => {
+      const ids = Object.keys(RIVALS).filter(id => RIVALS[id].tier === tier);
+      return `<div class="tier tier-${tier}">
+        <p class="label">${tierName} <span>· ${tier === 3 ? "final table" : tier === 0 ? "tables 1–2" : tier === 1 ? "tables 3–5" : "tables 6–8"}</span></p>
+        <div class="tier-grid">${ids.map(id => `
+          <div class="rival${tier === 3 ? " boss" : ""}${id === "augustus" ? " star" : ""}">
+            <span class="avatar">${initials(RIVALS[id].name)}</span>
+            <div><b>${RIVALS[id].name}</b><small>${RIVALS[id].style}</small></div>
+          </div>`).join("")}</div>
+      </div>`;
+    }).join("");
   }
   const runLive = () => !!G && !document.getElementById("again");
   function showHome() {
@@ -1610,18 +1826,21 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const live = runLive();
     $("play-btn").querySelector("span").textContent = live ? "Continue run" : "Play";
     $("new-btn").hidden = !live;
-    $("run-note").textContent = live ? `Run in progress: table ${G.t + 1} of ${TABLES.length}, ${G.bank} chips, ${G.charms.length} ${G.charms.length === 1 ? "charm" : "charms"}.` : "";
+    $("mode-warn").hidden = !live;
+    $("run-note").textContent = live ? `${MODES[G.mode].label} in progress: table ${G.t + 1} of ${NUM_TABLES}, ${G.bank} chips, ${G.charms.length} ${G.charms.length === 1 ? "charm" : "charms"}.` : "";
     window.scrollTo(0, 0);
   }
-  function showGame(fresh) {
+  // Play continues a run in progress, or starts the main 4-player mode. The mode cards always start fresh.
+  function showGame(mode) {
     $("home").hidden = true;
     $("game").hidden = false;
     window.scrollTo(0, 0);
-    if (fresh || !runLive()) newRun();
+    if (mode || !runLive()) newRun(mode || "table");
     else renderAll();
   }
-  $("play-btn").addEventListener("click", () => showGame(false));
-  $("new-btn").addEventListener("click", () => showGame(true));
+  $("play-btn").addEventListener("click", () => showGame(null));
+  $("new-btn").addEventListener("click", () => showGame("table"));
+  document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => showGame(b.dataset.mode)));
   $("home-btn").addEventListener("click", showHome);
 
   renderHome();
