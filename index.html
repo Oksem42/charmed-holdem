@@ -340,6 +340,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .case-price { font-family: var(--f-mono); color: var(--charm); white-space: nowrap; }
 .case-card > p { color: var(--muted); font-size: 13.5px; }
 .odds { display: flex; height: 6px; border-radius: 99px; overflow: hidden; gap: 2px; }
+.odds i { min-width: 4px; }
 .odds-key { font-size: 11.5px !important; font-family: var(--f-mono); }
 .case-items { display: flex; flex-wrap: wrap; gap: 6px; }
 .mini-item { border-radius: 8px; border-bottom: 3px solid var(--rc); background: rgba(0,0,0,.25); padding: 3px; opacity: .55; }
@@ -2096,10 +2097,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     win_jackpot:   { kind: "win", name: "Jackpot 777", rarity: "legendary", g: "7" },
   };
   const owns = (id) => COSMETICS[id].free || P.owned.includes(id);
+  // Odds are percentages and deliberately harsh: Epic and Legendary prizes should feel like an event.
   const CASES = {
-    felt:     { name: "Felt Case", price: 100, kinds: ["back", "theme"], blurb: "Card backs and table themes.", odds: { common: 65, rare: 25, epic: 8, legendary: 2 } },
-    showtime: { name: "Showtime Case", price: 150, kinds: ["win", "back"], blurb: "Win animations and card backs.", odds: { common: 60, rare: 26, epic: 11, legendary: 3 } },
-    vault:    { name: "High Roller Vault", price: 300, kinds: ["back", "theme", "win"], blurb: "Everything, with much better odds.", odds: { common: 30, rare: 38, epic: 24, legendary: 8 } },
+    felt:     { name: "Felt Case", price: 100, kinds: ["back", "theme"], blurb: "Card backs and table themes.", odds: { common: 86, rare: 12.5, epic: 1.35, legendary: 0.15 } },
+    showtime: { name: "Showtime Case", price: 150, kinds: ["win", "back"], blurb: "Win animations and card backs.", odds: { common: 84, rare: 14, epic: 1.8, legendary: 0.2 } },
+    vault:    { name: "High Roller Vault", price: 300, kinds: ["back", "theme", "win"], blurb: "Everything, with better odds. Still a long shot.", odds: { common: 74, rare: 22, epic: 3.5, legendary: 0.5 } },
   };
   // Duplicates turn back into tokens.
   const REFUND = { common: 20, rare: 45, epic: 90, legendary: 180 };
