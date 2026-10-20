@@ -13,6 +13,8 @@ Both modes share the charms, shop, hand levels and all in. Rivals are seated by 
 ## Rivals
 Twenty-nine rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
 
+**The final table** is always a 1v1 against The House, which calls every bet, raise and all in. It opens with its own lead-up animation (preview it from the dev panel).
+
 **Elites** are mini-bosses with special powers. Only one Elite ever sits at a table:
 - **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
 - **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
