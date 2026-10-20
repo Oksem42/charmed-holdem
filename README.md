@@ -18,7 +18,7 @@ Twenty-eight rivals, each with a playstyle and a backstory (hover a rival in gam
 - **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
 - **Christofor Ford** (River Read): knows your hand on the river and only calls or bets there when he's ahead.
 - **Dubious Dustin** (Snap Call): always calls your all ins, whatever he's holding.
-- **Liam Ford** (Protection Racket): the mafia boss cancels every effect that multiplies your score at his table.
+- **Liam Ford** (Protection Racket): the mafia boss cancels your strongest score multiplier on every hand at his table.
 - **Elias Primack** (Family Rules): Augustus's son. When you fold, 40% of the time he won't let you leave, and the hand plays out to showdown.
 
 New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).

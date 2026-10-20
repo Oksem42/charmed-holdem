@@ -957,7 +957,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
                 power: { name: "River Read", desc: "Knows your hand on the river. He only calls or bets there when he's ahead." },
                 bio: "Former head of casino security. He caught every cheat in the building, then quietly learned all their tricks." },
     liam:     { name: "Liam Ford", tier: 3, style: "Intimidating. Bets often and calls a lot.", p: { call: .12, bet: .15, bluff: .12, shove: .02 },
-                power: { name: "Protection Racket", desc: "Cancels every effect that multiplies your score at his table." },
+                power: { name: "Protection Racket", desc: "Cancels your strongest score multiplier on every hand at his table." },
                 bio: "Christofor Ford's younger brother, who went the other way. He runs the protection racket on this floor, and nothing gets multiplied in his casino without his cut." },
     elias:    { name: "Elias Primack", tier: 3, style: "Spoiled and reckless. Plays almost every hand.", p: { call: .2, bet: .12, bluff: .22, shove: -.06 },
                 power: { name: "Family Rules", desc: "When you fold, 40% of the time he won't let you leave: you call and the hand plays out to showdown." },
@@ -1347,11 +1347,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (lb) { lines.push([`${nameOf(you.score)} Lv.${G.lv[you.cat]}`, lb, ""]); flat += lb; }
     }
     // Charms pay left to right. Echo, sitting to the right of a charm, makes that charm pay again.
+    const mults = [];
     const pay = (key, name, r) => {
       if (r.add) { lines.push([name, r.add, "ch", key]); flat += r.add; }
-      // Liam Ford's Protection Racket: no multipliers at his table.
-      if (r.mult && eliteHere() === "liam") { lines.push([`${name} ×${r.mult}`, "cancelled", "ch neg", key]); H.racket = true; }
-      else if (r.mult) { lines.push([name, "×" + r.mult, "ch mult", key]); mult *= r.mult; }
+      // Multipliers are collected first and applied after every charm has fired (Liam Ford may cancel one).
+      if (r.mult) { mults.push({ v: r.mult, line: lines.length }); lines.push([name, "×" + r.mult, "ch mult", key]); }
       if (r.levelUp) { G.lv[1] += r.levelUp; lines.push(["Pair levels up", "Lv." + G.lv[1], "ch lvl", key]); }
     };
     const fire = (id, r) => {
@@ -1370,6 +1370,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const others = new Set(fired.map(f => f[0]).filter(id => id !== "bracelet")).size;
       if (others) fire("bracelet", { add: 15 * others });
     }
+    // Liam Ford's Protection Racket: he cancels your single strongest multiplier (the first one, if there's a tie).
+    let cut = -1;
+    if (mults.length && eliteHere() === "liam") {
+      cut = mults.reduce((bi, m, i) => (m.v > mults[bi].v ? i : bi), 0);
+      const L = lines[mults[cut].line];
+      lines[mults[cut].line] = [`${L[0]} ${L[1]}`, "cancelled", "ch neg", L[3]];
+      H.racket = true;
+    }
+    mults.forEach((m, i) => { if (i !== cut) mult *= m.v; });
     if (fired.some(f => f[1].emptyPiggy)) G.piggy = 0;
     // A loss can cost chips (Devil's Deal), but never more than you have.
     // All-in pots don't get multiplied: when you shoved, multipliers only boost your bonuses, not the pot.
