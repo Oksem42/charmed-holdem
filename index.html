@@ -2962,11 +2962,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     return `<div class="rtile" style="--rc:${RARITY[c.rarity].color}">${preview(id)}<span>${c.name}</span></div>`;
   }
   // Fill a reel with random rolls from the same case and plant the prize near the end.
-  // Near miss: when the prize is a Common, the tile just before it is a Legendary from this case,
-  // and the reel stops a hair past it. The prize was already rolled, so the odds are unchanged.
+  // Near miss: on 3 in 10 rolls, the reel stops a hair past a Legendary planted just before the prize.
+  // Only a Common prize can be a near miss, so each Common gets a near miss with chance 30% / (this case's Common odds).
+  // The prize was already rolled, so the posted odds are unchanged.
+  const NEAR_MISS_SHARE = 0.3;
   function buildReel(key, prize) {
     const ids = Array.from({ length: REEL_LEN }, (_, i) => i === WIN_AT ? prize : rollCase(key));
-    const nearMiss = COSMETICS[prize].rarity === "common";
+    const nearMiss = COSMETICS[prize].rarity === "common" && Math.random() < Math.min(1, NEAR_MISS_SHARE / (CASES[key].odds.common / 100));
     if (nearMiss) {
       const legends = caseItems(key).filter(id => COSMETICS[id].rarity === "legendary");
       if (legends.length) ids[WIN_AT - 1] = legends[Math.floor(Math.random() * legends.length)];
