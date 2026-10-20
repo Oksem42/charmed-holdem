@@ -510,6 +510,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .bank-row .mono { color: var(--text); font-variant-numeric: tabular-nums; }
 .bank-row .mono.up { color: var(--win); } .bank-row .mono.down { color: var(--lose); }
 .bank-row.tokens .mono { color: var(--charm); }
+.bank-row.danger span { color: var(--lose); font-weight: 700; }
+.bank-row.safe .mono { color: var(--win); }
 .bank-main.up b { animation: glowUp .9s ease; }
 .bank-main.down b { animation: glowDown .6s ease; }
 .stat.bank-mini { display: none; }
@@ -723,7 +725,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   <section class="home-sec" id="casino">
     <div class="home-head sec-split">
-      <div><p class="label">The casino</p><h2>Open a case.</h2><p class="hint">Earn tokens by clearing tables and finishing runs. Every prize is cosmetic: card backs, table themes and win animations. Duplicates turn back into tokens.</p></div>
+      <div><p class="label">The casino</p><h2>Open a case.</h2><p class="hint">Earn tokens by clearing tables and finishing runs. Every prize is cosmetic: card backs, table themes and win animations. You won't get duplicates until you own every item of the rarity you roll; after that they turn back into tokens.</p></div>
       <span class="wallet-chip big">◈ <b class="token-count">0</b> tokens</span>
     </div>
     <div class="case-grid" id="case-grid"></div>
@@ -862,6 +864,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         </div>
         <div class="bank-row"><span>Won at this table</span><span class="mono" id="bank-table">+0</span></div>
         <div class="bank-row"><span>In this hand</span><span class="mono" id="bank-hand">0</span></div>
+        <div class="bank-row" id="row-need" title="Chips you still need to win at this table, and the hands you have left to do it."><span>Still needed</span><span class="mono" id="bank-need">+0</span></div>
+        <div class="bank-row" id="row-lose" title="How many chips you can lose before you can't pay the next ante and the run ends."><span>Can lose</span><span class="mono" id="bank-lose">0</span></div>
         <div class="bank-row tokens"><span>Tokens</span><span class="mono">◈ <b class="token-count">0</b></span></div>
       </div>
       <div class="panel">
@@ -953,13 +957,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ace:      { name: "Ace Up", g: "A", type: "payout", price: 40, desc: "Win holding an Ace: +30", run: x => x.win && x.hole.some(c => c.r === 14) && { add: 30 } },
     kicker:   { name: "Kicker King", g: "K", type: "payout", price: 55, desc: "Win with only High Card: +100", run: x => x.win && x.cat === 0 && { add: 100 } },
     double:   { name: "Double Trouble", g: "2x", type: "payout", price: 70, desc: "Win with Two Pair or better: +50", run: x => x.win && x.cat >= 2 && { add: 50 } },
-    insure:   { name: "Insurance", g: "+", type: "payout", price: 45, desc: "Lose at showdown: get 25 back", run: x => x.lostShowdown && { add: 25 } },
+    insure:   { name: "Insurance", g: "+", type: "payout", price: 45, desc: "Lose at showdown: get back half of what you put into the pot.", run: x => x.lostShowdown && x.staked > 0 && { add: Math.ceil(x.staked / 2) } },
     flushfund:{ name: "Flush Fund", g: "♦", type: "mult", price: 90, desc: "Flushes pay ×2", run: x => x.win && (x.cat === 5 || x.cat === 8) && { mult: 2 } },
     straight: { name: "Straight Shooter", g: "→", type: "mult", price: 90, desc: "Straights pay ×2", run: x => x.win && (x.cat === 4 || x.cat === 8) && { mult: 2 } },
     roller:   { name: "High Roller", g: "$", type: "mult", price: 80, desc: "Bet on every street and win: ×1.5", run: x => x.win && x.betEvery && { mult: 1.5 } },
     trips:    { name: "Third Wheel", g: "III", type: "payout", price: 55, desc: "Win with Three of a Kind or a Full House: +75", run: x => x.win && (x.cat === 3 || x.cat === 6) && { add: 75 } },
     streak:   { name: "Hot Streak", g: "▲", type: "grow", price: 55, desc: "+10 for each win in a row. Resets when you lose.", run: x => x.win && x.streak > 0 && { add: 10 * x.streak } },
-    echo:     { name: "Echo", g: "↻", type: "combo", price: 150, desc: "The charm to its left triggers twice (bonuses only, never costs). Order matters.", run: () => null },
+    echo:     { name: "Echo", g: "↻", type: "combo", price: 150, desc: "The charm to its left triggers twice: bonuses in full, multipliers at half strength, never costs. Doubles Peek too. Order matters.", run: () => null },
     peek:     { name: "Peek", g: "◉", type: "play", price: 50, desc: "Bet on the flop to see one hole card of a rival still in the hand.", run: () => null },
     bigpot:   { name: "Big Pot Energy", g: "$$", type: "mult", price: 85, desc: "Win a pot bigger than 200: ×1.5", run: x => x.win && x.pot > 200 && { mult: 1.5 } },
     crowd:    { name: "Crowd Pleaser", g: "★", type: "payout", price: 55, modes: ["table"], desc: "Win a showdown against 2 or more rivals: +60", run: x => x.win && !x.byFold && x.rivalsShown >= 2 && { add: 60 } },
@@ -1338,11 +1342,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       // An overbet (more than the pot) doesn't count for Bluff Master.
       if (amt > H.pot) H.overbet = true;
       G.bank -= amt; H.pot += amt; H.myBets++; H.moveThis = "bet";
-      // Peek: betting the flop reveals one hole card of a rival still in the hand.
-      if (!short && H.street === 1 && has("peek") && H.peek === undefined) {
-        const pool = live(), o = pool[Math.floor(Math.random() * pool.length)];
-        H.peek = { o: H.opps.indexOf(o), c: Math.random() < .5 ? 0 : 1 };
-        setTimeout(() => { pulseCharm("peek"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
+      // Peek: betting the flop reveals one hole card of a rival still in the hand. With Echo to its right, two.
+      if (!short && H.street === 1 && has("peek") && !H.peeks) {
+        const echoed = G.charms[G.charms.indexOf("peek") + 1] === "echo" && has("echo");
+        const cards = shuffled(live().flatMap(o => [0, 1].map(c => ({ o: H.opps.indexOf(o), c }))));
+        H.peeks = cards.slice(0, echoed ? 2 : 1);
+        setTimeout(() => { pulseCharm("peek"); if (echoed) pulseCharm("echo"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
       }
       respond(amt, calls);
       if (!live().length) return finish({ allFold: true });
@@ -1422,7 +1427,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
       win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved, overbet: !!H.overbet,
-      youFold: !!youFold, pot: H.pot, bank: G.bank, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
+      youFold: !!youFold, pot: H.pot, bank: G.bank, staked: H.startBank - G.bank, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,
@@ -1453,8 +1458,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const i = G.charms.indexOf(id);
       // Echo repeats bonuses and multipliers, but never a cost (a negative payout or a shatter).
       if (G.charms[i + 1] === "echo" && H.stolen !== "echo" && !(r.add < 0) && !r.shatter) {
-        fired.push(["echo", r, id]);
-        pay("echo", `Echo: ${CHARMS[id].name}`, r);
+        // Echo copies multipliers at half strength: x2 becomes x1.5, x3 becomes x2.
+        const er = r.mult ? Object.assign({}, r, { mult: Math.round((1 + (r.mult - 1) / 2) * 100) / 100 }) : r;
+        fired.push(["echo", er, id]);
+        pay("echo", `Echo: ${CHARMS[id].name}`, er);
       }
     };
     G.charms.forEach(id => { if (H.stolen === id) return; const r = CHARMS[id].run(ctx); if (r) fire(id, r); });
@@ -2109,7 +2116,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     },
     // Peek: an eye opens over the revealed card and a scan line sweeps it.
     peek() {
-      const card = document.querySelector(`#opps .oseat[data-i="${H.peek.o}"] .card:nth-child(${H.peek.c + 1})`);
+      (H.peeks || []).forEach((pk, n) => setTimeout(() => peekOne(pk, n), n * 450));
+    },
+  };
+  function peekOne(pk, n) {
+      const card = document.querySelector(`#opps .oseat[data-i="${pk.o}"] .card:nth-child(${pk.c + 1})`);
       if (!card) return;
       const p = pt(card);
       const eye = fx("fx-eye", "◉");
@@ -2127,8 +2138,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         { transform: at(scan, p.x, p.t + p.h), opacity: 0 },
       ], { duration: 650, delay: 250, easing: "ease-in-out" });
       glowCard(card, "var(--fx-water)", 300);
-      callout("Peek!", { x: p.x, y: p.y - 80 }, "var(--fx-water)", 200);
-    },
+      callout(n ? "Echo Peek!" : "Peek!", { x: p.x, y: p.y - 80 }, n ? "var(--fx-pink)" : "var(--fx-water)", 200);
+  }
+  const CHARM_FX_MORE = {
     // Big Pot Energy: the pot swells and coins spiral out of it.
     bigpot(r) {
       const p = potPt();
@@ -2253,6 +2265,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       callout(`DEVIL'S DEAL ${bonusText(r)}`, { x: you.x, y: you.y - 90 }, "var(--fx-curse)", 300);
     },
   };
+  Object.assign(CHARM_FX, CHARM_FX_MORE);
   const rackTile = (id) => [...document.querySelectorAll("#rack .charm")].find(t => t.dataset.id === id);
   // Pop a rack tile outside the payout sequence (used by Peek).
   // Leo's Charm Thief: the stolen charm's glyph flies off the rack into his hands.
@@ -2377,7 +2390,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const faceUp = (sd || H.allIn) && !o.folded;
       o.cards.forEach((c, i) => {
         const key = `o${oi}c${i}`;
-        if (!faceUp && H.peek && H.peek.o === oi && H.peek.c === i) { cards.append(anim(cardEl(c, { peek: true }), key + "p", "flip", 0)); return; }
+        if (!faceUp && H.peeks && H.peeks.some(p => p.o === oi && p.c === i)) { cards.append(anim(cardEl(c, { peek: true }), key + "p", "flip", 0)); return; }
         const el = cardEl(c, faceUp ? style(c) : { down: true });
         const revealAt = H.revealOrder && H.revealOrder[oi] !== undefined ? .35 + H.revealOrder[oi] * .6 + i * .14 : null;
         cards.append(!faceUp ? anim(el, key, "deal", (oi + 1) * step + i * .32, 160)
@@ -2464,7 +2477,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       return;
     }
     const b = BETS[H.street];
-    const peekHint = H.street === 1 && has("peek") && H.peek === undefined;
+    const peekHint = H.street === 1 && has("peek") && !H.peeks;
     // Bet sizing. Not facing a bet: how much to bet (at least the street's minimum).
     // Facing a bet: the total to raise to (at least double their bet). Going all in stays on its own button.
     const facing = H.facing;
@@ -2566,7 +2579,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       let note = c.desc, badge = "";
       if (id === "streak") badge = G.streak ? `${G.streak} in a row` : "No streak";
       if (id === "echo") { const left = G.charms[i - 1]; note = left ? `Doubles ${CHARMS[left].name}` : "Nothing to its left yet. Move it right of a charm."; }
-      if (id === "peek" && H && H.peek !== undefined) badge = "Peeking";
+      if (id === "peek" && H && H.peeks) badge = H.peeks.length > 1 ? "Peeking ×2" : "Peeking";
       if (H && H.stolen === id && !H.over) { badge = "Stolen by Leo"; d.classList.add("stolen"); }
       if (id === "piggy") badge = `${G.piggy || 0} saved`;
       if (id === "second") badge = G.secondUsed ? "Used this table" : "Ready";
@@ -2599,6 +2612,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     $("bank-table").textContent = fmt(won);
     $("bank-table").className = "mono " + (won > 0 ? "up" : won < 0 ? "down" : "");
     $("bank-hand").textContent = H && !H.over ? Math.max(0, H.startBank - G.bank).toLocaleString("en-US") : "0";
+    // What it takes to survive: chips still needed for the target, and chips you can lose before you can't ante.
+    const need = Math.max(0, G.target - won), canLose = Math.max(0, G.bank - anteHere());
+    $("bank-need").textContent = need ? `+${need} in ${G.handsLeft} hand${G.handsLeft === 1 ? "" : "s"}` : "Target reached";
+    $("row-need").classList.toggle("danger", need > 0 && G.handsLeft <= 2);
+    $("row-need").classList.toggle("safe", need === 0);
+    $("bank-lose").textContent = `${canLose.toLocaleString("en-US")} chips`;
+    $("row-lose").classList.toggle("danger", canLose < 60);
     // The chip stack grows with your bankroll: one chip per 40, up to 12.
     const discs = Math.max(1, Math.min(12, Math.round(G.bank / 40)));
     if ($("chip-stack").children.length !== discs) $("chip-stack").innerHTML = Array.from({ length: discs }, (_, i) => `<i style="--n:${i}"></i>`).join("");
@@ -2702,7 +2722,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // Duplicates turn back into tokens.
   const REFUND = { common: 20, rare: 45, epic: 90, legendary: 180 };
   const caseItems = (c) => Object.keys(COSMETICS).filter(id => !COSMETICS[id].free && CASES[c].kinds.includes(COSMETICS[id].kind));
-  function rollCase(c) {
+  // fresh = rolling a real prize: within the rolled rarity, prefer items you don't own yet, so duplicates only
+  // happen once you own everything of that rarity. The odds per rarity are unchanged.
+  function rollCase(c, fresh) {
     const items = caseItems(c), odds = CASES[c].odds;
     let roll = Math.random() * 100, rarity = "common";
     for (const r of ["legendary", "epic", "rare", "common"]) { if (roll < odds[r]) { rarity = r; break; } roll -= odds[r]; }
@@ -2710,7 +2732,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const order = ["legendary", "epic", "rare", "common"];
     for (let i = order.indexOf(rarity); i < order.length; i++) {
       const pool = items.filter(id => COSMETICS[id].rarity === order[i]);
-      if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
+      if (!pool.length) continue;
+      const unowned = fresh ? pool.filter(id => !owns(id)) : [];
+      const from = unowned.length ? unowned : pool;
+      return from[Math.floor(Math.random() * from.length)];
     }
     return items[0];
   }
@@ -2938,7 +2963,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Roll every prize up front. Anything already owned, or already won earlier in this batch, is a duplicate.
     const results = [];
     for (let i = 0; i < qty; i++) {
-      const prize = rollCase(key), dupe = owns(prize);
+      const prize = rollCase(key, true), dupe = owns(prize);
       if (!dupe) P.owned.push(prize);
       results.push({ prize, dupe });
     }
