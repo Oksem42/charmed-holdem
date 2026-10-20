@@ -125,6 +125,7 @@ p { margin: 0; }
 .receipt .ln.ch span:first-child { color: var(--charm); }
 .receipt .ln.mult span:last-child { color: var(--charm); }
 .receipt .ln.neg span:last-child { color: var(--lose); }
+.receipt .ln.note span:first-child { color: var(--muted); font-style: italic; }
 .receipt .tot { display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; padding-top: 6px; }
 .receipt .empty { color: var(--muted); font-family: var(--f-body); font-size: 14px; }
 @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -773,7 +774,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         <p><b>Each hand</b> costs a 10-chip ante (20 at Augustus Primack's table). Bet, check, raise or fold on each street, just like Hold'em.</p>
         <p><b>Elite tables</b> seat a mini-boss with a special power. Hover any rival to read their story.</p>
         <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends. A big stack raises the target: it becomes half your chips minus 60 if that beats the table's base.</p>
-        <p><b>All in</b> pushes every chip. Opponents only call with strong hands, and losing one ends your run.</p>
+        <p><b>All in</b> pushes every chip. Most rivals only call with strong hands, but some always call, and losing one ends your run. Multiplier charms don't multiply an all-in pot, only your bonuses.</p>
         <p><b>Between tables</b> buy, sell and reorder charms, and level up hands. Beat all 8 tables to win.</p>
         <p><b>Keys:</b> <kbd>B</kbd> bet, <kbd>C</kbd> check or call, <kbd>F</kbd> fold, <kbd>R</kbd> raise, <kbd>↑</kbd><kbd>↓</kbd> bet size, <kbd>A</kbd> all in (press twice), <kbd>↵</kbd> continue.</p>
       </div>
@@ -880,6 +881,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
                 bio: "A street mime who never stopped performing. Whatever you do, he does a beat later." },
     gwen:     { name: "Granny Gwen", tier: 0, style: "Never bets. Checks every street and calls with anything decent.", passive: true, p: { call: 0, bet: 0, bluff: 0, shove: .08 },
                 bio: "Knits between hands. Has never raised a bet in her life and doesn't plan to start now." },
+    ida:      { name: "Iron Ida", tier: 0, style: "Calls any all in if she holds a pair or an ace. Folds to bets she doesn't like.", shoveSheriff: true, p: { call: -.05, bet: 0, bluff: .04, shove: 0 },
+                bio: "A retired prison guard with exactly one rule about all ins, and she has never broken it." },
     rock:     { name: "The Rock", tier: 1, style: "Folds unless strong.", p: { call: -.2, bet: -.1, bluff: .02, shove: .12 },
                 bio: "Has worn the same sunglasses for 30 years and folded nine hands in ten for just as long." },
     mel:      { name: "Maniac Mel", tier: 1, style: "Bets a lot. Bluffs a lot.", p: { call: .1, bet: .2, bluff: .35, shove: -.08 },
@@ -908,6 +911,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
                 bio: "Dealt cards here for 25 years and saw every bad beat there is. Now he flinches at scary boards." },
     mirage:   { name: "Mirage", tier: 2, style: "Reverse tells: bets her weak hands and checks her strong ones.", reverse: true, p: { call: 0, bet: 0, bluff: 0, shove: .04 },
                 bio: "A stage magician who lives for misdirection. Whatever she's showing you, the truth is the opposite." },
+    carla:    { name: "Curious Carla", tier: 2, style: "Balanced, but the bigger your all in, the more likely she calls it.", stackCurious: true, p: { call: 0, bet: 0, bluff: .08, shove: 0 },
+                bio: "An investigative journalist. A huge all in is a story, and she always wants to know how it ends." },
     // Elites: mini-bosses with a special power. Each run seats two of them, never more than one at a table.
     augustus: { name: "Augustus Primack", tier: 3, style: "Old money. Folds most hands, but when he plays he bets every street and never backs down.", aristocrat: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
                 power: { name: "Old Money", desc: "Antes are doubled to 20 at his table." },
@@ -918,6 +923,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ford:     { name: "Christofor Ford", tier: 3, style: "Patient and precise. Never wastes a chip.", reader: true, p: { call: 0, bet: 0, bluff: .05, shove: .05 },
                 power: { name: "River Read", desc: "Knows your hand on the river. He only calls or bets there when he's ahead." },
                 bio: "Former head of casino security. He caught every cheat in the building, then quietly learned all their tricks." },
+    sal:      { name: "Sal \"Snap\" Moretti", tier: 3, style: "Loose and loud. Calls a lot, bluffs often.", snapCaller: true, p: { call: .15, bet: .1, bluff: .12, shove: 0 },
+                power: { name: "Snap Call", desc: "Always calls your all ins, whatever he's holding." },
+                bio: "Ran the back-room games for forty years. He has seen every shove bluff there is, and he calls them all before you finish pushing your chips in." },
     house:    { name: "The House", tier: 4, style: "The final boss. Never folds after the flop.", wall: true, p: { call: 0, bet: .1, bluff: .15, shove: 0 },
                 bio: "The casino itself, dealt by a dealer who never blinks. Every chip you've won was only ever on loan." },
   };
@@ -936,7 +944,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // A table's target is its base, or half the chips you sit down with minus 60, if that's higher.
   // Normal play never reaches the second number; doubling up with a lucky shove does, so it can't clear several tables at once.
   const targetFor = (t, stack) => Math.max(MODES[G.mode].targets[t], Math.round((stack / 2 - 60) / 10) * 10);
-  const initials = (name) => name.replace(/^The /, "").split(" ").map(w => w[0]).join("").slice(0, 2);
+  const initials = (name) => name.replace(/^The /, "").split(" ").filter(w => !/^"/.test(w)).map(w => w[0]).join("").slice(0, 2);
 
   // Seat the rivals for a whole run: easier rivals early, tougher ones later, two Elites, The House at the last table.
   function buildLineup(seats) {
@@ -1108,11 +1116,19 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const r = R(o), s = strength(o);
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit && s >= .7;
+    // Sal always calls. Ida calls with a pair or an ace. Carla gets more curious the bigger the shove.
+    if (r.snapCaller) return true;
+    if (r.shoveSheriff) {
+      const board = H.board.slice(0, shown()).map(c => c.r);
+      return o.cards.some(c => c.r === 14) || o.cards[0].r === o.cards[1].r || o.cards.some(c => board.includes(c.r));
+    }
     if (r.reader && H.street === 3) return fordAhead(o);
     if (r.pockets && H.street === 0) return worthy(o) && s >= .6;
     const sizePenalty = Math.min(.12, amt / 2500);
     const suspicion = Math.min(.45, seen * .15);
-    return s + Math.random() * .2 + (tilted(o) ? .15 : 0) > .62 + (r.p.shove || 0) + sizePenalty - suspicion;
+    // Carla: bigger shoves pull her in instead of scaring her off.
+    const curious = r.stackCurious ? Math.min(.32, Math.max(0, amt - 100) / 700) + sizePenalty : 0;
+    return s + Math.random() * .2 + (tilted(o) ? .15 : 0) + curious > .62 + (r.p.shove || 0) + sizePenalty - suspicion;
   }
   // Every rival still in (except the one who bet) calls or folds to a bet of amt.
   function respond(amt, decide, except) {
@@ -1150,6 +1166,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       respond(extra, (o, a) => callsShove(o, a, seen));
       const callers = live();
       if (!callers.length) return finish({ allFold: true });
+      if (callers.some(o => R(o).snapCaller)) setTimeout(snapCallFx, reduceMotion ? 0 : 120);
       say(`You shove ${amt}. <b>${listNames(callers.map(o => R(o).name))} ${callers.length > 1 ? "call" : "calls"}${seen ? ". They've seen your shoves" : ""}!</b>`);
       return goAllIn();
     }
@@ -1298,7 +1315,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
     if (fired.some(f => f[1].emptyPiggy)) G.piggy = 0;
     // A loss can cost chips (Devil's Deal), but never more than you have.
-    const payout = Math.max(-G.bank, Math.round((total + flat) * mult));
+    // All-in pots don't get multiplied: when you shoved, multipliers only boost your bonuses, not the pot.
+    // Without this, doubling a huge all-in pot snowballs a run.
+    const shovePot = H.shoved && win && mult > 1;
+    if (shovePot) lines.push(["All in: multipliers skip the pot", "", "note"]);
+    const payout = Math.max(-G.bank, Math.round(shovePot ? total + flat * mult : (total + flat) * mult));
     G.bank += payout;
     const net = G.bank - H.startBank;
 
@@ -2075,6 +2096,24 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ], { duration: 950, easing: "cubic-bezier(.4,0,.3,1)" });
     ring(e, "var(--fx-purple)", 900, 2.5);
     callout("Charm Thief!", { x: e.x, y: e.y + 60 }, "var(--fx-purple)", 850);
+  }
+  // Sal's Snap Call: his chips hit the pot before yours have settled.
+  function snapCallFx() {
+    if (reduceMotion) return;
+    const seat = [...document.querySelectorAll("#opps .oseat")].find(s => s.querySelector("b")?.textContent === RIVALS.sal.name);
+    if (!seat) return;
+    const e = pt(seat.querySelector(".avatar")), p = potPt();
+    seat.querySelector(".avatar").animate([{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 380, easing: "cubic-bezier(.3,1.6,.5,1)" });
+    for (let i = 0; i < 8; i++) {
+      const c = fx("fx-chip");
+      play(c, [
+        { transform: at(c, e.x, e.y, "scale(.6)"), opacity: 0 },
+        { transform: at(c, p.x + (i - 3.5) * 8, p.y, "scale(.9)"), opacity: 1, offset: .7 },
+        { transform: at(c, p.x + (i - 3.5) * 8, p.y, "scale(.4)"), opacity: 0 },
+      ], { duration: 420, delay: i * 25, easing: "cubic-bezier(.7,0,.3,1)" });
+    }
+    ring(e, "var(--fx-curse)", 0, 3);
+    callout("SNAP CALL!", { x: e.x, y: e.y + 60 }, "var(--fx-curse)", 80);
   }
   function pulseCharm(id) {
     const t = rackTile(id);

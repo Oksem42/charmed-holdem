@@ -11,14 +11,15 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 Both modes share the charms, shop, hand levels and all in. Rivals are seated by difficulty each run, with The House at the final table.
 
 ## Rivals
-Twenty-three rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
+Twenty-six rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
 
 **Elites** are mini-bosses with special powers. Only one Elite ever sits at a table:
 - **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
 - **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
 - **Christofor Ford** (River Read): knows your hand on the river and only calls or bets there when he's ahead.
+- **Sal "Snap" Moretti** (Snap Call): always calls your all ins, whatever he's holding.
 
-New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) and Mirage (reverse tells).
+New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).
 
 ## Casino and cosmetics
 - Earn tokens: +25 for each table you clear, plus tokens for the chips left at the end of a run (and +150 for beating the casino).
@@ -33,7 +34,7 @@ New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, give
 - Each table gives you 6 hands to win the chip target. Miss it and the run ends.
 - Between tables, buy, sell and reorder charms, reroll the shop, and level up hands.
 - Beat all 8 tables to win.
-- All in (`A`, press twice) pushes every chip. Opponents only call with strong hands, and losing one ends your run.
+- All in (`A`, press twice) pushes every chip. Most rivals only call with strong hands, but some always call, and losing one ends your run. Multiplier charms don't multiply an all-in pot, only your bonuses.
 - A big stack raises the table target to half your chips minus 60, if that beats the base target.
 - Choose your bet size with the slider or the Min, ½ pot, ¾ pot and Pot picks, and raise when a rival bets into you. Bigger bets make rivals fold more, but they catch on if you keep overbetting.
 - Keys: `B` bet, `C` check or call, `R` raise, arrow keys bet size, `F` fold, `A` all in, `Enter` continue.
