@@ -896,7 +896,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     second:   { name: "Second Chance", g: "⇄", type: "play", price: 60, desc: "Once per table, after the flop, swap one of your hole cards for a new one.", run: () => null },
     bracelet: { name: "Charm Bracelet", g: "∞", type: "combo", price: 65, desc: "+15 for each other charm that fired this hand. Pays after the others.", run: () => null },
     glass:    { name: "Glass Charm", g: "◇", type: "cursed", price: 70, desc: "Wins pay ×3, but each time it fires there's a 1 in 5 chance it shatters for good.", run: x => x.win && { mult: 3, shatter: Math.random() < .2 } },
-    devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 30 chips.", run: x => x.win ? { mult: 2 } : (x.lostShowdown || x.youFold) && { add: -30 } },
+    devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 15% of your chips.", run: x => { if (x.win) return { mult: 2 }; const cut = Math.round(x.bank * .15); return (x.lostShowdown || x.youFold) && cut > 0 && { add: -cut }; } },
   };
   const MAX_CHARMS = 5;
 
@@ -1330,7 +1330,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
       win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved, overbet: !!H.overbet,
-      youFold: !!youFold, pot: H.pot, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
+      youFold: !!youFold, pot: H.pot, bank: G.bank, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
       riverUp: win && !byFold && you.cat > turnBest.cat,

@@ -50,6 +50,6 @@ Add `#dev` to the address (or type d-e-v on the home page) to open a hidden pane
 - **Play style**: changes how you play (Bluff Master, Peek)
 - **Grows**: gets stronger over a run (Hot Streak)
 - **Combo**: works with other charms (Echo, which makes the charm to its left trigger twice; Charm Bracelet)
-- **Cursed**: huge upside with a real cost (Glass Charm can shatter; Devil's Deal costs 30 chips per lost hand)
+- **Cursed**: huge upside with a real cost (Glass Charm can shatter; Devil's Deal costs 15% of your chips per lost hand)
 
 The whole game is a single `index.html` with no build step.
