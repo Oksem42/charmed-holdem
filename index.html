@@ -418,6 +418,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .charm[data-type="cursed"] { background: repeating-linear-gradient(135deg, rgba(224,86,107,.1) 0 2px, transparent 2px 11px), var(--room-2); }
 .fx-shard { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 53; width: 12px; height: 16px; background: linear-gradient(135deg, #f4fbff, #9fd3ff); clip-path: polygon(50% 0, 100% 100%, 0 75%); }
 .fx-flame.devil { background: radial-gradient(circle at 50% 75%, #ffe0c4 0 15%, #ff5a3c 45%, #8a0f2a 80%); box-shadow: 0 0 16px 4px rgba(224,86,107,.6); }
+.dev-box { width: min(560px, 100%); border-color: rgba(108,196,240,.45); }
+.dev-title { font-family: var(--f-display); font-size: 26px; color: var(--fx-water); }
+.dev-status { color: var(--charm); font-size: 14px; }
+.dev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+ (max-width: 560px) { .dev-grid { grid-template-columns: 1fr; } }
 .lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -707,6 +712,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </div>
 </div>
 
+<div class="case-modal" id="dev-panel" hidden>
+  <div class="case-box dev-box" role="dialog" aria-modal="true" aria-labelledby="dev-title">
+    <div class="sec-split"><div><p class="label">Developer</p><h2 id="dev-title" class="dev-title">Dev panel</h2></div><button class="btn ghost sm" id="dev-close">Close</button></div>
+    <p class="dev-status mono" id="dev-status"></p>
+    <div class="dev-grid">
+      <button class="btn" id="dev-unlock">Unlock all cosmetics</button>
+      <button class="btn alt" id="dev-lock">Lock them again</button>
+      <button class="btn alt" id="dev-tokens">Add ◈ 1,000 tokens</button>
+      <button class="btn ghost" id="dev-reset-tokens">Reset tokens to 150</button>
+    </div>
+    <p class="hint">Changes are saved on this device only. Open this panel by adding <span class="mono">#dev</span> to the address, or by typing d-e-v on the home page.</p>
+  </div>
+</div>
+
 <div class="wrap" id="game" hidden>
   <header class="top">
     <div class="brand">
@@ -923,9 +942,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ford:     { name: "Christofor Ford", tier: 3, style: "Patient and precise. Never wastes a chip.", reader: true, p: { call: 0, bet: 0, bluff: .05, shove: .05 },
                 power: { name: "River Read", desc: "Knows your hand on the river. He only calls or bets there when he's ahead." },
                 bio: "Former head of casino security. He caught every cheat in the building, then quietly learned all their tricks." },
-    sal:      { name: "Sal \"Snap\" Moretti", tier: 3, style: "Loose and loud. Calls a lot, bluffs often.", snapCaller: true, p: { call: .15, bet: .1, bluff: .12, shove: 0 },
+    dustin:   { name: "Dubious Dustin", tier: 3, style: "Loose and loud. Calls a lot, bluffs often.", snapCaller: true, p: { call: .15, bet: .1, bluff: .12, shove: 0 },
                 power: { name: "Snap Call", desc: "Always calls your all ins, whatever he's holding." },
-                bio: "Ran the back-room games for forty years. He has seen every shove bluff there is, and he calls them all before you finish pushing your chips in." },
+                bio: "Ran the back-room games for forty years. Nobody believes a word he says, and he believes yours even less: he calls every all in before you've finished pushing your chips." },
     house:    { name: "The House", tier: 4, style: "The final boss. Never folds after the flop.", wall: true, p: { call: 0, bet: .1, bluff: .15, shove: 0 },
                 bio: "The casino itself, dealt by a dealer who never blinks. Every chip you've won was only ever on loan." },
   };
@@ -1116,7 +1135,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const r = R(o), s = strength(o);
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit && s >= .7;
-    // Sal always calls. Ida calls with a pair or an ace. Carla gets more curious the bigger the shove.
+    // Dustin always calls. Ida calls with a pair or an ace. Carla gets more curious the bigger the shove.
     if (r.snapCaller) return true;
     if (r.shoveSheriff) {
       const board = H.board.slice(0, shown()).map(c => c.r);
@@ -2097,10 +2116,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ring(e, "var(--fx-purple)", 900, 2.5);
     callout("Charm Thief!", { x: e.x, y: e.y + 60 }, "var(--fx-purple)", 850);
   }
-  // Sal's Snap Call: his chips hit the pot before yours have settled.
+  // Dubious Dustin's Snap Call: his chips hit the pot before yours have settled.
   function snapCallFx() {
     if (reduceMotion) return;
-    const seat = [...document.querySelectorAll("#opps .oseat")].find(s => s.querySelector("b")?.textContent === RIVALS.sal.name);
+    const seat = [...document.querySelectorAll("#opps .oseat")].find(s => s.querySelector("b")?.textContent === RIVALS.dustin.name);
     if (!seat) return;
     const e = pt(seat.querySelector(".avatar")), p = potPt();
     seat.querySelector(".avatar").animate([{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 380, easing: "cubic-bezier(.3,1.6,.5,1)" });
@@ -2302,10 +2321,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     pulseCharm("second");
     if (!reduceMotion) CHARM_FX.second(i);
   }
+  let devKeys = "";
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (!$("dev-panel").hidden) { if (key === "Escape") closeDev(); return; }
     if (!$("home").hidden) {
+      // Typing d-e-v on the home page opens the dev panel.
+      devKeys = (devKeys + (key.length === 1 ? key : "")).slice(-3);
+      if (devKeys === "dev") { devKeys = ""; openDev(); return; }
       if (!$("case-modal").hidden) { if (key === "Escape" && !$("prize").hidden) closeCase(); return; }
       if (key === "Enter" && !e.target.closest("button, a")) { e.preventDefault(); $("play-btn").click(); }
       return;
@@ -2924,6 +2948,33 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   $("new-btn").addEventListener("click", () => showGame("table"));
   document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => showGame(b.dataset.mode)));
   $("home-btn").addEventListener("click", showHome);
+
+  // ---------- Dev panel ----------
+  // Hidden tools for testing cosmetics. Open with #dev in the address, or by typing d-e-v on the home page.
+  function devStatus() {
+    const ids = Object.keys(COSMETICS), have = ids.filter(owns).length;
+    $("dev-status").textContent = `${have} of ${ids.length} cosmetics unlocked · ◈ ${P.tokens.toLocaleString("en-US")} tokens`;
+  }
+  function devRefresh() { saveProfile(); applyCosmetics(); renderWallets(); renderCollection(); devStatus(); }
+  function openDev() { $("dev-panel").hidden = false; devStatus(); }
+  function closeDev() {
+    $("dev-panel").hidden = true;
+    if (location.hash === "#dev") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { location.hash = ""; } }
+  }
+  $("dev-unlock").addEventListener("click", () => { P.owned = Object.keys(COSMETICS).filter(id => !COSMETICS[id].free); devRefresh(); });
+  $("dev-lock").addEventListener("click", () => {
+    P.owned = [];
+    // Anything equipped that's now locked goes back to the free default.
+    const defaults = { back: "back_classic", theme: "theme_classic", win: "win_suits" };
+    Object.keys(P.equip).forEach(k => { if (!owns(P.equip[k])) P.equip[k] = defaults[k]; });
+    devRefresh();
+  });
+  $("dev-tokens").addEventListener("click", () => { P.tokens += 1000; devRefresh(); });
+  $("dev-reset-tokens").addEventListener("click", () => { P.tokens = 150; devRefresh(); });
+  $("dev-close").addEventListener("click", closeDev);
+  $("dev-panel").addEventListener("click", (e) => { if (e.target === $("dev-panel")) closeDev(); });
+  window.addEventListener("hashchange", () => { if (location.hash === "#dev") openDev(); });
+  if (location.hash === "#dev") setTimeout(openDev, 0);
 
   applyCosmetics();
   renderHome();

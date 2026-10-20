@@ -17,7 +17,7 @@ Twenty-six rivals, each with a playstyle and a backstory (hover a rival in game 
 - **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
 - **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
 - **Christofor Ford** (River Read): knows your hand on the river and only calls or bets there when he's ahead.
-- **Sal "Snap" Moretti** (Snap Call): always calls your all ins, whatever he's holding.
+- **Dubious Dustin** (Snap Call): always calls your all ins, whatever he's holding.
 
 New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).
 
@@ -28,6 +28,9 @@ New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, give
 - Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
 - The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
 - Optional online leaderboard: run `supabase-setup.sql` in a Supabase project, then put the Project URL and publishable key in the `ONLINE` setting in `index.html`.
+
+## Dev panel
+Add `#dev` to the address (or type d-e-v on the home page) to open a hidden panel that unlocks or re-locks every cosmetic and adds tokens. Changes only affect the device you're on.
 
 ## How to play
 - Each hand costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.
