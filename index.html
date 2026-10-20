@@ -916,6 +916,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
                 bio: "Knits between hands. Has never raised a bet in her life and doesn't plan to start now." },
     ida:      { name: "Iron Ida", tier: 0, style: "Calls any all in if she holds a pair or an ace. Folds to bets she doesn't like.", shoveSheriff: true, p: { call: -.05, bet: 0, bluff: .04, shove: 0 },
                 bio: "A retired prison guard with exactly one rule about all ins, and she has never broken it." },
+    ben:      { name: "Ben Anderson", tier: 0, style: "Has no idea how poker works. Every decision is a coin flip.", coinFlip: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
+                bio: "Wandered in out of the rain looking for a warm seat and found a chip on the floor. Nobody remembers seating him, he doesn't know the rules, and he's having the best night of his life." },
     rock:     { name: "The Rock", tier: 1, style: "Folds unless strong.", p: { call: -.2, bet: -.1, bluff: .02, shove: .12 },
                 bio: "Has worn the same sunglasses for 30 years and folded nine hands in ten for just as long." },
     mel:      { name: "Maniac Mel", tier: 1, style: "Bets a lot. Bluffs a lot.", p: { call: .1, bet: .2, bluff: .35, shove: -.08 },
@@ -1112,6 +1114,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   function wantsBet(o) {
     const r = R(o), p = r.p, s = strength(o);
+    // Ben Anderson ignores his cards entirely.
+    if (r.coinFlip) return Math.random() < .35;
     if (r.aristocrat) return o.commit;
     if (r.reader && H.street === 3) return fordAhead(o) ? Math.random() < .85 : Math.random() < .05;
     if (r.passive) return false;
@@ -1129,6 +1133,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   function calls(o, amt) {
     const r = R(o), s = strength(o);
+    if (r.coinFlip) return Math.random() < .5;
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit;
     if (r.reader && H.street === 3) return fordAhead(o);
@@ -1155,6 +1160,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // They remember: every shove you've made at this table makes them call the next one with a weaker hand.
   function callsShove(o, amt, seen) {
     const r = R(o), s = strength(o);
+    if (r.coinFlip) return Math.random() < .5;
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit && s >= .7;
     // Dustin always calls. Ida calls with a pair or an ace. Carla gets more curious the bigger the shove.
