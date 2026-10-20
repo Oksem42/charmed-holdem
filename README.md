@@ -4,6 +4,9 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 
 **Play it:** https://oksem42.github.io/charmed-holdem/
 
+## Tutorial
+A 12-step guide opens the first time you visit, covering the basics of Hold'em, hand rankings, your moves, table targets, rivals and Elites, charms, archetypes, the shop, cases and modes. Reopen it from "How to play" on the home page or the ? button in the game.
+
 ## Game modes
 - **4-player table** (main mode): you and three rivals at each of the 8 tables.
 - **Heads-up duel**: one rival per table.

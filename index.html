@@ -325,6 +325,50 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .oseat.winner { background: rgba(242,184,75,.14); box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5); }
 .oseat.winner .o-act { color: var(--charm); font-weight: 700; }
 .oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
+/* Tutorial */
+.tutorial { position: fixed; inset: 0; z-index: 75; display: grid; place-items: center; background: rgba(4, 8, 8, .84); padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
+.tut-box { width: min(720px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-rows: auto 1fr auto; background: var(--room-2); border: 1px solid rgba(242,184,75,.4); border-radius: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow: hidden; animation: rise .35s ease backwards; }
+.tut-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; padding: 20px 22px 8px; }
+.tut-head h2 { font-family: var(--f-display); font-size: clamp(24px, 4vw, 32px); color: var(--charm); }
+.tut-count { color: var(--muted); font-size: 12px; padding-top: 4px; }
+.tut-body { padding: 8px 22px 18px; overflow-y: auto; display: grid; gap: 12px; align-content: start; font-size: 15px; }
+.tut-body p { max-width: 62ch; }
+.tut-body b { color: var(--text); }
+.tut-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 22px 16px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.tut-nav { display: flex; gap: 8px; }
+.tut-dots { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+.tut-dot { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; background: rgba(236,230,218,.25); }
+.tut-dot.on { background: var(--charm); width: 22px; border-radius: 99px; }
+.tut-steps { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.tut-bullets { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.tut-table { display: flex; flex-wrap: wrap; gap: 12px 22px; padding: 14px; border-radius: 16px; background: radial-gradient(ellipse at 50% 45%, var(--baize), var(--baize-dark)); }
+.tut-table > div { display: grid; gap: 6px; }
+.tut-cards { display: flex; gap: 5px; flex-wrap: wrap; }
+.tut-cards .card { --w: 44px; width: 44px; }
+.tut-cards .card .p { font-size: 18px; } .tut-cards .card .c { font-size: 11px; }
+.tut-cards.mini .card { --w: 30px; width: 30px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+.tut-cards.mini .card .p { display: none; } .tut-cards.mini .card .c { font-size: 10px; top: 3px; left: 4px; }
+.tut-ranks { display: grid; gap: 6px; }
+.tut-rank { display: grid; grid-template-columns: 130px auto 1fr; gap: 10px; align-items: center; font-size: 13.5px; }
+.tut-rank small { color: var(--muted); }
+.tut-moves { display: grid; gap: 6px; }
+.tut-moves > div { display: grid; grid-template-columns: 70px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.22); font-size: 14px; }
+.tut-moves span { color: var(--muted); }
+.tut-panel { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(242,184,75,.4); background: linear-gradient(160deg, rgba(242,184,75,.1), transparent 60%); max-width: 360px; font-size: 13.5px; }
+.tut-panel > div { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); }
+.tut-panel .up { color: var(--win); }
+.tut-list { display: grid; gap: 6px; }
+.tut-list.cols { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.tut-list > div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.22); border-left: 3px solid var(--tc, var(--charm)); font-size: 13.5px; }
+.tut-list span { color: var(--muted); }
+.tut-type { color: var(--tc, var(--charm)) !important; }
+.help-btn { width: 34px; padding: 6px 0; font-weight: 800; }
+@media (max-width: 560px) {
+  .tut-rank { grid-template-columns: 1fr auto; } .tut-rank small { grid-column: 1 / -1; }
+  .tut-moves > div { grid-template-columns: 60px 1fr; } .tut-moves kbd { display: none; }
+  .tut-foot { justify-content: center; } .tut-dots { order: -1; width: 100%; }
+}
+
 /* Final table intro: lights out, two spotlights sweep, the title drops in, The House rises. */
 .final-intro { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 60%, #1a1405 0%, #050403 70%); padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
 .final-intro.play { animation: fiDark .8s ease backwards; }
@@ -705,7 +749,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <div class="profile-row">
         <label class="name-field" for="player-name"><span class="label">Your name</span><input id="player-name" type="text" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
         <a class="wallet-chip" href="#casino" title="Tokens: earn them by playing, spend them on cases">◈ <b class="token-count">0</b> tokens</a>
-        <nav class="quick-links"><a href="#casino">Casino</a><a href="#inventory">Inventory</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
+        <nav class="quick-links"><a href="#" data-open-tutorial>How to play</a><a href="#casino">Casino</a><a href="#inventory">Inventory</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
       </div>
     </div>
     <div class="hero-table" aria-hidden="true">
@@ -819,6 +863,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </div>
 </div>
 
+<div class="tutorial" id="tutorial" hidden>
+  <div class="tut-box" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+    <div class="tut-head"><div><p class="label" id="tut-kicker">Welcome</p><h2 id="tut-title">Charmed Hold'em</h2></div><span class="mono tut-count" id="tut-count">1 / 12</span></div>
+    <div class="tut-body" id="tut-body"></div>
+    <div class="tut-foot">
+      <button class="btn ghost sm" id="tut-skip">Skip</button>
+      <div class="tut-dots" id="tut-dots"></div>
+      <div class="tut-nav"><button class="btn ghost" id="tut-back">← Back</button><button class="btn" id="tut-next">Next →</button><button class="btn" id="tut-play" hidden>Let's play</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="final-intro" id="final-intro" hidden>
   <div class="fi-spot fi-l" aria-hidden="true"></div><div class="fi-spot fi-r" aria-hidden="true"></div>
   <div class="fi-stage" role="dialog" aria-modal="true" aria-labelledby="fi-title">
@@ -855,6 +911,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     </div>
     <div class="stats">
       <button class="btn ghost sm home-link" id="home-btn">← Home</button>
+      <button class="btn ghost sm help-btn" data-open-tutorial aria-label="How to play" title="How to play">?</button>
       <div class="stat"><span class="label">Table</span><b id="s-table">1 / 8</b></div>
       <div class="stat"><span class="label">Hands left</span><div class="pips" id="s-hands"></div></div>
       <div class="stat bank-mini"><span class="label">Chips</span><b id="s-bank-mini">200</b></div>
@@ -2616,6 +2673,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (tutorialOpen()) {
+      if (key === "ArrowRight" || (key === "Enter" && !e.target.closest("button"))) { e.preventDefault(); $($("tut-next").hidden ? "tut-play" : "tut-next").click(); }
+      else if (key === "ArrowLeft") { e.preventDefault(); $("tut-back").click(); }
+      else if (key === "Escape") closeTutorial();
+      return;
+    }
     if (finalIntroGo) { if (key === "Enter" || key === "Escape") { e.preventDefault(); finalIntroGo(); } return; }
     if (!$("dev-panel").hidden) { if (key === "Escape") closeDev(); return; }
     if (!$("home").hidden) {
@@ -3402,9 +3465,102 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   window.addEventListener("hashchange", () => { if (location.hash === "#" + DEV_CODE) openDev(); });
   if (location.hash === "#" + DEV_CODE) setTimeout(openDev, 0);
 
+  // ---------- Tutorial ----------
+  // Opens by itself the first time someone visits, and any time from "How to play".
+  // Lists (elites, charm types, archetypes, cases) are built from the game's own data so they stay accurate.
+  const tc = (s) => s.split(" ").map(x => { const r = { J: 11, Q: 12, K: 13, A: 14 }[x.slice(0, -1)] || +x.slice(0, -1); return cardEl({ r, s: x.slice(-1) }).outerHTML; }).join("");
+  const TUT = [
+    { kicker: "Welcome", title: "Charmed Hold'em",
+      body: () => `<p>Real Texas Hold'em, turned into a run. Beat <b>8 tables</b> of rivals, collect <b>charms</b> that pay out in their own wild ways, and build a combo that breaks the casino.</p>
+        <ol class="tut-steps"><li><b>Play hands</b> of Hold'em against rivals.</li><li><b>Hit the chip target</b> at each table within 6 hands.</li><li><b>Shop between tables</b> for charms and upgrades.</li><li><b>Beat The House</b> at the final table.</li></ol>
+        <p class="hint">This takes about two minutes. Use the arrows or the Next button, and press Skip any time.</p>` },
+    { kicker: "The basics", title: "A hand of Hold'em",
+      body: () => `<p>You get <b>2 hole cards</b> that only you see. Everyone shares <b>5 cards on the board</b>. Your hand is the <b>best 5 cards</b> you can make from those 7.</p>
+        <div class="tut-table"><div><span class="label">Your hole cards</span><div class="tut-cards">${tc("A♠ K♠")}</div></div><div><span class="label">The board</span><div class="tut-cards">${tc("Q♠ J♠ 10♠ 4♦ 2♣")}</div></div></div>
+        <p>The board comes out in <b>streets</b>: <b>preflop</b> (no board yet), the <b>flop</b> (3 cards), the <b>turn</b> (1 more) and the <b>river</b> (the last one). There's a round of betting on each street, and you act first. If more than one player is left after the river, it's a <b>showdown</b>: the best hand takes the pot.</p>` },
+    { kicker: "The basics", title: "Hand rankings",
+      body: () => `<p>Best to worst. The pill under your cards always shows what you're holding right now.</p>
+        <div class="tut-ranks">${[["Straight flush", "9♥ 8♥ 7♥ 6♥ 5♥", "Five in a row, all one suit"], ["Four of a kind", "Q♠ Q♥ Q♦ Q♣ 3♠", ""], ["Full house", "K♠ K♥ K♦ 7♣ 7♠", "Three of a kind plus a pair"], ["Flush", "A♦ J♦ 8♦ 6♦ 2♦", "Five of one suit"], ["Straight", "10♣ 9♦ 8♠ 7♥ 6♣", "Five in a row"], ["Three of a kind", "8♠ 8♥ 8♦ K♣ 4♠", ""], ["Two pair", "J♠ J♥ 5♦ 5♣ A♠", ""], ["Pair", "10♠ 10♥ A♦ 7♣ 3♠", ""], ["High card", "A♣ Q♦ 9♠ 6♥ 2♣", "Nothing else: highest card plays"]]
+          .map(([n, cs, why]) => `<div class="tut-rank"><b>${n}</b><div class="tut-cards mini">${tc(cs)}</div>${why ? `<small>${why}</small>` : ""}</div>`).join("")}</div>
+        <p class="hint">Same hand type? The higher cards win, and if those tie too, the best leftover card (the kicker) decides it.</p>` },
+    { kicker: "Playing", title: "Your moves",
+      body: () => `<div class="tut-moves">
+          <div><b>Check</b><span>Pass without betting. Only when nobody has bet.</span><kbd>C</kbd></div>
+          <div><b>Bet</b><span>Put chips in. Pick the size with the slider or Min / ½ pot / ¾ pot / Pot.</span><kbd>B</kbd></div>
+          <div><b>Call</b><span>Match a rival's bet to stay in.</span><kbd>C</kbd></div>
+          <div><b>Raise</b><span>Call and put in more. Everyone still in must match it or fold.</span><kbd>R</kbd></div>
+          <div><b>Fold</b><span>Give up the hand. You lose what you've already put in.</span><kbd>F</kbd></div>
+          <div><b>All in</b><span>Push every chip. Press twice to confirm. Lose it and your run is over.</span><kbd>A</kbd></div>
+        </div>
+        <p>Every hand costs a <b>10-chip ante</b>. Bigger bets make rivals fold more, but they catch on if you keep overbetting or shoving. Arrow keys nudge your bet size, and <kbd>↵</kbd> moves on to the next hand.</p>` },
+    { kicker: "Playing", title: "Winning a table",
+      body: () => `<p>Each table gives you <b>6 hands</b> to win its <b>chip target</b>. Hit it and you move on to the shop and the next table. Miss it, or run too low to pay the ante, and the run ends.</p>
+        <div class="tut-panel"><div><span>Your chips</span><b class="mono">240</b></div><div><span>Won at this table</span><b class="mono up">+40</b></div><div><span>Still needed</span><b class="mono">+35 in 3 hands</b></div><div><span>Can lose</span><b class="mono">230 chips</b></div></div>
+        <p>The <b>chip panel</b> beside the table tracks all of this. <b>Still needed</b> and <b>Can lose</b> turn red when you're in danger. Bring a big stack to a table and its target rises: half your chips minus 60, if that's higher than normal.</p>` },
+    { kicker: "Rivals", title: "Know who you're playing",
+      body: () => `<p>There are ${Object.keys(RIVALS).length} rivals and every one plays differently: some call everything, some only bet monsters, some bluff the river. <b>Hover a rival</b> to read their backstory. They also <b>remember your shoves</b>: every all in at a table makes them call the next one more easily.</p>
+        <p><b>Elites</b> are mini-bosses with special powers. Each run has two of them (tables 4 and 7), never more than one at a table:</p>
+        <div class="tut-list">${Object.values(RIVALS).filter(r => r.tier === 3).map(r => `<div><b>${r.name}</b><span>${r.power.name}: ${r.power.desc}</span></div>`).join("")}</div>
+        <p>The <b>final table</b> is a 1v1 against <b>The House</b>, which <b>calls every bet</b>. Bluffs don't work there, but strong hands always get paid.</p>` },
+    { kicker: "Charms", title: "Charms make the run",
+      body: () => `<p>Your <b>rack</b> holds up to ${MAX_CHARMS} charms. After you win a hand they pay out <b>left to right</b>, each with its own effect, and the receipt shows exactly what paid.</p>
+        <div class="tut-list cols">${Object.entries(TYPES).map(([k, t]) => `<div style="--tc:${t.color}"><b class="tut-type">${t.label}</b><span>${{ payout: "Flat bonus chips when their condition hits.", mult: "Multiply the whole payout. Rare and huge.", play: "Change how you play the hand.", grow: "Get stronger the longer the run goes.", combo: "Work with the charms beside them. Echo copies the charm to its left.", cursed: "Huge upside with a real cost." }[k] || ""}</span></div>`).join("")}</div>
+        <p><b>Hand levels</b> pay extra whenever you win with that hand type. Level them up in the shop.</p>` },
+    { kicker: "Charms", title: "Archetypes",
+      body: () => `<p>Pick a playstyle and build around it. Own <b>2 charms</b> of an archetype for a set bonus, and <b>3</b> for a stronger one. Your rack shows your progress, like "Bluffer 2/3 ✓".</p>
+        <div class="tut-list">${Object.values(ARCHETYPES).map(a => `<div style="--tc:${a.color}"><b class="tut-type">${a.name}</b><span>${a.blurb} 2: ${a.tiers[0]}. 3: ${a.tiers[1]}.</span></div>`).join("")}</div>` },
+    { kicker: "Between tables", title: "The shop",
+      body: () => `<ul class="tut-bullets"><li><b>Buy charms</b> with your chips. Three are on offer each visit.</li><li><b>Reroll</b> the offers for 10 chips (each reroll costs 5 more).</li><li><b>Sell</b> a charm for half its price, and <b>reorder</b> your rack with the arrows. Order matters for Echo.</li><li><b>Level up hands</b> so they pay more when you win with them.</li></ul>
+        <p class="hint">Chips you spend in the shop are chips you don't have at the next table, so spend wisely.</p>` },
+    { kicker: "Rewards", title: "Tokens, cases and style",
+      body: () => `<p>You earn <b>tokens</b> for every table you clear and for the chips left at the end of a run. Spend them in the <b>Casino</b> on cases, opening 1, 3, 5 or 10 at a time.</p>
+        <div class="tut-list cols">${Object.entries(RARITY).map(([k, r]) => `<div style="--tc:${r.color}"><b class="tut-type">${r.label}</b><span>${{ common: "Most pulls.", rare: "About 1 in 8.", epic: "A few percent.", legendary: "Well under 1%." }[k]}</span></div>`).join("")}</div>
+        <p>Prizes are cosmetic: <b>card backs</b>, <b>table themes</b> and <b>win animations</b>. Equip them in your <b>Collection</b>. Duplicates go to your <b>Inventory</b>, where you can keep them or sell the extras for tokens.</p>` },
+    { kicker: "Modes", title: "Two ways to play",
+      body: () => `<div class="tut-list cols"><div><b class="tut-type">4-player table</b><span>The main mode. You and three rivals at every table: bigger pots, more people to read.</span></div><div><b class="tut-type">Heads-up duel</b><span>One rival per table. Every hand is you against them.</span></div></div>
+        <p>Finished runs go on the <b>Leaderboard</b>, ranked by tables cleared and then chips. Set your name on the home page so your runs show up as yours.</p>` },
+    { kicker: "You're ready", title: "A few last tips",
+      body: () => `<ul class="tut-bullets"><li><b>Fold weak hands early.</b> The ante is cheap; chasing junk isn't.</li><li><b>Bet your strong hands.</b> Rivals who call pay you off, especially The House.</li><li><b>Watch the chip panel.</b> It tells you how much you need and how much you can afford to lose.</li><li><b>Pick an archetype</b> by the second shop and build toward 3 charms.</li><li><b>All in is a weapon, not a habit.</b> Rivals adapt, and some always call.</li></ul>
+        <p class="hint">You can reopen this guide from "How to play" on the home page or the ? button in the game.</p>` },
+  ];
+  let tutStep = 0;
+  function renderTutorial() {
+    const s = TUT[tutStep], last = tutStep === TUT.length - 1;
+    $("tut-kicker").textContent = s.kicker;
+    $("tut-title").textContent = s.title;
+    $("tut-body").innerHTML = s.body();
+    $("tut-body").scrollTop = 0;
+    $("tut-dots").innerHTML = TUT.map((_, i) => `<button type="button" class="tut-dot${i === tutStep ? " on" : ""}" data-tut="${i}" aria-label="Step ${i + 1}"></button>`).join("");
+    $("tut-dots").querySelectorAll("[data-tut]").forEach(b => b.addEventListener("click", () => { tutStep = +b.dataset.tut; renderTutorial(); }));
+    $("tut-count").textContent = `${tutStep + 1} / ${TUT.length}`;
+    $("tut-back").disabled = tutStep === 0;
+    $("tut-next").hidden = last;
+    $("tut-play").hidden = !last;
+    $("tut-skip").textContent = last ? "Close" : "Skip";
+  }
+  function openTutorial(step = 0) {
+    tutStep = step;
+    $("tutorial").hidden = false;
+    renderTutorial();
+    setTimeout(() => $("tut-next").hidden ? $("tut-play").focus() : $("tut-next").focus(), 0);
+  }
+  function closeTutorial() {
+    $("tutorial").hidden = true;
+    P.tutorialSeen = true;
+    saveProfile();
+  }
+  const tutorialOpen = () => !$("tutorial").hidden;
+  $("tut-next").addEventListener("click", () => { if (tutStep < TUT.length - 1) { tutStep++; renderTutorial(); } });
+  $("tut-back").addEventListener("click", () => { if (tutStep > 0) { tutStep--; renderTutorial(); } });
+  $("tut-skip").addEventListener("click", closeTutorial);
+  $("tut-play").addEventListener("click", () => { closeTutorial(); if ($("game").hidden) showGame(null); });
+  document.querySelectorAll("[data-open-tutorial]").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); openTutorial(0); }));
+
   applyCosmetics();
   renderHome();
   showHome();
+  // First visit: the tutorial opens by itself.
+  if (!P.tutorialSeen) openTutorial(0);
 })();
 </script>
 </body>
