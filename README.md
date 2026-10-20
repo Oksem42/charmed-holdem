@@ -23,7 +23,7 @@ Twenty-nine rivals, each with a playstyle and a backstory (hover a rival in game
 - **Liam Ford** (Protection Racket): the mafia boss cancels your strongest score multiplier on every hand at his table.
 - **Elias Primack** (Family Rules): Augustus's son. When you fold, 40% of the time he won't let you leave, and the hand plays out to showdown.
 
-New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).
+New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (never bets), Jackson (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).
 
 ## Casino and cosmetics
 - Earn tokens: +25 for each table you clear, plus tokens for the chips left at the end of a run (and +150 for beating the casino).

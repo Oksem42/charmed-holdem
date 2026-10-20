@@ -164,6 +164,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .goal-row b { color: var(--charm); }
 
 /* Rack: each charm is coloured by its type */
+.rack { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.rack .charm { max-width: none; padding: 8px 8px 8px 6px; gap: 8px; }
+.rack .charm .g { width: 32px; height: 32px; font-size: 13px; }
+.rack .charm b { font-size: 13px; }
+.rack .charm small { font-size: 11.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 1060px) { .rack { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .rack { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rack .charm small { -webkit-line-clamp: 2; } }
+.shop-grid.owned { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 560px) { .shop-grid.owned { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .rack-wrap { display: grid; gap: 8px; }
 .rack-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; }
 .charm { position: relative; --tc: var(--charm); border-top: 3px solid var(--tc); }
@@ -825,7 +834,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </div>
 
   <div class="rack-wrap">
-    <div class="rack-head"><p class="label">Your charms · <span id="c-count">1/5</span></p><p class="hint">They pay left to right after each hand you win.</p></div>
+    <div class="rack-head"><p class="label">Your charms · <span id="c-count">1/6</span></p><p class="hint">They pay left to right after each hand you win.</p></div>
     <div class="rack" id="rack"></div>
   </div>
 
@@ -960,7 +969,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     glass:    { name: "Glass Charm", g: "◇", type: "cursed", price: 70, desc: "Wins pay ×3, but each time it fires there's a 1 in 5 chance it shatters for good.", run: x => x.win && { mult: 3, shatter: Math.random() < .2 } },
     devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 15% of your chips.", run: x => { if (x.win) return { mult: 2 }; const cut = Math.round(x.bank * .15); return (x.lostShowdown || x.youFold) && cut > 0 && { add: -cut }; } },
   };
-  const MAX_CHARMS = 5;
+  const MAX_CHARMS = 6;
 
   // ---------- Rivals ----------
   // Every rival has a playstyle and a backstory. p holds their basic tendencies; the flags switch on special behaviour in the AI below.
@@ -990,7 +999,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
                 bio: "Hit a one-outer on the river in 1994 and still believes it'll happen every hand." },
     tina:     { name: "Tilted Tina", tier: 1, style: "Goes wild for two hands after she loses a pot.", tilt: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 },
                 bio: "A champion arm-wrestler who takes every lost pot as a personal insult." },
-    freddie:  { name: "Fast Freddie", tier: 1, style: "Bets every flop, then gives up on the turn if you're still there.", cbet: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
+    jackson:  { name: "Jackson", tier: 1, style: "Bets every flop, then gives up on the turn if you're still there.", cbet: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
                 bio: "A racecar driver who plays the way he drives: flat out early, out of gas by the end." },
     pockets:  { name: "Sir Pockets", tier: 1, style: "Only plays pocket pairs and high cards. Folds everything else before the flop.", pockets: true, p: { call: 0, bet: .05, bluff: .04, shove: .06 },
                 bio: "A knight of the realm, or so he claims. He has strict rules about which hands are worthy." },

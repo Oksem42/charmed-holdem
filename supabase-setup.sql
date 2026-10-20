@@ -9,7 +9,7 @@ create table if not exists public.scores (
   tables     int  not null check (tables between 0 and 8),
   victory    boolean not null default false,
   chips      int  not null check (chips between 0 and 100000),
-  charms     int  not null default 0 check (charms between 0 and 5),
+  charms     int  not null default 0 check (charms between 0 and 6),
   -- A run only counts as a victory if all 8 tables were cleared.
   check (not victory or tables = 8)
 );
