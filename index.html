@@ -424,6 +424,32 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .prize small { color: var(--muted); }
 .prize.r-legendary { box-shadow: 0 0 40px -6px var(--r-legend); }
 .case-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.case-box { max-height: calc(100vh - 32px); overflow-y: auto; }
+.reels { display: grid; gap: 8px; }
+.reels.multi .reel-window { padding: 6px 0; }
+.reels.multi .rtile { width: 88px; padding: 6px 4px; gap: 4px; }
+.reels.multi .rtile .pv { width: 40px; height: 40px; }
+.reels.multi .rtile .pv-back .card { --w: 26px; width: 26px; }
+.reels.multi .rtile .pv-win b { font-size: 20px; }
+.reels.multi .rtile span:last-child { font-size: 10.5px; }
+.reels.tight .reel-window { padding: 3px 0; }
+.reels.tight .rtile { padding: 3px 4px; }
+.reels.tight .rtile span:last-child { display: none; }
+.case-buy { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.qty { display: inline-flex; padding: 3px; border-radius: 99px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+.qty-btn { border: 0; background: transparent; color: var(--muted); padding: 5px 10px; border-radius: 99px; font-family: var(--f-mono); font-size: 12.5px; font-weight: 700; }
+.qty-btn[aria-pressed="true"] { background: var(--charm); color: var(--charm-ink); }
+.prize.multi { display: grid; gap: 12px; align-items: stretch; }
+.multi-head { display: grid; gap: 2px; }
+.multi-head b { font-family: var(--f-display); font-size: 22px; }
+.multi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.mprize { display: grid; justify-items: center; gap: 4px; padding: 10px 6px; border-radius: 12px; background: rgba(0,0,0,.25); border-bottom: 4px solid var(--rc); text-align: center; animation: rise .35s ease backwards; animation-delay: calc(var(--i) * 60ms); }
+.mprize .pv { width: 52px; height: 52px; }
+.mprize b { font-family: var(--f-body); font-size: 13px; }
+.mprize .rar { font-size: 10px; }
+.mprize small { font-size: 11px; color: var(--muted); }
+.mprize.dupe { opacity: .6; }
+.mprize.best { box-shadow: 0 0 0 2px var(--rc), 0 0 26px -6px var(--rc); }
 
 /* Collection */
 .collection { display: grid; gap: 18px; }
@@ -742,7 +768,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 <div class="case-modal" id="case-modal" hidden>
   <div class="case-box" role="dialog" aria-modal="true" aria-labelledby="case-title">
     <p class="label" id="case-title">Case</p>
-    <div class="reel-window" id="reel-window"><div class="reel" id="reel"></div><i class="reel-marker"></i></div>
+    <div class="reels" id="reels"></div>
     <div class="prize" id="prize" hidden></div>
     <div class="case-actions" id="case-actions"></div>
   </div>
@@ -2848,88 +2874,146 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     document.querySelectorAll(".token-count").forEach(el => el.textContent = P.tokens.toLocaleString("en-US"));
     if ($("case-grid")) renderCases();
   }
+  // How many of each case to open at once.
+  const QTY = [1, 3, 5, 10];
+  const caseQty = Object.fromEntries(Object.keys(CASES).map(k => [k, 1]));
   function renderCases() {
     $("case-grid").innerHTML = Object.entries(CASES).map(([key, c]) => {
       const items = caseItems(key);
       const odds = Object.entries(c.odds).map(([r, pct]) => `<i style="flex:${pct};background:${RARITY[r].color}" title="${RARITY[r].label} ${pct}%"></i>`).join("");
+      const q = caseQty[key], cost = c.price * q, poor = P.tokens < cost;
       return `<div class="case-card case-${key}">
         <div class="case-lid"><span class="case-name">${c.name}</span><span class="case-price">◈ ${c.price}</span></div>
         <p>${c.blurb}</p>
         <div class="odds">${odds}</div>
         <p class="odds-key">${Object.entries(c.odds).map(([r, pct]) => `<span style="color:${RARITY[r].color}">${RARITY[r].label} ${pct}%</span>`).join(" · ")}</p>
         <div class="case-items">${items.map(id => `<span class="mini-item${owns(id) ? " got" : ""}" style="--rc:${RARITY[COSMETICS[id].rarity].color}" title="${COSMETICS[id].name} (${RARITY[COSMETICS[id].rarity].label})${owns(id) ? ", owned" : ""}">${preview(id)}</span>`).join("")}</div>
-        <button class="btn${key === "vault" ? "" : " alt"}" data-case="${key}" ${P.tokens < c.price ? "disabled" : ""}>${P.tokens < c.price ? `Need ◈ ${c.price - P.tokens} more` : "Open case"}</button>
+        <div class="case-buy">
+          <div class="qty" role="group" aria-label="How many ${c.name}s to open">${QTY.map(n => `<button type="button" class="qty-btn" data-qty="${key}:${n}" aria-pressed="${q === n}">×${n}</button>`).join("")}</div>
+          <button class="btn${key === "vault" ? "" : " alt"}" data-case="${key}" ${poor ? "disabled" : ""}>${poor ? `Need ◈ ${(cost - P.tokens).toLocaleString("en-US")} more` : q === 1 ? "Open case" : `Open ${q} · ◈ ${cost.toLocaleString("en-US")}`}</button>
+        </div>
       </div>`;
     }).join("");
-    document.querySelectorAll("[data-case]").forEach(b => b.addEventListener("click", () => openCase(b.dataset.case)));
+    document.querySelectorAll("[data-qty]").forEach(b => b.addEventListener("click", () => { const [k, n] = b.dataset.qty.split(":"); caseQty[k] = +n; renderCases(); }));
+    document.querySelectorAll("[data-case]").forEach(b => b.addEventListener("click", () => openCase(b.dataset.case, caseQty[b.dataset.case])));
   }
 
-  const TILE_W = 118, TILE_GAP = 8, REEL_LEN = 48, WIN_AT = 40;
+  // Tile sizes must match the CSS: one big reel when opening one case, smaller stacked reels for several.
+  const TILE_W = 118, TILE_W_SMALL = 88, TILE_GAP = 8, REEL_LEN = 48, WIN_AT = 40;
+  const RANK = { common: 0, rare: 1, epic: 2, legendary: 3 };
   function reelTile(id) {
     const c = COSMETICS[id];
     return `<div class="rtile" style="--rc:${RARITY[c.rarity].color}">${preview(id)}<span>${c.name}</span></div>`;
   }
-  function openCase(key) {
-    const c = CASES[key];
-    if (P.tokens < c.price) return;
-    P.tokens -= c.price;
-    const prize = rollCase(key);
-    const dupe = owns(prize);
-    if (!dupe) P.owned.push(prize);
-    saveProfile();
-
-    const modal = $("case-modal");
-    modal.hidden = false;
-    $("case-title").textContent = c.name;
-    $("prize").hidden = true;
-    $("case-actions").innerHTML = "";
-    // Fill the reel with random rolls from the same case, and plant the prize near the end.
+  // Fill a reel with random rolls from the same case and plant the prize near the end.
+  // Near miss: when the prize is a Common, the tile just before it is a Legendary from this case,
+  // and the reel stops a hair past it. The prize was already rolled, so the odds are unchanged.
+  function buildReel(key, prize) {
     const ids = Array.from({ length: REEL_LEN }, (_, i) => i === WIN_AT ? prize : rollCase(key));
-    // Near miss: when the prize is a Common, the tile just before it is a Legendary from this case,
-    // and the reel stops a hair past it. The prize itself was already rolled above, so the odds are unchanged.
     const nearMiss = COSMETICS[prize].rarity === "common";
     if (nearMiss) {
       const legends = caseItems(key).filter(id => COSMETICS[id].rarity === "legendary");
       if (legends.length) ids[WIN_AT - 1] = legends[Math.floor(Math.random() * legends.length)];
     }
-    const reel = $("reel");
-    reel.innerHTML = ids.map(reelTile).join("");
-    const win = $("reel-window").clientWidth;
-    // jitter is how far the marker ends up from the prize tile's centre (negative = toward its left edge).
-    // A near miss stops 4 to 14px inside the left edge, right after the Legendary slides past the marker.
-    const jitter = nearMiss ? -(TILE_W / 2 - (4 + Math.random() * 10)) : (Math.random() - .5) * (TILE_W * .7);
-    const endX = -(WIN_AT * (TILE_W + TILE_GAP) + TILE_W / 2 - win / 2 + jitter);
-    const done = () => revealPrize(key, prize, dupe);
-    if (reduceMotion) { reel.style.transform = `translateX(${endX}px)`; done(); return; }
-    const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration: nearMiss ? 6200 : 5200, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
-    spin.onfinish = done;
+    return { ids, nearMiss };
+  }
+  function openCase(key, qty = 1) {
+    const c = CASES[key];
+    if (P.tokens < c.price * qty) return;
+    P.tokens -= c.price * qty;
+    // Roll every prize up front. Anything already owned, or already won earlier in this batch, is a duplicate.
+    const results = [];
+    for (let i = 0; i < qty; i++) {
+      const prize = rollCase(key), dupe = owns(prize);
+      if (!dupe) P.owned.push(prize);
+      results.push({ prize, dupe });
+    }
+    saveProfile();
+
+    $("case-modal").hidden = false;
+    $("case-title").textContent = qty > 1 ? `${c.name} ×${qty}` : c.name;
+    $("prize").hidden = true;
+    $("case-actions").innerHTML = "";
+    const box = $("reels");
+    box.className = "reels" + (qty > 1 ? " multi" : "") + (qty > 5 ? " tight" : "");
+    box.innerHTML = results.map(() => `<div class="reel-window"><div class="reel"></div><i class="reel-marker"></i></div>`).join("");
+    const tileW = qty > 1 ? TILE_W_SMALL : TILE_W;
+    let finished = 0;
+    const allDone = () => qty === 1 ? revealPrize(key, results[0].prize, results[0].dupe) : revealMany(key, results);
+    [...box.children].forEach((win, i) => {
+      const res = results[i];
+      const { ids, nearMiss } = buildReel(key, res.prize);
+      const reel = win.firstElementChild;
+      reel.innerHTML = ids.map(reelTile).join("");
+      res.tile = reel.children[WIN_AT];
+      // jitter is how far the marker ends up from the prize tile's centre (negative = toward its left edge).
+      // A near miss stops just inside the left edge, right after the Legendary slides past the marker.
+      const jitter = nearMiss ? -(tileW / 2 - (4 + Math.random() * 8)) : (Math.random() - .5) * (tileW * .7);
+      const endX = -(WIN_AT * (tileW + TILE_GAP) + tileW / 2 - win.clientWidth / 2 + jitter);
+      if (reduceMotion) { reel.style.transform = `translateX(${endX}px)`; return; }
+      // Several reels stop one after another, top to bottom.
+      const duration = (qty > 1 ? 4200 + i * 220 : 5200) + (nearMiss ? 1000 : 0);
+      const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
+      spin.onfinish = () => { res.tile.classList.add("won"); if (++finished === qty) allDone(); };
+    });
+    if (reduceMotion) { results.forEach(r => r.tile.classList.add("won")); allDone(); }
     renderWallets();
   }
   function revealPrize(key, id, dupe) {
     const c = COSMETICS[id], r = RARITY[c.rarity];
     // Duplicates pay out once the reel has stopped, so the token count doesn't spoil the result.
     if (dupe) { P.tokens += REFUND[c.rarity]; saveProfile(); }
-    const tiles = $("reel").children;
-    if (tiles[WIN_AT]) tiles[WIN_AT].classList.add("won");
     const box = $("prize");
     box.hidden = false;
     box.style.setProperty("--rc", r.color);
     box.className = "prize r-" + c.rarity;
     box.innerHTML = `${preview(id)}<div><span class="rar">${r.label} · ${KINDS[c.kind].replace(/s$/, "")}</span><b>${c.name}</b>${dupe ? `<small>You already own this. Converted to ◈ ${REFUND[c.rarity]} tokens.</small>` : `<small>New! Added to your collection.</small>`}</div>`;
-    const acts = $("case-actions");
-    acts.innerHTML = `${!dupe ? `<button class="btn" id="prize-equip">Equip now</button>` : ""}
-      <button class="btn alt" id="case-again" ${P.tokens < CASES[key].price ? "disabled" : ""}>Open another · ◈ ${CASES[key].price}</button>
-      <button class="btn ghost" id="case-close">Close</button>`;
-    if (!dupe) $("prize-equip").addEventListener("click", () => { equip(id); $("prize-equip").textContent = "Equipped"; $("prize-equip").disabled = true; });
-    $("case-again").addEventListener("click", () => openCase(key));
-    $("case-close").addEventListener("click", closeCase);
+    caseActions(key, 1, !dupe ? id : null);
     if (!reduceMotion) {
       const p = pt(box.querySelector(".pv"));
       ring(p, r.color, 0, c.rarity === "legendary" ? 6 : 4);
-      if (c.rarity === "epic" || c.rarity === "legendary") WIN_FX.win_fireworks(p, 10, 100);
+      if (RANK[c.rarity] >= 2) WIN_FX.win_fireworks(p, 10, 100);
     }
     renderWallets();
     renderCollection();
+  }
+  // Several cases: one summary of everything won, best prize first.
+  function revealMany(key, results) {
+    const refund = results.filter(r => r.dupe).reduce((s, r) => s + REFUND[COSMETICS[r.prize].rarity], 0);
+    if (refund) { P.tokens += refund; saveProfile(); }
+    const sorted = [...results].sort((a, b) => RANK[COSMETICS[b.prize].rarity] - RANK[COSMETICS[a.prize].rarity]);
+    const bestR = COSMETICS[sorted[0].prize].rarity, fresh = results.filter(r => !r.dupe).length;
+    const box = $("prize");
+    box.hidden = false;
+    box.style.setProperty("--rc", RARITY[bestR].color);
+    box.className = "prize multi r-" + bestR;
+    box.innerHTML = `<div class="multi-head"><b>${results.length} cases opened</b><small>${fresh} new · ${results.length - fresh} duplicate${results.length - fresh === 1 ? "" : "s"}${refund ? ` → ◈ ${refund} tokens` : ""}</small></div>
+      <div class="multi-grid">${sorted.map((r, i) => {
+        const c = COSMETICS[r.prize], rr = RARITY[c.rarity];
+        return `<div class="mprize${r.dupe ? " dupe" : ""}${i === 0 ? " best" : ""}" style="--rc:${rr.color};--i:${i}">${preview(r.prize)}<b>${c.name}</b><span class="rar">${rr.label}</span>${r.dupe ? `<small>Duplicate · ◈ ${REFUND[c.rarity]}</small>` : `<button type="button" class="btn sm" data-eq="${r.prize}">Equip</button>`}</div>`;
+      }).join("")}</div>`;
+    box.querySelectorAll("[data-eq]").forEach(b => b.addEventListener("click", () => {
+      equip(b.dataset.eq);
+      box.querySelectorAll("[data-eq]").forEach(o => { if (COSMETICS[o.dataset.eq].kind === COSMETICS[b.dataset.eq].kind) { o.textContent = "Equip"; o.disabled = false; } });
+      b.textContent = "Equipped"; b.disabled = true;
+    }));
+    caseActions(key, results.length, null);
+    if (!reduceMotion) {
+      const best = pt(box.querySelector(".mprize.best .pv"));
+      ring(best, RARITY[bestR].color, 0, RANK[bestR] >= 3 ? 6 : 4);
+      if (RANK[bestR] >= 2) WIN_FX.win_fireworks(best, 10, 100);
+    }
+    renderWallets();
+    renderCollection();
+  }
+  function caseActions(key, qty, equipId) {
+    const cost = CASES[key].price * qty;
+    $("case-actions").innerHTML = `${equipId ? `<button class="btn" id="prize-equip">Equip now</button>` : ""}
+      <button class="btn alt" id="case-again" ${P.tokens < cost ? "disabled" : ""}>${qty === 1 ? "Open another" : `Open ${qty} more`} · ◈ ${cost.toLocaleString("en-US")}</button>
+      <button class="btn ghost" id="case-close">Close</button>`;
+    if (equipId) $("prize-equip").addEventListener("click", () => { equip(equipId); $("prize-equip").textContent = "Equipped"; $("prize-equip").disabled = true; });
+    $("case-again").addEventListener("click", () => openCase(key, qty));
+    $("case-close").addEventListener("click", closeCase);
   }
   function closeCase() {
     $("case-modal").hidden = true;
