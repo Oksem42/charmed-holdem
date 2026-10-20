@@ -13,7 +13,7 @@ Both modes share the charms, shop, hand levels and all in. Rivals are seated by 
 ## Rivals
 Twenty-nine rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
 
-**The final table** is always a 1v1 against The House, which calls every bet, raise and all in. It opens with its own lead-up animation (preview it from the dev panel).
+**The final table** is always a 1v1 against The House, which calls every bet, raise and all in. It opens with its own lead-up animation.
 
 **Elites** are mini-bosses with special powers. Only one Elite ever sits at a table:
 - **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
@@ -32,9 +32,6 @@ New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (ne
 - Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
 - The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
 - Optional online leaderboard: run `supabase-setup.sql` in a Supabase project, then put the Project URL and publishable key in the `ONLINE` setting in `index.html`.
-
-## Dev panel
-Add `#dev` to the address (or type d-e-v on the home page) to open a hidden panel that unlocks or re-locks every cosmetic and adds tokens. Changes only affect the device you're on.
 
 ## How to play
 - Each hand costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.

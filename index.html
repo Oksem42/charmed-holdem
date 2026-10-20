@@ -798,7 +798,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <button class="btn ghost" id="dev-reset-tokens">Reset tokens to 150</button>
       <button class="btn ghost" id="dev-final">Preview final intro</button>
     </div>
-    <p class="hint">Changes are saved on this device only. Open this panel by adding <span class="mono">#dev</span> to the address, or by typing d-e-v on the home page.</p>
+    <p class="hint">Changes are saved on this device only. Open it again with the secret code.</p>
   </div>
 </div>
 
@@ -2507,16 +2507,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     pulseCharm("second");
     if (!reduceMotion) CHARM_FX.second(i);
   }
-  let devKeys = "";
+  // The dev panel's secret code: type it on the home page, all four letters within 2 seconds.
+  const DEV_CODE = "zuni";
+  let devKeys = "", devKeyTimes = [];
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (finalIntroGo) { if (key === "Enter" || key === "Escape") { e.preventDefault(); finalIntroGo(); } return; }
     if (!$("dev-panel").hidden) { if (key === "Escape") closeDev(); return; }
     if (!$("home").hidden) {
-      // Typing d-e-v on the home page opens the dev panel.
-      devKeys = (devKeys + (key.length === 1 ? key : "")).slice(-3);
-      if (devKeys === "dev") { devKeys = ""; openDev(); return; }
+      if (key.length === 1) {
+        devKeys = (devKeys + key.toLowerCase()).slice(-DEV_CODE.length);
+        devKeyTimes = [...devKeyTimes, Date.now()].slice(-DEV_CODE.length);
+        if (devKeys === DEV_CODE && devKeyTimes[devKeyTimes.length - 1] - devKeyTimes[0] <= 2000) { devKeys = ""; devKeyTimes = []; openDev(); return; }
+      }
       if (!$("case-modal").hidden) { if (key === "Escape" && !$("prize").hidden) closeCase(); return; }
       if (key === "Enter" && !e.target.closest("button, a")) { e.preventDefault(); $("play-btn").click(); }
       return;
@@ -3197,7 +3201,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   $("home-btn").addEventListener("click", showHome);
 
   // ---------- Dev panel ----------
-  // Hidden tools for testing cosmetics. Open with #dev in the address, or by typing d-e-v on the home page.
+  // Hidden tools for testing cosmetics. Open with #zuni in the address, or by typing the code (DEV_CODE) quickly on the home page.
   function devStatus() {
     const ids = Object.keys(COSMETICS), have = ids.filter(owns).length;
     $("dev-status").textContent = `${have} of ${ids.length} cosmetics unlocked · ◈ ${P.tokens.toLocaleString("en-US")} tokens`;
@@ -3206,7 +3210,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function openDev() { $("dev-panel").hidden = false; devStatus(); }
   function closeDev() {
     $("dev-panel").hidden = true;
-    if (location.hash === "#dev") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { location.hash = ""; } }
+    if (location.hash === "#" + DEV_CODE) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { location.hash = ""; } }
   }
   $("dev-unlock").addEventListener("click", () => { P.owned = Object.keys(COSMETICS).filter(id => !COSMETICS[id].free); devRefresh(); });
   $("dev-lock").addEventListener("click", () => {
@@ -3221,8 +3225,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   $("dev-close").addEventListener("click", closeDev);
   $("dev-final").addEventListener("click", () => { closeDev(); finalIntro(null); });
   $("dev-panel").addEventListener("click", (e) => { if (e.target === $("dev-panel")) closeDev(); });
-  window.addEventListener("hashchange", () => { if (location.hash === "#dev") openDev(); });
-  if (location.hash === "#dev") setTimeout(openDev, 0);
+  window.addEventListener("hashchange", () => { if (location.hash === "#" + DEV_CODE) openDev(); });
+  if (location.hash === "#" + DEV_CODE) setTimeout(openDev, 0);
 
   applyCosmetics();
   renderHome();
