@@ -43,6 +43,14 @@ New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (ne
 - Choose your bet size with the slider or the Min, ½ pot, ¾ pot and Pot picks, and raise when a rival bets into you. Bigger bets make rivals fold more, but they catch on if you keep overbetting.
 - Keys: `B` bet, `C` check or call, `R` raise, arrow keys bet size, `F` fold, `A` all in, `Enter` continue.
 
+## Archetypes
+Playstyles you can build around. Own 2 charms of an archetype for a set bonus, 3 for a stronger one:
+- **Bluffer** (Bluff Master, Peek, Poker Face, Smoke & Mirrors): win without showing your cards.
+- **High Stakes** (Big Pot Energy, Nerves of Steel, Safety Net): live and die by the all in.
+- **Grinder** (Piggy Bank, Insurance, Patience, Steady Hands): fold the junk, win the long game. 3 charms give 7 hands per table.
+- **Aggressor** (High Roller, Pressure Cooker, Momentum): bet, raise, repeat.
+- **Gambler** (River Rat, Glass Charm, Devil's Deal, Second Chance): risk it all for the river.
+
 ## Charm types
 - **Payout**: flat bonus chips (Pair Pal, Underdog, Pocket Rockets...)
 - **Multiplier**: multiplies the whole payout (Flush Fund, High Roller...)

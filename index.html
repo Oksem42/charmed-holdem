@@ -501,6 +501,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .inv-item.has-extra { border-color: rgba(242,184,75,.4); border-left-color: var(--rc); }
 .inv-count { position: absolute; top: 8px; right: 10px; font-family: var(--f-mono); font-weight: 700; font-size: 14px; color: var(--charm); }
 .inv-btns { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+/* Archetypes */
+.arch-row { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-left: 10px; vertical-align: middle; }
+.arch-chip { font-family: var(--f-mono); font-size: 11px; letter-spacing: .02em; text-transform: none; padding: 2px 9px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--ac) 50%, transparent); color: var(--ac); }
+.arch-chip.t2 { background: color-mix(in srgb, var(--ac) 18%, transparent); font-weight: 700; }
+.arch-chip.t3 { background: var(--ac); color: var(--ink); font-weight: 700; box-shadow: 0 0 14px -2px var(--ac); }
+.arch-tag { font-style: normal; color: var(--ac); }
+.arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.arch-card { background: var(--room-2); border: 1px solid var(--line); border-top: 4px solid var(--ac); border-radius: 16px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.arch-name { font-family: var(--f-display); font-size: 22px; color: var(--ac); }
+.arch-card p { color: var(--muted); font-size: 14px; }
+.arch-tiers { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; }
+.arch-tiers li { display: flex; gap: 8px; align-items: baseline; }
+.arch-tiers li span { flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ac); color: var(--ink); font-family: var(--f-mono); font-weight: 700; font-size: 11px; }
+.receipt .ln.arch span:first-child { color: var(--fx-green); }
 .lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -775,6 +789,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     </ol>
   </section>
 
+  <section class="home-sec" id="archetypes">
+    <div class="home-head"><p class="label">Archetypes</p><h2>Pick a playstyle. Build around it.</h2><p class="hint">Each archetype has its own charms. Own 2 of them for a set bonus, and 3 for a stronger one.</p></div>
+    <div class="arch-grid" id="home-archetypes"></div>
+  </section>
+
   <section class="home-sec">
     <div class="home-head"><p class="label">Charms</p><h2>Five kinds of lucky.</h2><p class="hint">Mix types to build a combo. Order on your rack matters.</p></div>
     <div class="type-grid" id="home-types"></div>
@@ -851,7 +870,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </div>
 
   <div class="rack-wrap">
-    <div class="rack-head"><p class="label">Your charms · <span id="c-count">1/6</span></p><p class="hint">They pay left to right after each hand you win.</p></div>
+    <div class="rack-head"><p class="label">Your charms · <span id="c-count">1/6</span></p><div class="arch-row" id="arch-row" aria-label="Archetype progress"></div><p class="hint">They pay left to right after each hand you win.</p></div>
     <div class="rack" id="rack"></div>
   </div>
 
@@ -965,7 +984,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const CHARMS = {
     pairpal:  { name: "Pair Pal", g: "II", type: "payout", price: 40, desc: "Win with a Pair: +40", run: x => x.win && x.cat === 1 && { add: 40 } },
     heart:    { name: "Heartbreaker", g: "♥", type: "payout", price: 50, desc: "+15 for each ♥ in your winning hand", run: x => { if (!x.win || !x.five) return; const n = x.five.filter(c => c.s === "♥").length; return n && { add: 15 * n }; } },
-    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded to a bet of up to the pot (not an overbet or all in): +50", run: x => x.win && x.byFold && !x.shoved && !x.overbet && { add: 50 } },
+    bluff:    { name: "Bluff Master", g: "?!", type: "play", price: 50, desc: "Win because they folded to a bet of up to the pot (not an overbet or all in): +35", run: x => x.win && x.byFold && !x.shoved && !x.overbet && { add: 35 } },
     pocket:   { name: "Pocket Rockets", g: "PP", type: "payout", price: 60, desc: "Win holding a pocket pair: +150 and Pair levels up", run: x => x.win && x.hole[0].r === x.hole[1].r && { add: 150, levelUp: 1 } },
     river:    { name: "River Rat", g: "~", type: "payout", price: 60, desc: "Win after the river improves your hand: +70", run: x => x.win && x.riverUp && { add: 70 } },
     under:    { name: "Underdog", g: "7", type: "payout", price: 45, desc: "Win with both hole cards 7 or lower: +70", run: x => x.win && x.hole.every(c => c.r <= 7) && { add: 70 } },
@@ -985,9 +1004,31 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     piggy:    { name: "Piggy Bank", g: "◎", type: "grow", price: 50, desc: "Saves +5 every hand. Pays out everything saved when you win.", run: x => x.win && x.piggy > 0 && { add: x.piggy, emptyPiggy: true } },
     second:   { name: "Second Chance", g: "⇄", type: "play", price: 60, desc: "Once per table, after the flop, swap one of your hole cards for a new one.", run: () => null },
     bracelet: { name: "Charm Bracelet", g: "∞", type: "combo", price: 65, desc: "+15 for each other charm that fired this hand. Pays after the others.", run: () => null },
-    glass:    { name: "Glass Charm", g: "◇", type: "cursed", price: 70, desc: "Wins pay ×3. Lose a hand and it shatters, taking a third of your chips with it.", run: x => x.win ? { mult: 3 } : (x.lostShowdown || x.youFold) && { add: -Math.round(x.bank / 3), shatter: true } },
-    devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 15% of your chips.", run: x => { if (x.win) return { mult: 2 }; const cut = Math.round(x.bank * .15); return (x.lostShowdown || x.youFold) && cut > 0 && { add: -cut }; } },
+    glass:    { name: "Glass Charm", g: "◇", type: "cursed", price: 70, desc: "Wins pay ×3. Lose a hand and it shatters, taking a third of your chips with it.", run: x => x.win ? { mult: 3 } : (x.lostShowdown || x.youFold) && { add: -Math.round(x.bank / (x.cursedHalf ? 6 : 3)), shatter: true } },
+    devil:    { name: "Devil's Deal", g: "♆", type: "cursed", price: 60, desc: "Wins pay ×2, but every hand you lose costs you 15% of your chips.", run: x => { if (x.win) return { mult: 2 }; const cut = Math.round(x.bank * (x.cursedHalf ? .075 : .15)); return (x.lostShowdown || x.youFold) && cut > 0 && { add: -cut }; } },
+    // Archetype charms
+    poker:    { name: "Poker Face", g: "◐", type: "grow", price: 55, desc: "Win because they folded: +5, and +5 more for every fold win before it at this table.", run: x => x.win && x.byFold && { add: 5 * (x.poker + 1), pokerUp: true } },
+    smoke:    { name: "Smoke & Mirrors", g: "≋", type: "play", price: 50, desc: "Your first bet each hand is noticeably more likely to make rivals fold.", run: () => null },
+    nerves:   { name: "Nerves of Steel", g: "⚡", type: "payout", price: 55, desc: "Win a showdown after your all in gets called: +100.", run: x => x.win && x.shoved && !x.byFold && { add: 100 } },
+    safety:   { name: "Safety Net", g: "⌂", type: "payout", price: 60, desc: "Lose a hand you went all in on: get 30% of your shove back.", run: x => (x.lostShowdown || x.youFold) && x.shoveAmt > 0 && { add: Math.round(x.shoveAmt * .3) } },
+    patience: { name: "Patience", g: "⧗", type: "play", price: 40, desc: "Fold before the flop: get your ante back.", run: x => x.youFold && x.foldStreet === 0 && { add: x.ante } },
+    steady:   { name: "Steady Hands", g: "═", type: "payout", price: 50, desc: "Win at showdown without ever betting or raising: +60.", run: x => x.win && !x.byFold && x.myBets === 0 && { add: 60 } },
+    pressure: { name: "Pressure Cooker", g: "▣", type: "payout", price: 60, desc: "Win a hand you raised in: +40 for each raise.", run: x => x.win && x.raises > 0 && { add: 40 * x.raises } },
+    momentum: { name: "Momentum", g: "»", type: "grow", price: 55, desc: "Win a hand you bet in: pays +5, and grows by 5 every time it pays.", run: x => x.win && x.myBets > 0 && { add: x.momentum + 5, momentumUp: true } },
   };
+  // Archetypes: playstyles you can build around. Owning 2 or 3 of an archetype's charms unlocks its set bonuses.
+  const ARCHETYPES = {
+    bluff:   { name: "Bluffer", color: "var(--fx-purple)", blurb: "Win without showing your cards.", tiers: ["+15 whenever they fold to you", "Your bets make rivals fold more often"] },
+    allin:   { name: "High Stakes", color: "var(--fx-curse)", blurb: "Live and die by the all in.", tiers: ["Win a called all in: +60", "Rivals remember your shoves half as much"] },
+    grind:   { name: "Grinder", color: "var(--fx-green)", blurb: "Fold the junk, win the long game.", tiers: ["Win at showdown: +30", "7 hands per table instead of 6"] },
+    aggro:   { name: "Aggressor", color: "var(--charm)", blurb: "Bet, raise, repeat.", tiers: ["+10 for each bet or raise in a hand you win", "Your bets put 50% more pressure on rivals"] },
+    gambler: { name: "Gambler", color: "var(--fx-water)", blurb: "Risk it all for the river.", tiers: ["Win after the river improves your hand: +40", "Cursed charms cost half as much"] },
+  };
+  const CHARM_ARCH = { bluff: "bluff", peek: "bluff", poker: "bluff", smoke: "bluff", bigpot: "allin", nerves: "allin", safety: "allin", piggy: "grind", insure: "grind", patience: "grind", steady: "grind", roller: "aggro", pressure: "aggro", momentum: "aggro", river: "gambler", glass: "gambler", devil: "gambler", second: "gambler" };
+  Object.entries(CHARM_ARCH).forEach(([id, a]) => { CHARMS[id].arch = a; });
+  // How many charms of an archetype are working this hand (a charm Leo stole doesn't count).
+  const archCount = (a) => G ? G.charms.filter(id => CHARMS[id].arch === a && has(id)).length : 0;
+  const handsMax = () => HANDS_PER_TABLE + (archCount("grind") >= 3 ? 1 : 0);
   const MAX_CHARMS = 6;
 
   // ---------- Rivals ----------
@@ -1125,6 +1166,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     mode = mode || (G && G.mode) || "table";
     G = { mode, t: 0, handsLeft: HANDS_PER_TABLE, bank: 200, start: 200, charms: ["pairpal"], lv: [1, 1, 1, 1, 1, 1, 1, 1, 1], shop: null, streak: 0, shoves: 0, raises: 0, piggy: 0, secondUsed: false, tilt: {}, lineup: buildLineup(MODES[mode].seats) };
     G.target = targetFor(0, G.bank);
+    G.handsMax = HANDS_PER_TABLE;
     $("screen").hidden = true;
     receiptEmpty();
     renderAll();
@@ -1164,7 +1206,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     G.bank -= Math.min(ante, G.bank);
     if (G.bank === 0) { say(`Your ante was your last ${ante} chips, so you're all in.`); return goAllIn(); }
     const elite = eliteHere();
-    if (elite && G.handsLeft === HANDS_PER_TABLE) say(`<b class="elite-say">♛ Elite table: ${RIVALS[elite].name}.</b> ${RIVALS[elite].power.name}: ${RIVALS[elite].power.desc}`);
+    if (elite && G.handsLeft === (G.handsMax || HANDS_PER_TABLE)) say(`<b class="elite-say">♛ Elite table: ${RIVALS[elite].name}.</b> ${RIVALS[elite].power.name}: ${RIVALS[elite].power.desc}`);
     else if (H.stolen) say(`Leo Badechluer pockets your <b>${CHARMS[H.stolen].name}</b> for this hand.`);
     else say(opps.length > 1 ? "Your move. You act first each street." : "Your move. Bet to build the pot, or check to see the next card cheaply.");
     renderAll();
@@ -1246,7 +1288,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (r.chaser && hasDraw(o)) return true;
     if (r.odds) return s + Math.random() * .15 > amt / (H.pot + amt) + .3;
     // Leo ignores bet size completely.
-    const size = r.fearless ? 0 : sizePressure(amt);
+    // Extra fold pressure on your own bets: Smoke & Mirrors, and Bluffer with 3 charms.
+    const bluffPush = H.youBetting ? (H.smokeNow ? .08 : 0) + (archCount("bluff") >= 3 ? .06 : 0) : 0;
+    const size = (r.fearless ? 0 : sizePressure(amt)) + bluffPush;
     if (r.rookie) return s + Math.random() * .25 > .45 + size;
     if (r.passive) return s + Math.random() * .25 > .4 + size;
     if (r.cbet && H.street >= 2) return s + Math.random() * .2 > .55 + size;
@@ -1257,7 +1301,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // Rivals catch on to repeated big bets at a table, which takes some of that pressure away again.
   function sizePressure(amt) {
     const before = Math.max(1, H.pot - amt);
-    const pressure = Math.min(.35, Math.max(0, amt / before - .25) * .35);
+    const pressure = Math.min(.35, Math.max(0, amt / before - .25) * .35) * (H.youBetting && archCount("aggro") >= 3 ? 1.5 : 1);
     return Math.max(0, pressure - Math.min(.35, G.raises * .08));
   }
   // Calling a shove risks a lot, so rivals need a strong hand for the first one. Bigger shoves make them tighter.
@@ -1281,6 +1325,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Carla: bigger shoves pull her in instead of scaring her off.
     const curious = r.stackCurious ? Math.min(.32, Math.max(0, amt - 100) / 700) + sizePenalty : 0;
     return s + Math.random() * .2 + (tilted(o) ? .15 : 0) + curious > .62 + (r.p.shove || 0) + sizePenalty - suspicion;
+  }
+  // Rivals respond to a bet or raise you made. Smoke & Mirrors works on your first bet each hand.
+  function youRespond(amt) {
+    H.youBetting = true;
+    H.smokeNow = has("smoke") && !H.smoked;
+    if (H.smokeNow) H.smoked = true;
+    respond(amt, calls);
+    H.youBetting = false; H.smokeNow = false;
   }
   // Every rival still in (except the one who bet) calls or folds to a bet of amt.
   function respond(amt, decide, except) {
@@ -1323,10 +1375,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (kind === "shove") {
       // Voluntary all in: push every chip. If someone bet, you call and raise the rest.
       const amt = G.bank, extra = amt - H.facing;
-      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0; H.shoved = true; H.moveThis = "bet";
+      G.bank = 0; H.pot += amt; H.myBets++; H.facing = 0; H.shoved = true; H.shoveAmt = amt; H.moveThis = "bet";
       if (extra <= 0) { say(`You're all in for ${amt}.`); return goAllIn(); }
       const seen = G.shoves;
-      G.shoves++;
+      // High Stakes (3 charms): rivals only remember half of each shove.
+      G.shoves += archCount("allin") >= 3 ? .5 : 1;
       respond(extra, (o, a) => callsShove(o, a, seen));
       const callers = live();
       if (!callers.length) return finish({ allFold: true });
@@ -1341,7 +1394,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const extra = total - H.facing;
       if (extra > H.pot + H.facing) H.overbet = true;
       G.bank -= total; H.pot += total; H.myBets++; H.facing = 0; H.moveThis = "bet";
-      respond(extra, calls);
+      H.raisesHand = (H.raisesHand || 0) + 1;
+      youRespond(extra);
       G.raises++;
       if (!live().length) return finish({ allFold: true });
       say(`You raise to ${total}. ${tableTalk()}.`);
@@ -1364,7 +1418,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         H.peeks = cards.slice(0, echoed ? 2 : 1);
         setTimeout(() => { pulseCharm("peek"); if (echoed) pulseCharm("echo"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
       }
-      respond(amt, calls);
+      youRespond(amt);
       if (!live().length) return finish({ allFold: true });
       say(`${short ? `You go all in for ${amt}.` : `You bet ${amt}.`} ${tableTalk()}.`);
       return short ? goAllIn() : nextStreet();
@@ -1442,6 +1496,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
       win, byFold, lostShowdown, hole: H.you, shoved: !!H.shoved, overbet: !!H.overbet,
+      shoveAmt: H.shoveAmt || 0, foldStreet: H.street, ante: anteHere(), myBets: H.myBets, raises: H.raisesHand || 0,
+      cursedHalf: archCount("gambler") >= 3, poker: G.poker || 0, momentum: G.momentum || 0,
       youFold: !!youFold, pot: H.pot, bank: G.bank, staked: H.startBank - G.bank, rivalsShown: H.showdown ? inHand.length : 0, piggy: G.piggy || 0,
       cat: win && !byFold ? you.cat : -1,
       five: win && !byFold ? you.cards : null,
@@ -1495,6 +1551,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
     mults.forEach((m, i) => { if (i !== cut) mult *= m.v; });
     if (fired.some(f => f[1].emptyPiggy)) G.piggy = 0;
+    if (fired.some(f => f[1].pokerUp)) G.poker = (G.poker || 0) + 1;
+    if (fired.some(f => f[0] === "momentum")) G.momentum = (G.momentum || 0) + 5;
+    // Archetype set bonuses (2 charms of the same archetype).
+    const setBonus = (a, ok, amt) => { if (ok && amt > 0 && archCount(a) >= 2) { lines.push([`${ARCHETYPES[a].name} set`, amt, "ch arch", null]); flat += amt; } };
+    setBonus("bluff", win && byFold, 15);
+    setBonus("allin", win && H.shoved && !byFold, 60);
+    setBonus("grind", win && !byFold, 30);
+    setBonus("aggro", win, 10 * H.myBets);
+    setBonus("gambler", ctx.riverUp, 40);
     // A loss can cost chips (Devil's Deal), but never more than you have.
     // All-in pots don't get multiplied: when you shoved, multipliers only boost your bonuses, not the pot.
     // Without this, doubling a huge all-in pot snowballs a run.
@@ -1665,7 +1730,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const typeOf = (id) => TYPES[CHARMS[id].type];
   function charmFace(id) {
     const c = CHARMS[id], ty = typeOf(id);
-    return `<div class="top-i"><span class="g" style="--tc:${ty.color}">${c.g}</span><div><span class="ty" style="--tc:${ty.color}">${ty.label}</span><b>${c.name}</b></div></div><p>${c.desc}</p>`;
+    return `<div class="top-i"><span class="g" style="--tc:${ty.color}">${c.g}</span><div><span class="ty" style="--tc:${ty.color}">${ty.label}${c.arch ? ` · <i class="arch-tag" style="--ac:${ARCHETYPES[c.arch].color}">${ARCHETYPES[c.arch].name}</i>` : ""}</span><b>${c.name}</b></div></div><p>${c.desc}</p>`;
   }
   function renderShop() {
     const here = listNames(G.lineup[G.t].map(id => RIVALS[id].name)), next = G.lineup[G.t + 1].map(id => RIVALS[id]);
@@ -1752,7 +1817,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     renderShop();
   }
   function nextTable() {
-    G.t++; G.handsLeft = HANDS_PER_TABLE; G.start = G.bank; G.shop = null; G.shoves = 0; G.raises = 0; G.secondUsed = false;
+    G.t++; G.handsMax = handsMax(); G.handsLeft = G.handsMax; G.start = G.bank; G.shop = null; G.shoves = 0; G.raises = 0; G.secondUsed = false; G.poker = 0;
     G.target = targetFor(G.t, G.bank);
     $("screen").hidden = true;
     receiptEmpty();
@@ -2603,11 +2668,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       d.dataset.type = c.type;
       if (H && H.stolen === id && !H.over) badge = "Stolen by Leo";
       d.title = c.desc;
-      d.innerHTML = `<span class="g">${c.g}</span><div><span class="ty">${ty.label}</span><b>${c.name}</b><small>${note}</small></div>${badge ? `<span class="badge">${badge}</span>` : ""}`;
+      d.innerHTML = `<span class="g">${c.g}</span><div><span class="ty">${ty.label}${c.arch ? ` · <i class="arch-tag" style="--ac:${ARCHETYPES[c.arch].color}">${ARCHETYPES[c.arch].name}</i>` : ""}</span><b>${c.name}</b><small>${note}</small></div>${badge ? `<span class="badge">${badge}</span>` : ""}`;
       r.append(d);
     }
     firePending = false;
     $("c-count").textContent = `${G.charms.length}/${MAX_CHARMS}`;
+    // Archetype progress: how many charms you have toward each set bonus.
+    $("arch-row").innerHTML = Object.entries(ARCHETYPES).map(([a, A]) => {
+      const n = archCount(a);
+      if (!n) return "";
+      const tip = A.tiers.map((t, i) => `${i + 2} charms: ${t}`).join(" · ");
+      return `<span class="arch-chip${n >= 3 ? " t3" : n >= 2 ? " t2" : ""}" style="--ac:${A.color}" title="${tip}">${A.name} ${Math.min(n, 3)}/3${n >= 2 ? " ✓" : ""}</span>`;
+    }).join("");
   }
   function renderLevels() {
     // Highlight the hand you're currently holding.
@@ -2620,7 +2692,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const won = G.bank - G.start;
     $("s-table").textContent = `${G.t + 1} / ${NUM_TABLES}`;
     $("mode-chip").textContent = MODES[G.mode].label;
-    $("s-hands").innerHTML = Array.from({ length: HANDS_PER_TABLE }, (_, i) => `<i class="${i < G.handsLeft ? "on" : ""}"></i>`).join("") + `<span class="sr">${G.handsLeft} hands left</span>`;
+    $("s-hands").innerHTML = Array.from({ length: G.handsMax || HANDS_PER_TABLE }, (_, i) => `<i class="${i < G.handsLeft ? "on" : ""}"></i>`).join("") + `<span class="sr">${G.handsLeft} hands left</span>`;
     const d = hudDelay; hudDelay = 0;
     tween($("s-bank"), shownBank, G.bank, n => n.toLocaleString("en-US"), d);
     $("s-bank-mini").textContent = G.bank.toLocaleString("en-US");
@@ -2639,7 +2711,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if ($("chip-stack").children.length !== discs) $("chip-stack").innerHTML = Array.from({ length: discs }, (_, i) => `<i style="--n:${i}"></i>`).join("");
     shownBank = G.bank;
     const who = G.mode === "duel" ? "Your rival remembers" : "The table remembers";
-    $("shove-note").textContent = G.shoves >= 2 ? `${who} ${G.shoves} shoves and calls them lighter now.` : G.shoves === 1 ? `${who} your shove.` : "";
+    const nShoves = Math.ceil(G.shoves);
+    $("shove-note").textContent = nShoves >= 2 ? `${who} ${nShoves} shoves and calls them lighter now.` : nShoves === 1 ? `${who} your shove.` : "";
     $("streets").innerHTML = STREETS.map((s, i) => {
       const st = !H ? "" : H.over && H.showdown ? "done" : i < H.street ? "done" : i === H.street && !H.over ? "now" : "";
       return `<span class="${st}">${s}</span>`;
@@ -3242,6 +3315,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     });
     $("hero-tokens").innerHTML = ["flushfund", "echo", "streak", "peek", "pairpal"].map((id, i) =>
       `<span class="token" style="--tc:${typeOf(id).color};--i:${i}" title="${CHARMS[id].name}">${CHARMS[id].g}</span>`).join("");
+    $("home-archetypes").innerHTML = Object.entries(ARCHETYPES).map(([a, A]) => {
+      const ids = Object.keys(CHARMS).filter(id => CHARMS[id].arch === a);
+      return `<div class="arch-card" style="--ac:${A.color}">
+        <b class="arch-name">${A.name}</b><p>${A.blurb}</p>
+        <div class="chips">${ids.map(id => `<span class="chip" style="--tc:${A.color}" title="${CHARMS[id].desc}"><i>${CHARMS[id].g}</i>${CHARMS[id].name}</span>`).join("")}</div>
+        <ol class="arch-tiers">${A.tiers.map((t, i) => `<li><span>${i + 2}</span>${t}</li>`).join("")}</ol>
+      </div>`;
+    }).join("");
     $("home-types").innerHTML = Object.entries(TYPES).map(([key, ty]) => {
       const list = Object.entries(CHARMS).filter(([, c]) => c.type === key);
       return `<div class="type-card" style="--tc:${ty.color}">
