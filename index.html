@@ -325,6 +325,23 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .oseat.winner { background: rgba(242,184,75,.14); box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5); }
 .oseat.winner .o-act { color: var(--charm); font-weight: 700; }
 .oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
+/* Guided tutorial coach: a spotlight cut out of a dimmed screen, and a speech bubble beside it */
+.coach { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
+.coach-spot { position: fixed; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(3, 6, 6, .62), 0 0 0 2px var(--charm), 0 0 24px 2px rgba(242,184,75,.45); transition: left .35s ease, top .35s ease, width .35s ease, height .35s ease; pointer-events: none; }
+.coach-spot.full { box-shadow: 0 0 0 9999px rgba(3, 6, 6, .62); }
+.coach-spot.hidden { box-shadow: none; }
+.coach-spot.act { animation: coachPulse 1.4s ease-in-out infinite; }
+@keyframes coachPulse { 50% { box-shadow: 0 0 0 9999px rgba(3, 6, 6, .62), 0 0 0 4px var(--charm), 0 0 36px 8px rgba(242,184,75,.6); } }
+.coach-bubble { position: fixed; left: 0; top: 0; width: min(380px, calc(100vw - 24px)); pointer-events: auto; background: var(--stock); color: var(--ink); border-radius: 16px; padding: 14px 16px; display: grid; gap: 8px; box-shadow: 0 18px 40px rgba(0,0,0,.5); transition: left .35s ease, top .35s ease; animation: rise .3s ease backwards; }
+.coach-bubble .label { color: #7a6a4a; }
+.coach-text { font-size: 15px; line-height: 1.45; }
+.coach-text b { color: #6b2a10; }
+.coach-do { display: block; margin-top: 6px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #a3360f; }
+.coach-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.coach-bubble .btn.ghost { color: var(--ink); border-color: rgba(27,26,23,.25); }
+.coach-bubble kbd { border-color: currentColor; }
+.coach-bubble.nudge { animation: shake .4s ease; }
+
 /* Tutorial */
 .tutorial { position: fixed; inset: 0; z-index: 75; display: grid; place-items: center; background: rgba(4, 8, 8, .84); padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
 .tut-box { width: min(720px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-rows: auto 1fr auto; background: var(--room-2); border: 1px solid rgba(242,184,75,.4); border-radius: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow: hidden; animation: rise .35s ease backwards; }
@@ -753,7 +770,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <div class="profile-row">
         <label class="name-field" for="player-name"><span class="label">Your name</span><input id="player-name" type="text" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
         <a class="wallet-chip" href="#casino" title="Tokens: earn them by playing, spend them on cases">◈ <b class="token-count">0</b> tokens</a>
-        <nav class="quick-links"><a href="#" data-open-tutorial>How to play</a><a href="#casino">Casino</a><a href="#inventory">Inventory</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
+        <nav class="quick-links"><a href="#" data-start-guided>How to play</a><a href="#casino">Casino</a><a href="#inventory">Inventory</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
       </div>
     </div>
     <div class="hero-table" aria-hidden="true">
@@ -867,6 +884,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </div>
 </div>
 
+<div class="coach" id="coach" hidden>
+  <div class="coach-spot hidden" id="coach-spot"></div>
+  <div class="coach-bubble" id="coach-bubble" role="dialog" aria-live="polite" hidden>
+    <p class="label" id="coach-count">Practice</p>
+    <p class="coach-text" id="coach-text"></p>
+    <div class="coach-btns" id="coach-btns"></div>
+  </div>
+</div>
+
 <div class="tutorial" id="tutorial" hidden>
   <div class="tut-box" role="dialog" aria-modal="true" aria-labelledby="tut-title">
     <div class="tut-head"><div><p class="label" id="tut-kicker">Welcome</p><h2 id="tut-title">Charmed Hold'em</h2></div><span class="mono tut-count" id="tut-count">1 / 12</span></div>
@@ -918,7 +944,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     <div class="dev-sec">
       <p class="label">Tutorial</p>
       <div class="dev-grid">
-        <button class="btn alt" id="dev-tutorial">Open tutorial</button>
+        <button class="btn alt" id="dev-tutorial">Play guided tutorial</button>
+        <button class="btn ghost" id="dev-guide">Open text guide</button>
         <button class="btn ghost" id="dev-tutorial-reset">Show tutorial on next visit</button>
       </div>
     </div>
@@ -1275,6 +1302,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Deal round the table twice, burn a card before the flop, turn and river.
     for (let r = 0; r < 2; r++) { you.push(d[k++]); opps.forEach(o => o.cards.push(d[k++])); }
     k++; const board = [d[k++], d[k++], d[k++]]; k++; board.push(d[k++]); k++; board.push(d[k++]);
+    // Guided tutorial: the cards are scripted so the lesson always plays out the same way.
+    if (TUTOR) {
+      const sc = TUTOR_HANDS[TUTOR.hand];
+      you.splice(0, 2, ...tutorCards(sc.you)); board.splice(0, 5, ...tutorCards(sc.board));
+      opps.length = 0; opps.push({ id: "rae", cards: tutorCards(sc.opp), folded: false, act: "", put: 0 });
+    }
     // The cards nobody has been dealt (Second Chance draws from these).
     const deck = d.slice(k);
     const ante = anteHere();
@@ -1418,13 +1451,19 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function respond(amt, decide, except) {
     live().forEach(o => {
       if (o === except) return;
-      if (decide(o, amt)) { H.pot += amt; o.put += amt; o.act = "Calls"; }
+      if (TUTOR ? TUTOR_HANDS[TUTOR.hand].rivalCalls[H.street] : decide(o, amt)) { H.pot += amt; o.put += amt; o.act = "Calls"; }
       else { o.folded = true; o.act = "Folds"; }
     });
   }
   const tableTalk = () => H.opps.filter(o => o.act).map(o => `${R(o).name} ${o.act.toLowerCase()}`).join(" · ");
 
+  // During the guided tutorial only the move being taught goes through; afterwards the coach moves on.
   function act(kind, size) {
+    if (TUTOR && !tutorGate("act:" + kind)) return;
+    actCore(kind, size);
+    if (TUTOR) tutorDone("act:" + kind);
+  }
+  function actCore(kind, size) {
     const b = BETS[H.street];
     H.opps.forEach(o => { if (!o.folded) o.act = ""; });
     if (kind === "fold") {
@@ -1470,7 +1509,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (kind === "raise") {
       // Raise: call the bet and put in more. Everyone still in decides on the extra.
       const total = Math.max(H.facing * 2, Math.round(size || 0));
-      if (total >= G.bank) return act("shove");
+      if (total >= G.bank) return actCore("shove");
       const extra = total - H.facing;
       if (extra > H.pot + H.facing) H.overbet = true;
       G.bank -= total; H.pot += total; H.myBets++; H.facing = 0; H.moveThis = "bet";
@@ -1485,7 +1524,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const short = G.bank <= b;
       // You choose the size: at least the street's minimum, and a bet of everything you have is an all in.
       const want = short ? G.bank : Math.max(b, Math.round(size || b));
-      if (!short && want >= G.bank) return act("shove");
+      if (!short && want >= G.bank) return actCore("shove");
       const amt = want;
       if (amt > b * 1.5) G.raises++;
       // An overbet (more than the pot) doesn't count for Bluff Master.
@@ -1505,7 +1544,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
     if (kind === "check") {
       H.moveThis = "check";
-      const bettor = live().find(o => wantsBet(o));
+      const bettor = TUTOR ? (TUTOR_HANDS[TUTOR.hand].rivalBets[H.street] ? live()[0] : null) : live().find(o => wantsBet(o));
       if (bettor) {
         H.pot += b; bettor.put += b; H.facing = b; bettor.act = `Bets ${b}`;
         respond(b, calls, bettor);
@@ -1779,6 +1818,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
 
   function afterHand() {
+    if (TUTOR) { if (!tutorGate("next-hand")) return; TUTOR.hand++; setTimeout(() => tutorDone("next-hand"), 0); }
     // A Glass Charm that shattered last hand is gone now.
     if (G.shatterGlass) { G.charms = G.charms.filter(id => id !== "glass"); G.shatterGlass = false; }
     const won = G.bank - G.start;
@@ -2602,7 +2642,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (btn) btn.textContent = labelFn();
     };
     range.addEventListener("input", () => update(+range.value));
-    wrap.querySelectorAll(".size-pick").forEach(p => p.addEventListener("click", () => update(+p.dataset.size)));
+    wrap.querySelectorAll(".size-pick").forEach(p => p.addEventListener("click", () => { update(+p.dataset.size); if (TUTOR) tutorDone("size:" + p.firstChild.textContent.trim()); }));
     wrap.adjust = (d) => update(H.size + d);
     return wrap;
   }
@@ -2696,6 +2736,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest("input:not([type=range]), textarea")) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (TUTOR) {
+      if (coachInfoStep() && (key === "Enter" || key === "ArrowRight") && !e.target.closest("button")) { e.preventDefault(); goStep(TUTOR.step + 1); return; }
+      if (key === "Escape") { endGuided(TUTOR.saved.game ? "game" : "home"); return; }
+    }
     if (tutorialOpen()) {
       if (key === "ArrowRight" || (key === "Enter" && !e.target.closest("button"))) { e.preventDefault(); $($("tut-next").hidden ? "tut-play" : "tut-next").click(); }
       else if (key === "ArrowLeft") { e.preventDefault(); $("tut-back").click(); }
@@ -2811,7 +2855,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   let shownBank = null, shownWon = null;
   let lastFired = [], fireDelays = {}, firePending = false;
-  function renderAll() { renderHud(); renderCards(); renderActions(); renderRack(lastFired); renderLevels(); }
+  function renderAll() { renderHud(); renderCards(); renderActions(); renderRack(lastFired); renderLevels(); if (TUTOR) positionCoach(); }
 
   function receiptEmpty() {
     lastFired = []; fireDelays = {}; firePending = false;
@@ -3437,6 +3481,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   const runLive = () => !!G && !document.getElementById("again");
   function showHome() {
+    if (TUTOR) { endGuided("home"); return; }
     $("game").hidden = true;
     $("home").hidden = false;
     renderWallets(); renderCollection(); renderInventory(); renderBoard();
@@ -3519,11 +3564,148 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     afterHand();
   });
   $("dev-chips").addEventListener("click", () => { if (!runLive()) return; G.bank += 500; renderAll(); devStatus(); });
-  $("dev-tutorial").addEventListener("click", () => { closeDev(); openTutorial(0); });
+  $("dev-tutorial").addEventListener("click", () => { closeDev(); startGuided(); });
+  $("dev-guide").addEventListener("click", () => { closeDev(); openTutorial(0); });
   $("dev-tutorial-reset").addEventListener("click", () => { P.tutorialSeen = false; saveProfile(); $("dev-tutorial-reset").textContent = "Will show on next visit ✓"; });
   $("dev-panel").addEventListener("click", (e) => { if (e.target === $("dev-panel")) closeDev(); });
   window.addEventListener("hashchange", () => { if (location.hash === "#" + DEV_CODE) openDev(); });
   if (location.hash === "#" + DEV_CODE) setTimeout(openDev, 0);
+
+  // ---------- Guided tutorial ----------
+  // A hands-on practice run on the real table. A coach spotlights one thing at a time,
+  // and the player does each move themself. Cards and the rival's moves are scripted.
+  let TUTOR = null;
+  const tutorCards = (s) => s.split(" ").map(x => ({ r: { J: 11, Q: 12, K: 13, A: 14 }[x.slice(0, -1)] || +x.slice(0, -1), s: x.slice(-1) }));
+  // rivalBets / rivalCalls: what Rookie Rae does on each street (preflop, flop, turn, river).
+  const TUTOR_HANDS = [
+    { you: "A♠ A♥", opp: "9♣ 8♦", board: "A♦ K♣ 4♥ 7♠ 2♦", rivalBets: [false, false, false, false], rivalCalls: [true, true, true, true] },
+    { you: "7♣ 2♦", opp: "A♣ A♦", board: "K♠ Q♥ 9♦ 5♣ 3♥", rivalBets: [true, true, true, true], rivalCalls: [true, true, true, true] },
+  ];
+  const btn = (k) => `#actions [data-key="${k}"]`;
+  // Each step: what to spotlight, what the coach says, and what moves it on
+  // ("next" = the Next button, otherwise the move the player has to make).
+  const GUIDE = [
+    { text: "Welcome to <b>Charmed Hold'em</b>! Let's play a practice hand together against Rookie Rae. Nothing here counts, so relax.", wait: "next", intro: true },
+    { sel: "#you", text: "These two cards are yours: <b>a pair of Aces</b>, the best starting hand in poker. Only you can see them.", wait: "next" },
+    { sel: "#opps .oseat", text: "This is <b>Rookie Rae</b>. Her cards stay face down until the end of the hand.", wait: "next" },
+    { sel: ".pot", text: "Everyone pays a <b>10-chip ante</b> each hand, so there's already 20 in the pot.", wait: "next" },
+    { sel: btn("b"), text: "With Aces you want more chips in the pot. <b>Press Bet.</b>", wait: "act:bet" },
+    { sel: "#board", text: "<b>The flop</b>: three shared cards anyone can use. An Ace! You now have <b>three of a kind</b>.", wait: "next", delay: 1100 },
+    { sel: "#you-hn", text: "This label always shows <b>your best hand</b> right now.", wait: "next" },
+    { sel: btn("c"), text: "Sometimes it pays to slow down and let your rival catch up. <b>Press Check</b> to see the next card for free.", wait: "act:check" },
+    { sel: "#actions .sizer", text: "<b>The turn</b> is out. Time to bet big. You can bet any amount: <b>tap Pot</b> to bet the size of the pot.", wait: "size:Pot", delay: 900 },
+    { sel: btn("b"), text: "Bigger bets win bigger pots, but scare weak hands away. <b>Press Bet.</b>", wait: "act:bet" },
+    { sel: btn("c"), text: "<b>The river</b>: the last card. <b>Press Check</b> and we'll go to the showdown.", wait: "act:check", delay: 900 },
+    { sel: "#opps .oseat", text: "<b>Showdown!</b> Rae's cards flip over. Your three Aces beat her nine-high, so the pot is yours.", wait: "next", when: () => H.over && !H.revealPending, delay: 2600 },
+    { sel: "#receipt", text: "Your <b>payout</b>: the pot, plus a bonus for winning with Three of a Kind, plus your charms.", wait: "next" },
+    { sel: "#rack", text: "These are your <b>charms</b>. <b>Ace Up</b> paid +30 because you held an Ace. Buy more between tables and build combos.", wait: "next" },
+    { sel: ".bankroll", text: "Your <b>chips</b>. Every table has a target to hit within 6 hands. <b>Still needed</b> shows what's left, and <b>Can lose</b> how much you can afford to lose.", wait: "next" },
+    { sel: btn("Enter"), text: "Let's play one more. <b>Press Next hand.</b>", wait: "next-hand" },
+    { sel: "#you", text: "<b>7 and 2</b> of different suits: the worst starting hand in poker.", wait: "next", delay: 1000 },
+    { sel: btn("c"), text: "<b>Press Check</b> and see what Rae does.", wait: "act:check" },
+    { sel: "#opps .oseat", text: "Rae <b>bet</b>. She only bets good hands, so you're almost certainly beaten.", wait: "next", delay: 400 },
+    { sel: btn("f"), text: "Folding costs you nothing more. Knowing when to quit is half of poker. <b>Press Fold.</b>", wait: "act:fold" },
+    { text: "Nice fold! That's the core of the game: <b>bet your good hands, fold your bad ones</b>, and let your charms grow your wins. Rivals with special powers, archetypes, the shop and the casino you'll pick up as you play.", wait: "end", delay: 900 },
+  ];
+  function startGuided() {
+    if (TUTOR) return;
+    TUTOR = { step: -1, hand: 0, saved: { G, H, game: !$("game").hidden } };
+    $("tutorial").hidden = true;
+    $("home").hidden = true; $("game").hidden = false; window.scrollTo(0, 0);
+    newRun("duel");
+    G.charms = ["ace", "pairpal"];
+    G.target = 9999;
+    renderAll();
+    $("coach").hidden = false;
+    goStep(0);
+  }
+  function endGuided(choice) {
+    if (!TUTOR) return;
+    const saved = TUTOR.saved;
+    clearTimeout(TUTOR.timer);
+    TUTOR = null;
+    $("coach").hidden = true;
+    P.tutorialSeen = true; saveProfile();
+    document.querySelectorAll("body > [class^='fx-']").forEach(e => e.remove());
+    if (choice === "run") { newRun("table"); return; }
+    // Anything else puts back whatever run you had before the tutorial.
+    G = saved.G; H = saved.H;
+    receiptEmpty();
+    if (choice === "game" && saved.game && runLive()) { renderAll(); return; }
+    showHome();
+    if (choice === "guide") openTutorial(0);
+  }
+  function goStep(i) {
+    if (!TUTOR) return;
+    TUTOR.step = i;
+    const s = GUIDE[i];
+    $("coach-bubble").hidden = true;
+    $("coach-spot").className = "coach-spot hidden";
+    clearTimeout(TUTOR.timer);
+    // Wait for the moment to be right (cards dealt, reveal finished) before showing the step.
+    const show = () => {
+      if (!TUTOR || TUTOR.step !== i) return;
+      if (s.when && !s.when()) { TUTOR.timer = setTimeout(show, 150); return; }
+      TUTOR.timer = setTimeout(() => { if (TUTOR && TUTOR.step === i) renderStep(i); }, s.when ? s.delay || 0 : 0);
+    };
+    TUTOR.timer = setTimeout(show, s.when ? 0 : s.delay || 0);
+  }
+  function renderStep(i) {
+    const s = GUIDE[i], acting = s.wait !== "next" && s.wait !== "end";
+    $("coach-count").textContent = `Practice · ${i + 1} / ${GUIDE.length}`;
+    $("coach-text").innerHTML = s.text + (acting ? `<span class="coach-do">Your move</span>` : "");
+    $("coach-btns").innerHTML = s.wait === "end"
+      ? `<button class="btn" data-coach="run">Start a real run</button><button class="btn alt" data-coach="guide">Read the full guide</button><button class="btn ghost" data-coach="home">Home</button>`
+      : `${s.wait === "next" ? `<button class="btn sm" data-coach="next">Next <kbd>↵</kbd></button>` : ""}${s.intro ? `<button class="btn ghost sm" data-coach="guide">I'd rather read a guide</button>` : ""}<button class="btn ghost sm" data-coach="skip">Skip tutorial</button>`;
+    $("coach-btns").querySelectorAll("[data-coach]").forEach(b => b.addEventListener("click", () => {
+      const c = b.dataset.coach;
+      if (c === "next") goStep(TUTOR.step + 1);
+      else endGuided(c === "skip" ? (TUTOR.saved.game ? "game" : "home") : c);
+    }));
+    $("coach-bubble").hidden = false;
+    const el = s.sel && document.querySelector(s.sel);
+    if (el) el.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+    positionCoach();
+    setTimeout(positionCoach, 400);
+    if (s.wait === "next" || s.wait === "end") setTimeout(() => { const b = $("coach-btns").querySelector("button"); if (b) b.focus({ preventScroll: true }); }, 50);
+  }
+  // Move the spotlight onto the current step's target and put the bubble beside it.
+  function positionCoach() {
+    if (!TUTOR || TUTOR.step < 0 || $("coach-bubble").hidden) return;
+    const s = GUIDE[TUTOR.step], spot = $("coach-spot"), bub = $("coach-bubble");
+    const el = s.sel && document.querySelector(s.sel);
+    const acting = s.wait !== "next" && s.wait !== "end";
+    const bw = bub.offsetWidth, bh = bub.offsetHeight, pad = 8;
+    if (!el) {
+      spot.className = "coach-spot full";
+      Object.assign(spot.style, { left: innerWidth / 2 + "px", top: innerHeight / 2 + "px", width: "0px", height: "0px" });
+      Object.assign(bub.style, { left: Math.max(12, (innerWidth - bw) / 2) + "px", top: Math.max(12, (innerHeight - bh) / 2) + "px" });
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    spot.className = "coach-spot" + (acting ? " act" : "");
+    Object.assign(spot.style, { left: r.left - pad + "px", top: r.top - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+    const below = r.bottom + pad + 14 + bh < innerHeight;
+    const top = below ? r.bottom + pad + 14 : Math.max(12, r.top - pad - 14 - bh);
+    const left = Math.min(Math.max(12, r.left + r.width / 2 - bw / 2), innerWidth - bw - 12);
+    Object.assign(bub.style, { left: left + "px", top: top + "px" });
+  }
+  // Is this move the one the coach is waiting for? If not, give the bubble a nudge.
+  function tutorGate(kind) {
+    const s = TUTOR && GUIDE[TUTOR.step];
+    if (s && !$("coach-bubble").hidden && s.wait === kind) return true;
+    const b = $("coach-bubble");
+    b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge");
+    return false;
+  }
+  function tutorDone(kind) {
+    if (!TUTOR) return;
+    const s = GUIDE[TUTOR.step];
+    if (s && s.wait === kind) goStep(TUTOR.step + 1);
+  }
+  const coachInfoStep = () => TUTOR && !$("coach-bubble").hidden && GUIDE[TUTOR.step] && GUIDE[TUTOR.step].wait === "next";
+  window.addEventListener("resize", () => positionCoach());
+  window.addEventListener("scroll", () => positionCoach(), { passive: true });
 
   // ---------- Tutorial ----------
   // Opens by itself the first time someone visits, and any time from "How to play".
@@ -3620,7 +3802,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   renderHome();
   showHome();
   // First visit: the tutorial opens by itself.
-  if (!P.tutorialSeen) openTutorial(0);
+  if (!P.tutorialSeen) startGuided();
+  document.querySelectorAll("[data-start-guided]").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); startGuided(); }));
 })();
 </script>
 </body>
