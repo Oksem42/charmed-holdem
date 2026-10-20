@@ -494,6 +494,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .dev-status { color: var(--charm); font-size: 14px; }
 .dev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
  (max-width: 560px) { .dev-grid { grid-template-columns: 1fr; } }
+/* Inventory */
+.inv-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.inv-item { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; padding: 10px; border-radius: 14px; background: var(--room-2); border: 1px solid var(--line); border-left: 4px solid var(--rc); min-width: 0; }
+.inv-item.has-extra { border-color: rgba(242,184,75,.4); border-left-color: var(--rc); }
+.inv-count { position: absolute; top: 8px; right: 10px; font-family: var(--f-mono); font-weight: 700; font-size: 14px; color: var(--charm); }
+.inv-btns { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
 .lb-error { color: var(--lose); border-color: rgba(241,154,142,.4); margin-bottom: 6px; }
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -684,7 +691,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <div class="profile-row">
         <label class="name-field" for="player-name"><span class="label">Your name</span><input id="player-name" type="text" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
         <a class="wallet-chip" href="#casino" title="Tokens: earn them by playing, spend them on cases">◈ <b class="token-count">0</b> tokens</a>
-        <nav class="quick-links"><a href="#casino">Casino</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
+        <nav class="quick-links"><a href="#casino">Casino</a><a href="#inventory">Inventory</a><a href="#collection-sec">Collection</a><a href="#leaderboard">Leaderboard</a></nav>
       </div>
     </div>
     <div class="hero-table" aria-hidden="true">
@@ -725,7 +732,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 
   <section class="home-sec" id="casino">
     <div class="home-head sec-split">
-      <div><p class="label">The casino</p><h2>Open a case.</h2><p class="hint">Earn tokens by clearing tables and finishing runs. Every prize is cosmetic: card backs, table themes and win animations. You won't get duplicates until you own every item of the rarity you roll; after that they turn back into tokens.</p></div>
+      <div><p class="label">The casino</p><h2>Open a case.</h2><p class="hint">Earn tokens by clearing tables and finishing runs. Every prize is cosmetic: card backs, table themes and win animations. Duplicates go to your inventory, where you can keep them or sell the extras for tokens.</p></div>
       <span class="wallet-chip big">◈ <b class="token-count">0</b> tokens</span>
     </div>
     <div class="case-grid" id="case-grid"></div>
@@ -737,6 +744,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <span class="hint" id="collection-count"></span>
     </div>
     <div class="collection" id="collection"></div>
+  </section>
+
+  <section class="home-sec" id="inventory">
+    <div class="home-head sec-split">
+      <div><p class="label">Inventory</p><h2>Your stash.</h2><p class="hint">Every cosmetic you've pulled, with how many copies you have. Keep duplicates, or sell the extras for tokens. You always keep one copy.</p></div>
+      <div class="inv-actions"><span class="hint" id="inv-summary"></span><button class="btn alt" id="inv-sell-all">Sell all duplicates</button></div>
+    </div>
+    <div class="inv-grid" id="inv-grid"></div>
   </section>
 
   <section class="home-sec" id="leaderboard">
@@ -2671,11 +2686,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // If storage is blocked, everything still works for this visit; it just isn't remembered.
   const STORE_KEY = "charmed-holdem-profile";
   const P = (() => {
-    const base = { name: "Player", tokens: 150, owned: [], equip: { back: "back_classic", theme: "theme_classic", win: "win_suits" }, board: [] };
+    const base = { name: "Player", tokens: 150, inv: {}, equip: { back: "back_classic", theme: "theme_classic", win: "win_suits" }, board: [] };
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { saved = null; }
     if (!saved || typeof saved !== "object") return base;
-    return Object.assign(base, saved, { equip: Object.assign(base.equip, saved.equip || {}) });
+    const p = Object.assign(base, saved, { equip: Object.assign(base.equip, saved.equip || {}) });
+    // Older saves kept a list of unlocked items: each becomes one copy in the inventory.
+    if (Array.isArray(p.owned)) { p.owned.forEach(id => { p.inv[id] = Math.max(1, p.inv[id] || 0); }); delete p.owned; }
+    if (!p.inv || typeof p.inv !== "object") p.inv = {};
+    return p;
   })();
   function saveProfile() { try { localStorage.setItem(STORE_KEY, JSON.stringify(P)); } catch (e) { /* storage blocked: keep going */ } }
   function addTokens(n) { P.tokens += n; saveProfile(); renderWallets(); }
@@ -2712,7 +2731,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     win_lightning: { kind: "win", name: "Lightning", rarity: "epic", g: "ϟ" },
     win_jackpot:   { kind: "win", name: "Jackpot 777", rarity: "legendary", g: "7" },
   };
-  const owns = (id) => COSMETICS[id].free || P.owned.includes(id);
+  // The inventory counts copies of each cosmetic. Free items are always owned.
+  const owns = (id) => COSMETICS[id].free || (P.inv[id] || 0) > 0;
+  const copies = (id) => P.inv[id] || 0;
+  const addItem = (id) => { P.inv[id] = copies(id) + 1; };
   // Odds are percentages and deliberately harsh: Epic and Legendary prizes should feel like an event.
   const CASES = {
     felt:     { name: "Felt Case", price: 100, kinds: ["back", "theme"], blurb: "Card backs and table themes.", odds: { common: 86, rare: 12.5, epic: 1.35, legendary: 0.15 } },
@@ -2722,9 +2744,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   // Duplicates turn back into tokens.
   const REFUND = { common: 20, rare: 45, epic: 90, legendary: 180 };
   const caseItems = (c) => Object.keys(COSMETICS).filter(id => !COSMETICS[id].free && CASES[c].kinds.includes(COSMETICS[id].kind));
-  // fresh = rolling a real prize: within the rolled rarity, prefer items you don't own yet, so duplicates only
-  // happen once you own everything of that rarity. The odds per rarity are unchanged.
-  function rollCase(c, fresh) {
+  function rollCase(c) {
     const items = caseItems(c), odds = CASES[c].odds;
     let roll = Math.random() * 100, rarity = "common";
     for (const r of ["legendary", "epic", "rare", "common"]) { if (roll < odds[r]) { rarity = r; break; } roll -= odds[r]; }
@@ -2732,10 +2752,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const order = ["legendary", "epic", "rare", "common"];
     for (let i = order.indexOf(rarity); i < order.length; i++) {
       const pool = items.filter(id => COSMETICS[id].rarity === order[i]);
-      if (!pool.length) continue;
-      const unowned = fresh ? pool.filter(id => !owns(id)) : [];
-      const from = unowned.length ? unowned : pool;
-      return from[Math.floor(Math.random() * from.length)];
+      if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
     }
     return items[0];
   }
@@ -2963,8 +2980,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Roll every prize up front. Anything already owned, or already won earlier in this batch, is a duplicate.
     const results = [];
     for (let i = 0; i < qty; i++) {
-      const prize = rollCase(key, true), dupe = owns(prize);
-      if (!dupe) P.owned.push(prize);
+      const prize = rollCase(key), dupe = owns(prize);
+      addItem(prize);
       results.push({ prize, dupe });
     }
     saveProfile();
@@ -2993,20 +3010,19 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       // Several reels stop one after another, top to bottom.
       const duration = (qty > 1 ? 4200 + i * 220 : 5200) + (nearMiss ? 1000 : 0);
       const spin = reel.animate([{ transform: "translateX(0)" }, { transform: `translateX(${endX}px)` }], { duration, easing: "cubic-bezier(.08,.6,.12,1)", fill: "forwards" });
-      spin.onfinish = () => { res.tile.classList.add("won"); if (++finished === qty) allDone(); };
+      // The finished promise resolves even in a background tab, where frame-based finish events can stall.
+      spin.finished.then(() => { res.tile.classList.add("won"); if (++finished === qty) allDone(); }).catch(() => {});
     });
     if (reduceMotion) { results.forEach(r => r.tile.classList.add("won")); allDone(); }
     renderWallets();
   }
   function revealPrize(key, id, dupe) {
     const c = COSMETICS[id], r = RARITY[c.rarity];
-    // Duplicates pay out once the reel has stopped, so the token count doesn't spoil the result.
-    if (dupe) { P.tokens += REFUND[c.rarity]; saveProfile(); }
     const box = $("prize");
     box.hidden = false;
     box.style.setProperty("--rc", r.color);
     box.className = "prize r-" + c.rarity;
-    box.innerHTML = `${preview(id)}<div><span class="rar">${r.label} · ${KINDS[c.kind].replace(/s$/, "")}</span><b>${c.name}</b>${dupe ? `<small>You already own this. Converted to ◈ ${REFUND[c.rarity]} tokens.</small>` : `<small>New! Added to your collection.</small>`}</div>`;
+    box.innerHTML = `${preview(id)}<div><span class="rar">${r.label} · ${KINDS[c.kind].replace(/s$/, "")}</span><b>${c.name}</b>${dupe ? `<small>Duplicate! You now have ×${copies(id)}. Keep it, or sell extras in your inventory for ◈ ${REFUND[c.rarity]} each.</small>` : `<small>New! Added to your collection.</small>`}</div>`;
     caseActions(key, 1, !dupe ? id : null);
     if (!reduceMotion) {
       const p = pt(box.querySelector(".pv"));
@@ -3018,18 +3034,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   // Several cases: one summary of everything won, best prize first.
   function revealMany(key, results) {
-    const refund = results.filter(r => r.dupe).reduce((s, r) => s + REFUND[COSMETICS[r.prize].rarity], 0);
-    if (refund) { P.tokens += refund; saveProfile(); }
+    // Duplicates go to the inventory; you choose later whether to sell them.
+    const dupeValue = results.filter(r => r.dupe).reduce((s, r) => s + REFUND[COSMETICS[r.prize].rarity], 0);
     const sorted = [...results].sort((a, b) => RANK[COSMETICS[b.prize].rarity] - RANK[COSMETICS[a.prize].rarity]);
     const bestR = COSMETICS[sorted[0].prize].rarity, fresh = results.filter(r => !r.dupe).length;
     const box = $("prize");
     box.hidden = false;
     box.style.setProperty("--rc", RARITY[bestR].color);
     box.className = "prize multi r-" + bestR;
-    box.innerHTML = `<div class="multi-head"><b>${results.length} cases opened</b><small>${fresh} new · ${results.length - fresh} duplicate${results.length - fresh === 1 ? "" : "s"}${refund ? ` → ◈ ${refund} tokens` : ""}</small></div>
+    box.innerHTML = `<div class="multi-head"><b>${results.length} cases opened</b><small>${fresh} new · ${results.length - fresh} duplicate${results.length - fresh === 1 ? "" : "s"}${dupeValue ? ` (worth ◈ ${dupeValue} if you sell them in your inventory)` : ""}</small></div>
       <div class="multi-grid">${sorted.map((r, i) => {
         const c = COSMETICS[r.prize], rr = RARITY[c.rarity];
-        return `<div class="mprize${r.dupe ? " dupe" : ""}${i === 0 ? " best" : ""}" style="--rc:${rr.color};--i:${i}">${preview(r.prize)}<b>${c.name}</b><span class="rar">${rr.label}</span>${r.dupe ? `<small>Duplicate · ◈ ${REFUND[c.rarity]}</small>` : `<button type="button" class="btn sm" data-eq="${r.prize}">Equip</button>`}</div>`;
+        return `<div class="mprize${r.dupe ? " dupe" : ""}${i === 0 ? " best" : ""}" style="--rc:${rr.color};--i:${i}">${preview(r.prize)}<b>${c.name}</b><span class="rar">${rr.label}</span>${r.dupe ? `<small>Duplicate · now ×${copies(r.prize)}</small>` : `<button type="button" class="btn sm" data-eq="${r.prize}">Equip</button>`}</div>`;
       }).join("")}</div>`;
     box.querySelectorAll("[data-eq]").forEach(b => b.addEventListener("click", () => {
       equip(b.dataset.eq);
@@ -3056,6 +3072,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   function closeCase() {
     $("case-modal").hidden = true;
+    renderInventory();
     renderWallets();
   }
 
@@ -3121,6 +3138,45 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (!res.ok) throw new Error("HTTP " + res.status);
     return (await res.json()).map(r => ({ name: r.name, tables: r.tables, victory: r.victory, chips: r.chips, at: Date.parse(r.created_at) }));
   }
+
+  // ---------- Inventory ----------
+  // Every cosmetic you've pulled with its copy count. Extras (anything past the first copy) can be sold.
+  const extras = (id) => Math.max(0, copies(id) - 1);
+  function sellCopies(id, n) {
+    const k = Math.min(n, extras(id));
+    if (!k) return;
+    P.inv[id] -= k;
+    P.tokens += REFUND[COSMETICS[id].rarity] * k;
+    saveProfile();
+    renderInventory(); renderWallets();
+  }
+  function renderInventory() {
+    const ids = Object.keys(P.inv).filter(id => COSMETICS[id] && copies(id) > 0)
+      .sort((a, b) => RANK[COSMETICS[b].rarity] - RANK[COSMETICS[a].rarity] || extras(b) - extras(a));
+    const dupes = ids.reduce((s, id) => s + extras(id), 0);
+    const value = ids.reduce((s, id) => s + extras(id) * REFUND[COSMETICS[id].rarity], 0);
+    $("inv-summary").textContent = dupes ? `${dupes} duplicate${dupes === 1 ? "" : "s"} worth ◈ ${value.toLocaleString("en-US")}` : "No duplicates right now";
+    $("inv-sell-all").disabled = !dupes;
+    $("inv-sell-all").textContent = dupes ? `Sell all duplicates · ◈ ${value.toLocaleString("en-US")}` : "Sell all duplicates";
+    $("inv-grid").innerHTML = ids.length ? ids.map(id => {
+      const c = COSMETICS[id], r = RARITY[c.rarity], ex = extras(id), each = REFUND[c.rarity];
+      return `<div class="inv-item${ex ? " has-extra" : ""}" style="--rc:${r.color}">
+        <span class="inv-count">×${copies(id)}</span>
+        ${preview(id)}
+        <div class="col-text"><b>${c.name}</b><span style="color:${r.color}">${r.label} · ◈ ${each} each</span></div>
+        <div class="inv-btns">
+          <button class="btn ghost sm" data-sell1="${id}" ${ex ? "" : "disabled"}>Sell 1</button>
+          <button class="btn alt sm" data-sellx="${id}" ${ex ? "" : "disabled"}>${ex ? `Sell extras (${ex}) · ◈ ${ex * each}` : "No extras"}</button>
+        </div>
+      </div>`;
+    }).join("") : `<p class="hint lb-empty">Nothing here yet. Open a case to start your stash.</p>`;
+    document.querySelectorAll("[data-sell1]").forEach(b => b.addEventListener("click", () => sellCopies(b.dataset.sell1, 1)));
+    document.querySelectorAll("[data-sellx]").forEach(b => b.addEventListener("click", () => sellCopies(b.dataset.sellx, Infinity)));
+  }
+  $("inv-sell-all").addEventListener("click", () => {
+    Object.keys(P.inv).forEach(id => { const k = extras(id); if (k && COSMETICS[id]) { P.tokens += REFUND[COSMETICS[id].rarity] * k; P.inv[id] = 1; } });
+    saveProfile(); renderInventory(); renderWallets();
+  });
 
   let boardMode = "table", boardScope = onlineOn() ? "online" : "device";
   function boardRows(rows) {
@@ -3214,7 +3270,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function showHome() {
     $("game").hidden = true;
     $("home").hidden = false;
-    renderWallets(); renderCollection(); renderBoard();
+    renderWallets(); renderCollection(); renderInventory(); renderBoard();
     const live = runLive();
     $("play-btn").querySelector("span").textContent = live ? "Continue run" : "Play";
     $("new-btn").hidden = !live;
@@ -3241,15 +3297,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const ids = Object.keys(COSMETICS), have = ids.filter(owns).length;
     $("dev-status").textContent = `${have} of ${ids.length} cosmetics unlocked · ◈ ${P.tokens.toLocaleString("en-US")} tokens`;
   }
-  function devRefresh() { saveProfile(); applyCosmetics(); renderWallets(); renderCollection(); devStatus(); }
+  function devRefresh() { saveProfile(); applyCosmetics(); renderWallets(); renderCollection(); renderInventory(); devStatus(); }
   function openDev() { $("dev-panel").hidden = false; devStatus(); }
   function closeDev() {
     $("dev-panel").hidden = true;
     if (location.hash === "#" + DEV_CODE) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { location.hash = ""; } }
   }
-  $("dev-unlock").addEventListener("click", () => { P.owned = Object.keys(COSMETICS).filter(id => !COSMETICS[id].free); devRefresh(); });
+  $("dev-unlock").addEventListener("click", () => { Object.keys(COSMETICS).filter(id => !COSMETICS[id].free).forEach(id => { P.inv[id] = Math.max(1, copies(id)); }); devRefresh(); });
   $("dev-lock").addEventListener("click", () => {
-    P.owned = [];
+    P.inv = {};
     // Anything equipped that's now locked goes back to the free default.
     const defaults = { back: "back_classic", theme: "theme_classic", win: "win_suits" };
     Object.keys(P.equip).forEach(k => { if (!owns(P.equip[k])) P.equip[k] = defaults[k]; });

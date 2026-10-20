@@ -27,7 +27,7 @@ New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (ne
 
 ## Casino and cosmetics
 - Earn tokens: +25 for each table you clear, plus tokens for the chips left at the end of a run (and +150 for beating the casino).
-- Open cases (Felt Case, Showtime Case, High Roller Vault) on a spinning reel. Open 1, 3, 5 or 10 at once: several reels spin together, then a summary shows everything you won. Prizes are cosmetic only: card backs, table themes and win animations, in Common, Rare, Epic and Legendary rarities. You won't get duplicates until you own everything of the rarity you roll; after that, duplicates turn back into tokens.
+- Open cases (Felt Case, Showtime Case, High Roller Vault) on a spinning reel. Open 1, 3, 5 or 10 at once: several reels spin together, then a summary shows everything you won. Prizes are cosmetic only: card backs, table themes and win animations, in Common, Rare, Epic and Legendary rarities. Duplicates go to your inventory, where you can see how many copies you have and sell the extras for tokens.
 - Equip your unlocks in the Collection. Three table themes are free.
 - Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
 - The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
