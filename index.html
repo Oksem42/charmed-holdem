@@ -316,6 +316,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .oseat.winner { background: rgba(242,184,75,.14); box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5); }
 .oseat.winner .o-act { color: var(--charm); font-weight: 700; }
 .oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
+/* Showdown reveal: each card starts face down, lifts, turns over with a glint and lands. */
+.card.reveal { animation: reveal .75s cubic-bezier(.2,.8,.3,1) backwards; animation-delay: var(--d, 0s); }
+.card.reveal::after { content: ""; position: absolute; inset: -3px; border-radius: 8px; background: repeating-linear-gradient(45deg, #7a2f2a 0 6px, #61241f 6px 12px); border: 3px solid var(--stock); opacity: 0; animation: revealBack .75s linear backwards; animation-delay: var(--d, 0s); }
+@keyframes reveal {
+  0% { transform: translateY(0) rotateY(0deg); }
+  35% { transform: translateY(-20px) rotateY(90deg) scale(1.12); }
+  70% { transform: translateY(-8px) rotateY(0deg) scale(1.06); box-shadow: 0 0 0 3px var(--charm), 0 0 26px 4px rgba(242,184,75,.6); }
+  100% { transform: none; }
+}
+@keyframes revealBack { 0%, 34% { opacity: 1; } 36%, 100% { opacity: 0; } }
+.o-act.late { animation: rise .35s cubic-bezier(.3,1.5,.5,1) backwards; animation-delay: var(--d, 0s); }
+.oseat.winner { animation: winnerGlow .8s ease; }
+@keyframes winnerGlow { 0% { box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5), 0 0 0 0 rgba(242,184,75,.7); } 50% { box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.9), 0 0 30px 6px rgba(242,184,75,.45); } }
+
 /* Elite rivals: a gold-and-violet seat with a crown */
 .oseat.elite { background: linear-gradient(180deg, rgba(180,107,255,.16), rgba(242,184,75,.08)); box-shadow: inset 0 0 0 1.5px rgba(199,156,255,.55), 0 0 26px -10px var(--fx-purple); }
 .oseat.elite .avatar { position: relative; background: linear-gradient(135deg, var(--fx-purple), var(--charm)); color: var(--ink); }
@@ -942,6 +956,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ford:     { name: "Christofor Ford", tier: 3, style: "Patient and precise. Never wastes a chip.", reader: true, p: { call: 0, bet: 0, bluff: .05, shove: .05 },
                 power: { name: "River Read", desc: "Knows your hand on the river. He only calls or bets there when he's ahead." },
                 bio: "Former head of casino security. He caught every cheat in the building, then quietly learned all their tricks." },
+    liam:     { name: "Liam Ford", tier: 3, style: "Intimidating. Bets often and calls a lot.", p: { call: .12, bet: .15, bluff: .12, shove: .02 },
+                power: { name: "Protection Racket", desc: "Cancels every effect that multiplies your score at his table." },
+                bio: "Christofor Ford's younger brother, who went the other way. He runs the protection racket on this floor, and nothing gets multiplied in his casino without his cut." },
+    elias:    { name: "Elias Primack", tier: 3, style: "Spoiled and reckless. Plays almost every hand.", p: { call: .2, bet: .12, bluff: .22, shove: -.06 },
+                power: { name: "Family Rules", desc: "When you fold, 40% of the time he won't let you leave: you call and the hand plays out to showdown." },
+                bio: "Augustus Primack's only son. He has never been told no in his life, and he doesn't let anyone else say it at his table either." },
     dustin:   { name: "Dubious Dustin", tier: 3, style: "Loose and loud. Calls a lot, bluffs often.", snapCaller: true, p: { call: .15, bet: .1, bluff: .12, shove: 0 },
                 power: { name: "Snap Call", desc: "Always calls your all ins, whatever he's holding." },
                 bio: "Ran the back-room games for forty years. Nobody believes a word he says, and he believes yours even less: he calls every all in before you've finished pushing your chips." },
@@ -965,10 +985,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const targetFor = (t, stack) => Math.max(MODES[G.mode].targets[t], Math.round((stack / 2 - 60) / 10) * 10);
   const initials = (name) => name.replace(/^The /, "").split(" ").filter(w => !/^"/.test(w)).map(w => w[0]).join("").slice(0, 2);
 
+  // Fair shuffle (Fisher-Yates). Sorting with a random comparison is biased toward the original order.
+  function shuffled(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   // Seat the rivals for a whole run: easier rivals early, tougher ones later, two Elites, The House at the last table.
   function buildLineup(seats) {
     const used = new Set(), lineup = [];
-    const elites = Object.keys(RIVALS).filter(id => RIVALS[id].tier === 3).sort(() => Math.random() - .5);
+    const elites = shuffled(Object.keys(RIVALS).filter(id => RIVALS[id].tier === 3));
     for (let t = 0; t < NUM_TABLES; t++) {
       const tier = TABLE_TIERS[t], here = [];
       if (tier === 4) here.push("house");
@@ -1162,7 +1184,19 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   function act(kind, size) {
     const b = BETS[H.street];
     H.opps.forEach(o => { if (!o.folded) o.act = ""; });
-    if (kind === "fold") return finish({ youFold: true });
+    if (kind === "fold") {
+      // Elias Primack's Family Rules: 40% of the time he won't let you fold. You call and the board plays out.
+      const elias = H.opps.find(o => o.id === "elias" && !o.folded);
+      if (elias && Math.random() < .4) {
+        const amt = Math.min(H.facing, G.bank);
+        if (amt < H.facing) H.pot -= (H.facing - amt) * H.matched;
+        G.bank -= amt; H.pot += amt; H.facing = 0;
+        say(`<b class="elite-say">Elias Primack: "Sit down. We're not done."</b> ${amt ? `You're dragged back in and call ${amt}.` : "You're dragged back in."} The board plays out.`);
+        setTimeout(familyRulesFx, 60);
+        return runOut("forced");
+      }
+      return finish({ youFold: true });
+    }
     if (kind === "call") {
       // Short of the full call: go all in. Chips you can't match go back to whoever put them in.
       const amt = Math.min(H.facing, G.bank);
@@ -1245,8 +1279,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     renderAll();
   }
   // All in: no more betting. Every hand still in is turned face up and the rest of the board is dealt out.
-  function goAllIn() {
-    H.allIn = true;
+  function goAllIn() { runOut("allIn"); }
+  // Deal out the rest of the board with no more betting (after an all in, or when Elias won't let you fold).
+  function runOut(flag) {
+    H[flag] = true;
     renderAll();
     const step = () => {
       if (H.over) return;
@@ -1313,7 +1349,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     // Charms pay left to right. Echo, sitting to the right of a charm, makes that charm pay again.
     const pay = (key, name, r) => {
       if (r.add) { lines.push([name, r.add, "ch", key]); flat += r.add; }
-      if (r.mult) { lines.push([name, "×" + r.mult, "ch mult", key]); mult *= r.mult; }
+      // Liam Ford's Protection Racket: no multipliers at his table.
+      if (r.mult && eliteHere() === "liam") { lines.push([`${name} ×${r.mult}`, "cancelled", "ch neg", key]); H.racket = true; }
+      else if (r.mult) { lines.push([name, "×" + r.mult, "ch mult", key]); mult *= r.mult; }
       if (r.levelUp) { G.lv[1] += r.levelUp; lines.push(["Pair levels up", "Lv." + G.lv[1], "ch lvl", key]); }
     };
     const fire = (id, r) => {
@@ -1365,12 +1403,26 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       say(`<b>Split pot</b> with ${listNames(winners.map(o => R(o).name))}. You all play ${nameOf(you.score)} ${five(you)}.<small>${why}</small>`);
     }
 
+    // Showdown reveal: rivals whose cards are still face down flip one seat at a time.
+    // The result, receipt, charms and chips all wait until the last card is up, so nothing is spoiled.
+    H.revealOrder = {};
+    let toReveal = 0;
+    if (H.showdown) H.opps.forEach((o, oi) => { if (!o.folded && !H.seen.has(`o${oi}c0u`)) H.revealOrder[oi] = toReveal++; });
+    const revealMs = reduceMotion || !toReveal ? 0 : 350 + toReveal * 600 + 300;
+    H.revealPending = revealMs > 0;
+    if (revealMs) {
+      const finalMsg = $("msg").innerHTML;
+      say("Showdown! Cards up…");
+      const hand = H;
+      setTimeout(() => { if (H !== hand) return; $("msg").innerHTML = finalMsg; H.revealPending = false; renderCards(); }, revealMs);
+    }
     // Charms go off one after another, each with its own effect, then the chips roll in.
     const fxAt = {};
-    fired.forEach(([id], k) => fxAt[id] = (reduceMotion ? 0 : 350 + k * 650));
+    fired.forEach(([id], k) => fxAt[id] = (reduceMotion ? 0 : revealMs + 350 + k * 650));
     const lastFx = fired.length ? fxAt[fired[fired.length - 1][0]] + 700 : 0;
-    const payAt = Math.max(lines.length * 120 + 250, lastFx);
-    showReceipt(lines, net, fired, fxAt);
+    const payAt = Math.max(revealMs + lines.length * 120 + 250, lastFx);
+    showReceipt(lines, net, fired, fxAt, revealMs / 1000);
+    if (H.racket) racketFx(Math.max(0, payAt - 600));
     G.handsLeft--;
     hudDelay = payout > 0 ? payAt : 0;
     renderAll();
@@ -1383,7 +1435,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     } else if (payout > 0) {
       flyChips(4, payAt - 200);
     }
-    if (youFold || lostShowdown) shake();
+    if (youFold || lostShowdown) setTimeout(shake, revealMs);
   }
 
   // ---------- Effects ----------
@@ -1480,7 +1532,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     return pick.map(id => ({ id, sold: false }));
   }
   function openShop() {
-    const cats = [1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - .5).slice(0, 2);
+    const cats = shuffled([1, 2, 3, 4, 5, 6, 7]).slice(0, 2);
     G.shop = { charms: rollCharms(), levels: cats.map(c => ({ c, sold: false })), reroll: 10 };
     renderShop();
   }
@@ -2116,6 +2168,40 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     ring(e, "var(--fx-purple)", 900, 2.5);
     callout("Charm Thief!", { x: e.x, y: e.y + 60 }, "var(--fx-purple)", 850);
   }
+  // Elias Primack's Family Rules: a gold chain snaps from his seat to your cards.
+  function familyRulesFx() {
+    if (reduceMotion) return;
+    const seat = [...document.querySelectorAll("#opps .oseat")].find(s => s.querySelector("b")?.textContent === RIVALS.elias.name);
+    const you = pt($("you"));
+    if (seat) {
+      const e = pt(seat.querySelector(".avatar"));
+      for (let i = 0; i < 10; i++) {
+        const link = fx("fx-orb", "", { background: "var(--charm)", boxShadow: "0 0 10px 2px var(--charm)", width: "12px", height: "12px" });
+        const t = i / 9;
+        play(link, [
+          { transform: at(link, e.x, e.y, "scale(.3)"), opacity: 0 },
+          { transform: at(link, e.x + (you.x - e.x) * t, e.y + (you.y - e.y) * t, "scale(1)"), opacity: 1, offset: .5 },
+          { transform: at(link, e.x + (you.x - e.x) * t, e.y + (you.y - e.y) * t, "scale(1)"), opacity: 0 },
+        ], { duration: 1200, delay: i * 40 });
+      }
+      seat.querySelector(".avatar").animate([{ scale: "1" }, { scale: "1.35" }, { scale: "1" }], { duration: 400 });
+    }
+    $("you").animate([{ translate: "0 0" }, { translate: "0 -14px" }, { translate: "0 0" }], { duration: 500, delay: 350, easing: "cubic-bezier(.3,1.6,.5,1)" });
+    callout("FAMILY RULES!", { x: you.x, y: you.y - 90 }, "var(--charm)", 300);
+  }
+  // Liam Ford's Protection Racket: a CANCELLED stamp over the pot.
+  function racketFx(delay) {
+    if (reduceMotion) return;
+    const p = potPt();
+    const s = fx("fx-stamp", "CANCELLED");
+    play(s, [
+      { transform: at(s, p.x, p.y - 40, "rotate(-10deg) scale(2.6)"), opacity: 0 },
+      { transform: at(s, p.x, p.y - 40, "rotate(-10deg) scale(.95)"), opacity: 1, offset: .2 },
+      { transform: at(s, p.x, p.y - 40, "rotate(-10deg) scale(1)"), opacity: 1, offset: .85 },
+      { transform: at(s, p.x, p.y - 40, "rotate(-10deg) scale(1)"), opacity: 0 },
+    ], { duration: 1500, delay, easing: "cubic-bezier(.2,.9,.3,1.2)" });
+    callout("Liam takes his cut", { x: p.x, y: p.y + 40 }, "var(--fx-curse)", delay + 300);
+  }
   // Dubious Dustin's Snap Call: his chips hit the pot before yours have settled.
   function snapCallFx() {
     if (reduceMotion) return;
@@ -2157,7 +2243,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     opps.replaceChildren(); you.replaceChildren(); board.replaceChildren();
     if (!H) return;
     const sd = H.over && H.showdown;
-    const winFive = sd && H.winBest ? H.winBest.cards : null;
+    // While the showdown reveal is still running, hold back who won.
+    const winFive = sd && H.winBest && !H.revealPending ? H.winBest.cards : null;
     const style = (c) => winFive ? { used: winFive.includes(c), dim: !winFive.includes(c) } : {};
     // Animate each card only the first time it appears in a given face-up/face-down state.
     let flipN = 0;
@@ -2176,7 +2263,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     H.opps.forEach((o, oi) => {
       const r = R(o);
       const seat = document.createElement("div");
-      const isWinner = H.over && H.winners && H.winners.includes(o);
+      const isWinner = H.over && !H.revealPending && H.winners && H.winners.includes(o);
       seat.className = "oseat" + (r.tier === 3 ? " elite" : "") + (o.folded ? " folded" : "") + (isWinner ? " winner" : "") + (tilted(o) ? " tilted" : "");
       seat.dataset.i = oi;
       seat.title = r.bio;
@@ -2188,11 +2275,16 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
         const key = `o${oi}c${i}`;
         if (!faceUp && H.peek && H.peek.o === oi && H.peek.c === i) { cards.append(anim(cardEl(c, { peek: true }), key + "p", "flip", 0)); return; }
         const el = cardEl(c, faceUp ? style(c) : { down: true });
-        cards.append(faceUp ? anim(el, key + "u", "flip", .15 * flipN++) : anim(el, key, "deal", (oi + 1) * step + i * .32, 160));
+        const revealAt = H.revealOrder && H.revealOrder[oi] !== undefined ? .35 + H.revealOrder[oi] * .6 + i * .14 : null;
+        cards.append(!faceUp ? anim(el, key, "deal", (oi + 1) * step + i * .32, 160)
+          : revealAt !== null ? anim(el, key + "u", "reveal", revealAt)
+          : anim(el, key + "u", "flip", .15 * flipN++));
       });
       const actEl = seat.querySelector(".o-act");
       const label = sd && !o.folded ? nameOf(o.best.score) : o.folded ? "Folded" : o.act;
       actEl.textContent = label || "";
+      // The hand name pops up just after this seat's cards land.
+      if (sd && H.revealPending && H.revealOrder[oi] !== undefined) { actEl.classList.add("late"); actEl.style.setProperty("--d", (.35 + H.revealOrder[oi] * .6 + .5) + "s"); }
       if (isWinner) actEl.textContent = (label ? label + " · " : "") + "Wins";
       if (tilted(o) && !H.over) actEl.textContent = (actEl.textContent ? actEl.textContent + " · " : "") + "On tilt";
       opps.append(seat);
@@ -2254,10 +2346,10 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       add(label, "Enter", afterHand, "btn big");
       return;
     }
-    if (H.allIn) {
+    if (H.allIn || H.forced) {
       const note = document.createElement("p");
       note.className = "allin-note";
-      note.textContent = "All in. Dealing out the board…";
+      note.textContent = H.forced ? "Elias won't let you leave. Dealing out the board…" : "All in. Dealing out the board…";
       a.append(note);
       return;
     }
@@ -2422,7 +2514,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     lastFired = []; fireDelays = {}; firePending = false;
     $("receipt").innerHTML = `<p class="empty">Win a hand to see your charms pay out here.</p>`;
   }
-  function showReceipt(lines, net, fired, fxAt) {
+  function showReceipt(lines, net, fired, fxAt, base = 0) {
     lastFired = fired.map(f => f[0]);
     fireDelays = Object.fromEntries(fired.map(([id]) => [id, fxAt[id] / 1000]));
     firePending = true;
@@ -2432,13 +2524,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     lines.forEach(([k, v, cls, id], i) => {
       const d = document.createElement("div");
       d.className = "ln " + cls;
-      d.style.animationDelay = (id ? fxAt[id] / 1000 : i * 0.12) + "s";
+      d.style.animationDelay = (id ? fxAt[id] / 1000 : base + i * 0.12) + "s";
       d.innerHTML = `<span>${k}</span><span>${typeof v === "number" ? (v < 0 ? "−" + Math.abs(Math.round(v)) : "+" + Math.round(v)) : v}</span>`;
       if (typeof v === "number" && v < 0) d.classList.add("neg");
       r.append(d);
     });
     const t = document.createElement("div");
     t.className = "tot";
+    t.style.animation = "pop .25s ease both";
+    t.style.animationDelay = (base + lines.length * 0.12) + "s";
     t.innerHTML = `<span>Net this hand</span><span style="color:${net >= 0 ? "var(--win)" : "var(--lose)"}">${fmt(net)}</span>`;
     r.append(t);
   }

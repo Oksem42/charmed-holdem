@@ -11,13 +11,15 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 Both modes share the charms, shop, hand levels and all in. Rivals are seated by difficulty each run, with The House at the final table.
 
 ## Rivals
-Twenty-six rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
+Twenty-eight rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
 
 **Elites** are mini-bosses with special powers. Only one Elite ever sits at a table:
 - **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
 - **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
 - **Christofor Ford** (River Read): knows your hand on the river and only calls or bets there when he's ahead.
 - **Dubious Dustin** (Snap Call): always calls your all ins, whatever he's holding.
+- **Liam Ford** (Protection Racket): the mafia boss cancels every effect that multiplies your score at his table.
+- **Elias Primack** (Family Rules): Augustus's son. When you fold, 40% of the time he won't let you leave, and the hand plays out to showdown.
 
 New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) Mirage (reverse tells), Iron Ida (calls any all in with a pair or an ace) and Curious Carla (the bigger your all in, the more likely she calls).
 
