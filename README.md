@@ -11,7 +11,14 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 Both modes share the charms, shop, hand levels and all in. Rivals are seated by difficulty each run, with The House at the final table.
 
 ## Rivals
-Sixteen rivals, each with their own playstyle, including Augustus Primack (folds most hands, but bets every street when he plays), Sly Sadie (traps with big hands), Copycat Cole (copies your last move), Midnight Moe (bluffs the river), Tilted Tina (goes wild after losing), Professor Pip (plays the pot odds) and Lucky Lenny (chases every draw).
+Twenty-three rivals, each with a playstyle and a backstory (hover a rival in game to read it). Each run seats them by difficulty: Easy, Tricky and Tough rivals, two Elites, and The House at the final table.
+
+**Elites** are mini-bosses with special powers. Only one Elite ever sits at a table:
+- **Augustus Primack** (Old Money): antes are doubled to 20 at his table.
+- **Leo Badechluer** (Charm Thief): steals one of your charms every hand at his table.
+- **Christofor Ford** (River Read): knows your hand on the river and only calls or bets there when he's ahead.
+
+New rivals include Granny Gwen (never bets), Fast Freddie (bets every flop, gives up on the turn), Sir Pockets (only plays pairs and high cards), Dealer Dan (scared of flush and straight boards) and Mirage (reverse tells).
 
 ## Casino and cosmetics
 - Earn tokens: +25 for each table you clear, plus tokens for the chips left at the end of a run (and +150 for beating the casino).

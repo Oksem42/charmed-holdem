@@ -315,6 +315,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .oseat.winner { background: rgba(242,184,75,.14); box-shadow: inset 0 0 0 1.5px rgba(242,184,75,.5); }
 .oseat.winner .o-act { color: var(--charm); font-weight: 700; }
 .oseat.tilted .avatar { background: var(--lose); animation: blink 1.2s ease-in-out infinite; }
+/* Elite rivals: a gold-and-violet seat with a crown */
+.oseat.elite { background: linear-gradient(180deg, rgba(180,107,255,.16), rgba(242,184,75,.08)); box-shadow: inset 0 0 0 1.5px rgba(199,156,255,.55), 0 0 26px -10px var(--fx-purple); }
+.oseat.elite .avatar { position: relative; background: linear-gradient(135deg, var(--fx-purple), var(--charm)); color: var(--ink); }
+.oseat.elite .avatar::after { content: "♛"; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); font-size: 14px; color: var(--charm); text-shadow: 0 0 8px var(--charm); }
+.oseat.elite .persona small { color: #e6d3ff; }
+.elite-say { color: var(--fx-purple); }
+.charm.stolen { opacity: .45; filter: grayscale(.8); }
+.charm.stolen .badge { background: var(--fx-purple); }
 .mode-chip { display: inline-block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 1px 8px; border-radius: 99px; border: 1px solid rgba(242,184,75,.5); color: var(--charm); margin-right: 6px; }
 .shove-note { text-transform: none; letter-spacing: 0; color: var(--lose); font-family: var(--f-body); font-size: 12.5px; margin-left: 6px; }
 
@@ -413,6 +421,27 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .lb-row.me .lb-name { color: var(--charm); }
 .board-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* Bankroll side panel: stays in view beside the table while you scroll */
+.bankroll { position: sticky; top: max(12px, env(safe-area-inset-top, 0px)); z-index: 3; gap: 8px; border-color: rgba(242,184,75,.4); background: linear-gradient(160deg, rgba(242,184,75,.1), var(--room-2) 60%); }
+.bank-top { display: flex; align-items: flex-end; gap: 14px; }
+.bank-main { display: grid; }
+.bank-main b { font-family: var(--f-display); font-size: 40px; line-height: 1; color: var(--charm); font-variant-numeric: tabular-nums; }
+.bankroll .stat-anim b { transform-origin: left center; }
+.chip-stack { position: relative; width: 44px; height: 64px; flex: none; }
+.chip-stack i { position: absolute; left: 2px; bottom: calc(var(--n) * 4.5px); width: 40px; height: 11px; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #ffd98a, var(--charm) 60%, #b07d1d); border: 2px dashed rgba(58,39,6,.55); box-shadow: 0 2px 0 #7a5410; animation: rise .3s ease backwards; animation-delay: calc(var(--n) * 30ms); }
+.bank-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; }
+.bank-row .mono { color: var(--text); font-variant-numeric: tabular-nums; }
+.bank-row .mono.up { color: var(--win); } .bank-row .mono.down { color: var(--lose); }
+.bank-row.tokens .mono { color: var(--charm); }
+.bank-main.up b { animation: glowUp .9s ease; }
+.bank-main.down b { animation: glowDown .6s ease; }
+.stat.bank-mini { display: none; }
+.stat.bank-mini b { color: var(--charm); }
+@media (max-width: 900px) {
+  .stat.bank-mini { display: grid; }
+  .bankroll { position: static; }
+}
+
 /* Bet sizing */
 .sizer { flex-basis: 100%; display: grid; gap: 8px; justify-items: center; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,.22); max-width: 520px; margin: 0 auto 2px; }
 .size-picks { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
@@ -462,7 +491,12 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
 .tier-0 .avatar { background: var(--fx-green); }
 .tier-1 .avatar { background: var(--fx-water); }
 .tier-2 .avatar { background: var(--fx-purple); }
-.tier-3 .avatar { background: var(--charm); }
+.rival .bio { margin-top: 6px; font-size: 12.5px; color: var(--muted); font-style: italic; line-height: 1.45; }
+.rival .power { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 700; color: #e6d3ff; }
+.rival.elite { border-color: rgba(199,156,255,.6); background: linear-gradient(135deg, rgba(180,107,255,.14), var(--room-2) 55%); box-shadow: 0 0 26px -12px var(--fx-purple); }
+.tier-3 .avatar { background: linear-gradient(135deg, var(--fx-purple), var(--charm)); }
+.tier-4 .avatar { background: var(--charm); }
+.roster .rival { align-items: start; }
 .rival.star { border-color: rgba(199,156,255,.6); box-shadow: 0 0 24px -10px var(--fx-purple); }
 .home { max-width: 1120px; margin: 0 auto; padding-block: 28px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 72px; }
 .home-hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; padding-top: 24px; }
@@ -653,7 +687,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   </section>
 
   <section class="home-sec">
-    <div class="home-head"><p class="label">The casino</p><h2>Sixteen rivals. No two play alike.</h2><p class="hint">Each run seats rivals by difficulty: easy ones early, tough ones later, and The House at the last table.</p></div>
+    <div class="home-head"><p class="label">The casino</p><h2><span id="rival-count">24</span> rivals. No two play alike.</h2><p class="hint">Each run seats rivals by difficulty: easy ones early, tough ones later, two Elites with special powers (never more than one at a table), and The House at the last table.</p></div>
     <div class="roster" id="home-lineup"></div>
   </section>
 
@@ -682,8 +716,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       <button class="btn ghost sm home-link" id="home-btn">← Home</button>
       <div class="stat"><span class="label">Table</span><b id="s-table">1 / 8</b></div>
       <div class="stat"><span class="label">Hands left</span><div class="pips" id="s-hands"></div></div>
-      <div class="stat bank"><span class="label">Chips</span><b id="s-bank">200</b></div>
-      <div class="stat tokens"><span class="label">Tokens</span><b class="token-count">0</b></div>
+      <div class="stat bank-mini"><span class="label">Chips</span><b id="s-bank-mini">200</b></div>
     </div>
   </header>
 
@@ -717,6 +750,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     </div>
 
     <aside class="side">
+      <div class="panel bankroll" aria-label="Your bankroll">
+        <div class="bank-top">
+          <div class="chip-stack" id="chip-stack" aria-hidden="true"></div>
+          <div class="bank-main"><span class="label">Your chips</span><b id="s-bank">200</b></div>
+        </div>
+        <div class="bank-row"><span>Won at this table</span><span class="mono" id="bank-table">+0</span></div>
+        <div class="bank-row"><span>In this hand</span><span class="mono" id="bank-hand">0</span></div>
+        <div class="bank-row tokens"><span>Tokens</span><span class="mono">◈ <b class="token-count">0</b></span></div>
+      </div>
       <div class="panel">
         <h2>Payout</h2>
         <div class="receipt" id="receipt"><p class="empty">Win a hand to see your charms pay out here.</p></div>
@@ -728,7 +770,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       </div>
       <div class="panel how">
         <h2 style="color:var(--text)">How to play</h2>
-        <p><b>Each hand</b> costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.</p>
+        <p><b>Each hand</b> costs a 10-chip ante (20 at Augustus Primack's table). Bet, check, raise or fold on each street, just like Hold'em.</p>
+        <p><b>Elite tables</b> seat a mini-boss with a special power. Hover any rival to read their story.</p>
         <p><b>Each table</b> gives you 6 hands to win the target. Miss it and the run ends. A big stack raises the target: it becomes half your chips minus 60 if that beats the table's base.</p>
         <p><b>All in</b> pushes every chip. Opponents only call with strong hands, and losing one ends your run.</p>
         <p><b>Between tables</b> buy, sell and reorder charms, and level up hands. Beat all 8 tables to win.</p>
@@ -824,28 +867,66 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const MAX_CHARMS = 5;
 
   // ---------- Rivals ----------
-  // Every rival has a playstyle. p holds their basic tendencies; the flags switch on special behaviour in the AI below.
+  // Every rival has a playstyle and a backstory. p holds their basic tendencies; the flags switch on special behaviour in the AI below.
+  // Tiers: 0 Easy, 1 Tricky, 2 Tough, 3 Elite (a mini-boss with a special power), 4 Boss.
   const RIVALS = {
-    rae:      { name: "Rookie Rae", tier: 0, style: "New to poker. Only bets good hands, so she's easy to read.", rookie: true, p: { call: 0, bet: 0, bluff: 0, shove: .05 } },
-    dunkin:   { name: "Dunkin Badecher", tier: 0, style: "Plays it straight.", p: { call: 0, bet: 0, bluff: .08, shove: 0 } },
-    lou:      { name: "Big Lou", tier: 0, style: "Calls almost anything.", p: { call: .25, bet: 0, bluff: .05, shove: -.14 } },
-    cole:     { name: "Copycat Cole", tier: 0, style: "Copies you. Bets after you bet, checks after you check.", mimic: true, p: { call: .05, bet: 0, bluff: 0, shove: 0 } },
-    rock:     { name: "The Rock", tier: 1, style: "Folds unless strong.", p: { call: -.2, bet: -.1, bluff: .02, shove: .12 } },
-    mel:      { name: "Maniac Mel", tier: 1, style: "Bets a lot. Bluffs a lot.", p: { call: .1, bet: .2, bluff: .35, shove: -.08 } },
-    doc:      { name: "Doc", tier: 1, style: "Balanced and careful.", p: { call: 0, bet: 0, bluff: .1, shove: .04 } },
-    lenny:    { name: "Lucky Lenny", tier: 1, style: "Chases every flush and straight draw to the river.", chaser: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 } },
-    tina:     { name: "Tilted Tina", tier: 1, style: "Goes wild for two hands after she loses a pot.", tilt: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 } },
-    wall:     { name: "The Wall", tier: 2, style: "Never folds after the flop.", wall: true, p: { call: 0, bet: 0, bluff: .1, shove: 0 } },
-    vi:       { name: "Vegas Vi", tier: 2, style: "Bets big hands, rarely bluffs.", p: { call: .05, bet: .1, bluff: .03, shove: .06 } },
-    sadie:    { name: "Sly Sadie", tier: 2, style: "A trapper. Checks her monster hands and lets you bet into her.", trap: true, p: { call: 0, bet: -.05, bluff: .05, shove: .02 } },
-    moe:      { name: "Midnight Moe", tier: 2, style: "Silent all hand, then bluffs the river.", riverBluff: true, p: { call: 0, bet: -.05, bluff: 0, shove: .04 } },
-    pip:      { name: "Professor Pip", tier: 2, style: "Only calls when the pot odds are right. Hates big bets.", odds: true, p: { call: 0, bet: 0, bluff: .08, shove: .1 } },
-    augustus: { name: "Augustus Primack", tier: 2, style: "Old money. Folds most hands, but when he plays he bets every street and never backs down.", aristocrat: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 } },
-    house:    { name: "The House", tier: 3, style: "The final boss. Never folds after the flop.", wall: true, p: { call: 0, bet: .1, bluff: .15, shove: 0 } },
+    rae:      { name: "Rookie Rae", tier: 0, style: "New to poker. Only bets good hands, so she's easy to read.", rookie: true, p: { call: 0, bet: 0, bluff: 0, shove: .05 },
+                bio: "Learned poker from a video last week. She's thrilled to be here and terrible at hiding it." },
+    dunkin:   { name: "Dunkin Badecher", tier: 0, style: "Plays it straight.", p: { call: 0, bet: 0, bluff: .08, shove: 0 },
+                bio: "Runs the donut stand outside the casino and plays on his lunch break. Steady, honest and slightly sticky. Doesn't talk about his cousin Leo." },
+    lou:      { name: "Big Lou", tier: 0, style: "Calls almost anything.", p: { call: .25, bet: 0, bluff: .05, shove: -.14 },
+                bio: "A retired trucker who came for the free buffet. He'll call your bet just to see what you had." },
+    cole:     { name: "Copycat Cole", tier: 0, style: "Copies you. Bets after you bet, checks after you check.", mimic: true, p: { call: .05, bet: 0, bluff: 0, shove: 0 },
+                bio: "A street mime who never stopped performing. Whatever you do, he does a beat later." },
+    gwen:     { name: "Granny Gwen", tier: 0, style: "Never bets. Checks every street and calls with anything decent.", passive: true, p: { call: 0, bet: 0, bluff: 0, shove: .08 },
+                bio: "Knits between hands. Has never raised a bet in her life and doesn't plan to start now." },
+    rock:     { name: "The Rock", tier: 1, style: "Folds unless strong.", p: { call: -.2, bet: -.1, bluff: .02, shove: .12 },
+                bio: "Has worn the same sunglasses for 30 years and folded nine hands in ten for just as long." },
+    mel:      { name: "Maniac Mel", tier: 1, style: "Bets a lot. Bluffs a lot.", p: { call: .1, bet: .2, bluff: .35, shove: -.08 },
+                bio: "Won a fortune on her first night in Vegas and has been trying to lose it ever since." },
+    doc:      { name: "Doc", tier: 1, style: "Balanced and careful.", p: { call: 0, bet: 0, bluff: .1, shove: .04 },
+                bio: "An actual surgeon. Calm hands, careful decisions, and he never plays when he's on call." },
+    lenny:    { name: "Lucky Lenny", tier: 1, style: "Chases every flush and straight draw to the river.", chaser: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 },
+                bio: "Hit a one-outer on the river in 1994 and still believes it'll happen every hand." },
+    tina:     { name: "Tilted Tina", tier: 1, style: "Goes wild for two hands after she loses a pot.", tilt: true, p: { call: 0, bet: 0, bluff: .06, shove: 0 },
+                bio: "A champion arm-wrestler who takes every lost pot as a personal insult." },
+    freddie:  { name: "Fast Freddie", tier: 1, style: "Bets every flop, then gives up on the turn if you're still there.", cbet: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
+                bio: "A racecar driver who plays the way he drives: flat out early, out of gas by the end." },
+    pockets:  { name: "Sir Pockets", tier: 1, style: "Only plays pocket pairs and high cards. Folds everything else before the flop.", pockets: true, p: { call: 0, bet: .05, bluff: .04, shove: .06 },
+                bio: "A knight of the realm, or so he claims. He has strict rules about which hands are worthy." },
+    wall:     { name: "The Wall", tier: 2, style: "Never folds after the flop.", wall: true, p: { call: 0, bet: 0, bluff: .1, shove: 0 },
+                bio: "Nobody knows his real name. He sits, he calls, he says nothing." },
+    vi:       { name: "Vegas Vi", tier: 2, style: "Bets big hands, rarely bluffs.", p: { call: .05, bet: .1, bluff: .03, shove: .06 },
+                bio: "A showgirl turned card shark. When she bets big, believe her." },
+    sadie:    { name: "Sly Sadie", tier: 2, style: "A trapper. Checks her monster hands and lets you bet into her.", trap: true, p: { call: 0, bet: -.05, bluff: .05, shove: .02 },
+                bio: "Plays the sweet old lady at the table. Don't fall for it." },
+    moe:      { name: "Midnight Moe", tier: 2, style: "Silent all hand, then bluffs the river.", riverBluff: true, p: { call: 0, bet: -.05, bluff: 0, shove: .04 },
+                bio: "Only plays after dark, and only speaks once the river card is down." },
+    pip:      { name: "Professor Pip", tier: 2, style: "Only calls when the pot odds are right. Hates big bets.", odds: true, p: { call: 0, bet: 0, bluff: .08, shove: .1 },
+                bio: "Teaches probability at the university and treats every call like a homework problem." },
+    dan:      { name: "Dealer Dan", tier: 2, style: "An ex-dealer. Plays scared when the board could make a flush or straight.", boardFear: true, p: { call: .05, bet: .05, bluff: .05, shove: .04 },
+                bio: "Dealt cards here for 25 years and saw every bad beat there is. Now he flinches at scary boards." },
+    mirage:   { name: "Mirage", tier: 2, style: "Reverse tells: bets her weak hands and checks her strong ones.", reverse: true, p: { call: 0, bet: 0, bluff: 0, shove: .04 },
+                bio: "A stage magician who lives for misdirection. Whatever she's showing you, the truth is the opposite." },
+    // Elites: mini-bosses with a special power. Each run seats two of them, never more than one at a table.
+    augustus: { name: "Augustus Primack", tier: 3, style: "Old money. Folds most hands, but when he plays he bets every street and never backs down.", aristocrat: true, p: { call: 0, bet: 0, bluff: 0, shove: 0 },
+                power: { name: "Old Money", desc: "Antes are doubled to 20 at his table." },
+                bio: "Heir to the Primack shipping fortune. He bought the casino's chandelier so he could sit under it. He only plays hands worth his time, and he plays those all the way." },
+    leo:      { name: "Leo Badechluer", tier: 3, style: "Fearless and aggressive. Big bets don't scare him.", fearless: true, p: { call: .1, bet: .15, bluff: .15, shove: -.05 },
+                power: { name: "Charm Thief", desc: "Steals one of your charms every hand at his table. It won't work for that hand." },
+                bio: "Dunkin Badecher's cousin. The family split over how to spell the name, and Leo has been taking things that aren't his ever since." },
+    ford:     { name: "Christofor Ford", tier: 3, style: "Patient and precise. Never wastes a chip.", reader: true, p: { call: 0, bet: 0, bluff: .05, shove: .05 },
+                power: { name: "River Read", desc: "Knows your hand on the river. He only calls or bets there when he's ahead." },
+                bio: "Former head of casino security. He caught every cheat in the building, then quietly learned all their tricks." },
+    house:    { name: "The House", tier: 4, style: "The final boss. Never folds after the flop.", wall: true, p: { call: 0, bet: .1, bluff: .15, shove: 0 },
+                bio: "The casino itself, dealt by a dealer who never blinks. Every chip you've won was only ever on loan." },
   };
-  const TIER_NAMES = ["Easy", "Tricky", "Tough", "Boss"];
+  const TIER_NAMES = ["Easy", "Tricky", "Tough", "Elite", "Boss"];
+  const TIER_WHERE = ["tables 1–2", "tables 3–5", "tables 6–7", "two per run, at tables 4 and 7", "final table"];
   const NUM_TABLES = 8;
-  const TABLE_TIERS = [0, 0, 1, 1, 1, 2, 2, 3];
+  const TABLE_TIERS = [0, 0, 1, 1, 1, 2, 2, 4];
+  // Tables that get an Elite. Only one Elite ever sits at a table.
+  const ELITE_TABLES = [3, 6];
   const MODES = {
     // More rivals means fewer pots won, so the 4-player targets are about 25% lower (tuned by simulation).
     table: { name: "Table", label: "4-player table", seats: 3, targets: [45, 75, 105, 150, 200, 270, 350, 450] },
@@ -857,12 +938,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   const targetFor = (t, stack) => Math.max(MODES[G.mode].targets[t], Math.round((stack / 2 - 60) / 10) * 10);
   const initials = (name) => name.replace(/^The /, "").split(" ").map(w => w[0]).join("").slice(0, 2);
 
-  // Seat the rivals for a whole run: easier rivals early, tougher ones later, The House at the last table.
+  // Seat the rivals for a whole run: easier rivals early, tougher ones later, two Elites, The House at the last table.
   function buildLineup(seats) {
     const used = new Set(), lineup = [];
+    const elites = Object.keys(RIVALS).filter(id => RIVALS[id].tier === 3).sort(() => Math.random() - .5);
     for (let t = 0; t < NUM_TABLES; t++) {
       const tier = TABLE_TIERS[t], here = [];
-      if (tier === 3) here.push("house");
+      if (tier === 4) here.push("house");
+      const e = ELITE_TABLES.indexOf(t);
+      if (e >= 0) here.push(elites[e]);
       const poolTier = Math.min(tier, 2);
       while (here.length < seats) {
         let pool = Object.keys(RIVALS).filter(id => RIVALS[id].tier === poolTier && !here.includes(id));
@@ -875,6 +959,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     }
     return lineup;
   }
+  // The Elite at the current table, if there is one.
+  const eliteHere = () => G && G.lineup ? G.lineup[G.t].find(id => RIVALS[id].tier === 3) : undefined;
+  const anteHere = () => eliteHere() === "augustus" ? ANTE * 2 : ANTE;
+  // Your charms that work this hand (Leo's Charm Thief can take one away).
+  const has = (id) => G.charms.includes(id) && !(H && H.stolen === id);
   const listNames = (names) => names.length < 2 ? names.join("") : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
 
   // ---------- State ----------
@@ -913,13 +1002,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     k++; const board = [d[k++], d[k++], d[k++]]; k++; board.push(d[k++]); k++; board.push(d[k++]);
     // The cards nobody has been dealt (Second Chance draws from these).
     const deck = d.slice(k);
-    H = { you, opps, board, street: 0, pot: ANTE * (1 + opps.length), deck, facing: 0, matched: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set(), prevMove: null, moveThis: null };
+    const ante = anteHere();
+    H = { you, opps, board, street: 0, pot: ante * (1 + opps.length), deck, facing: 0, matched: 0, myBets: 0, over: false, startBank: G.bank, seen: new Set(), prevMove: null, moveThis: null };
     // Augustus decides before the flop whether this hand is worth his time. If it is, he's in to the end.
     opps.forEach(o => { if (R(o).aristocrat) o.commit = strength(o) >= .62; });
-    G.bank -= ANTE;
-    if (G.bank === 0) { say("Your ante was your last 10 chips, so you're all in."); return goAllIn(); }
-    say(opps.length > 1 ? "Your move. You act first each street." : "Your move. Bet to build the pot, or check to see the next card cheaply.");
+    // Leo Badechluer's Charm Thief: one of your charms is out of action this hand.
+    if (eliteHere() === "leo" && G.charms.length) H.stolen = G.charms[Math.floor(Math.random() * G.charms.length)];
+    G.bank -= Math.min(ante, G.bank);
+    if (G.bank === 0) { say(`Your ante was your last ${ante} chips, so you're all in.`); return goAllIn(); }
+    const elite = eliteHere();
+    if (elite && G.handsLeft === HANDS_PER_TABLE) say(`<b class="elite-say">♛ Elite table: ${RIVALS[elite].name}.</b> ${RIVALS[elite].power.name}: ${RIVALS[elite].power.desc}`);
+    else if (H.stolen) say(`Leo Badechluer pockets your <b>${CHARMS[H.stolen].name}</b> for this hand.`);
+    else say(opps.length > 1 ? "Your move. You act first each street." : "Your move. Bet to build the pot, or check to see the next card cheaply.");
     renderAll();
+    if (H.stolen) setTimeout(stealFx, reduceMotion ? 0 : 900);
     // Pocket pair: a special moment once the hole cards have landed.
     if (you[0].r === you[1].r) setTimeout(pocketPairFx, reduceMotion ? 0 : 750);
   }
@@ -951,14 +1047,34 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     for (let lo = 1; lo <= 11; lo++) if ([0, 1, 2, 3].every(i => rs.has(lo + i))) return true;
     return false;
   }
+  // Christofor Ford's River Read: on the river he knows whether he's ahead of you.
+  const fordAhead = (o) => cmp(best([...o.cards, ...H.board]).score, best([...H.you, ...H.board]).score) >= 0;
+  // Sir Pockets only plays pairs and two high cards before the flop.
+  const worthy = (o) => o.cards[0].r === o.cards[1].r || (o.cards[0].r >= 11 && o.cards[1].r >= 11);
+  // Dealer Dan's scary board: three of a suit, or three cards close enough to make a straight.
+  function boardScary() {
+    const b = H.board.slice(0, shown());
+    if (b.length < 3) return false;
+    const suits = {}; b.forEach(c => suits[c.s] = (suits[c.s] || 0) + 1);
+    if (Object.values(suits).some(n => n >= 3)) return true;
+    const rs = [...new Set(b.map(c => c.r))].sort((x, y) => x - y);
+    for (let i = 0; i + 2 < rs.length; i++) if (rs[i + 2] - rs[i] <= 4) return true;
+    return false;
+  }
   function wantsBet(o) {
     const r = R(o), p = r.p, s = strength(o);
     if (r.aristocrat) return o.commit;
+    if (r.reader && H.street === 3) return fordAhead(o) ? Math.random() < .85 : Math.random() < .05;
+    if (r.passive) return false;
+    if (r.pockets && H.street === 0) return worthy(o);
+    if (r.cbet) return H.street === 1 ? true : s > .82;
+    if (r.reverse) return s < .4 ? Math.random() < .55 : s > .75 ? Math.random() < .15 : Math.random() < .25;
     if (r.trap && s >= .8) return false;
     if (r.rookie) return s > .6 && Math.random() < .85;
     if (r.mimic) return H.prevMove === "bet" ? Math.random() < .75 || s > .6 : s + Math.random() * .2 > .8;
     let bet = p.bet, bluff = p.bluff;
     if (tilted(o)) { bet += .25; bluff += .3; }
+    if (r.boardFear && boardScary()) { bet -= .15; bluff = 0; }
     if (r.riverBluff) bluff = H.street === 3 ? .45 : 0;
     return s + Math.random() * .25 + bet > .66 || Math.random() < bluff;
   }
@@ -966,12 +1082,18 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const r = R(o), s = strength(o);
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit;
+    if (r.reader && H.street === 3) return fordAhead(o);
+    if (r.pockets && H.street === 0) return worthy(o);
     if (r.trap && s >= .8) return true;
     if (r.chaser && hasDraw(o)) return true;
     if (r.odds) return s + Math.random() * .15 > amt / (H.pot + amt) + .3;
-    const size = sizePressure(amt);
+    // Leo ignores bet size completely.
+    const size = r.fearless ? 0 : sizePressure(amt);
     if (r.rookie) return s + Math.random() * .25 > .45 + size;
-    return s + Math.random() * .3 + r.p.call + (tilted(o) ? .15 : 0) > .42 + size;
+    if (r.passive) return s + Math.random() * .25 > .4 + size;
+    if (r.cbet && H.street >= 2) return s + Math.random() * .2 > .55 + size;
+    const fear = r.boardFear && boardScary() ? .15 : 0;
+    return s + Math.random() * .3 + r.p.call + (tilted(o) ? .15 : 0) > .42 + size + fear;
   }
   // Bigger bets make weak hands fold: a min bet adds no pressure, a pot-sized bet adds a lot.
   // Rivals catch on to repeated big bets at a table, which takes some of that pressure away again.
@@ -986,6 +1108,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     const r = R(o), s = strength(o);
     if (r.wall && H.street >= 1) return true;
     if (r.aristocrat) return o.commit && s >= .7;
+    if (r.reader && H.street === 3) return fordAhead(o);
+    if (r.pockets && H.street === 0) return worthy(o) && s >= .6;
     const sizePenalty = Math.min(.12, amt / 2500);
     const suspicion = Math.min(.45, seen * .15);
     return s + Math.random() * .2 + (tilted(o) ? .15 : 0) > .62 + (r.p.shove || 0) + sizePenalty - suspicion;
@@ -1053,7 +1177,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (amt > H.pot) H.overbet = true;
       G.bank -= amt; H.pot += amt; H.myBets++; H.moveThis = "bet";
       // Peek: betting the flop reveals one hole card of a rival still in the hand.
-      if (!short && H.street === 1 && G.charms.includes("peek") && H.peek === undefined) {
+      if (!short && H.street === 1 && has("peek") && H.peek === undefined) {
         const pool = live(), o = pool[Math.floor(Math.random() * pool.length)];
         H.peek = { o: H.opps.indexOf(o), c: Math.random() < .5 ? 0 : 1 };
         setTimeout(() => { pulseCharm("peek"); if (!reduceMotion) CHARM_FX.peek(); }, 60);
@@ -1129,7 +1253,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     if (win) G.streak++;
     else if (!split) G.streak = 0;
     // Piggy Bank saves 5 every hand, before it gets the chance to pay out.
-    if (G.charms.includes("piggy")) G.piggy = (G.piggy || 0) + 5;
+    if (has("piggy")) G.piggy = (G.piggy || 0) + 5;
     // River Rat: did the river card improve your hand category?
     const turnBest = best([...H.you, ...H.board.slice(0, 4)]);
     const ctx = {
@@ -1161,14 +1285,14 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       pay(id, CHARMS[id].name, r);
       if (r.shatter) { G.shatterGlass = true; lines.push(["Glass Charm shatters!", "gone", "ch neg", id]); }
       const i = G.charms.indexOf(id);
-      if (G.charms[i + 1] === "echo") {
+      if (G.charms[i + 1] === "echo" && H.stolen !== "echo") {
         fired.push(["echo", r, id]);
         pay("echo", `Echo: ${CHARMS[id].name}`, r);
       }
     };
-    G.charms.forEach(id => { const r = CHARMS[id].run(ctx); if (r) fire(id, r); });
+    G.charms.forEach(id => { if (H.stolen === id) return; const r = CHARMS[id].run(ctx); if (r) fire(id, r); });
     // Charm Bracelet counts every other charm that fired, so it pays last.
-    if (G.charms.includes("bracelet")) {
+    if (has("bracelet")) {
       const others = new Set(fired.map(f => f[0]).filter(id => id !== "bracelet")).size;
       if (others) fire("bracelet", { add: 15 * others });
     }
@@ -1235,7 +1359,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   }
   function flyChips(n, delay) {
     if (reduceMotion) return;
-    const a = centerOf($("pot")), b = centerOf($("s-bank"));
+    const a = centerOf($("pot")), b = centerOf(bankEl());
     for (let i = 0; i < n; i++) {
       const c = spawn("fx-chip", "", 0, 0);
       const mx = a.x + (Math.random() - .5) * 180, my = a.y - 50 - Math.random() * 90;
@@ -1275,6 +1399,8 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       anim.onfinish = () => el.remove();
     }
   }
+  // Chips fly to whichever chip counter you can see: the side panel, or the compact one on small screens.
+  function bankEl() { const side = $("s-bank"); return side.getBoundingClientRect().top < innerHeight && side.offsetParent ? side : $("s-bank-mini"); }
   function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
   function shake() { restart($("table"), "shake"); }
   function tween(el, from, to, f, delay) {
@@ -1300,7 +1426,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       addTokens(TOKENS_PER_TABLE);
       return openShop();
     }
-    if (G.handsLeft <= 0 || G.bank < ANTE) return endScreen(false);
+    if (G.handsLeft <= 0 || G.bank < anteHere()) return endScreen(false);
     receiptEmpty();
     deal();
   }
@@ -1915,7 +2041,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (r.add < 0) {
         const flash = fx("fx-flash", "", { background: "var(--fx-curse)" });
         play(flash, [{ opacity: 0 }, { opacity: .25, offset: .2 }, { opacity: 0 }], { duration: 500 });
-        const bank = pt($("s-bank"));
+        const bank = pt(bankEl());
         callout(`Devil's Deal ${r.add}`, { x: bank.x, y: bank.y + 40 }, "var(--fx-curse)", 100);
         return;
       }
@@ -1933,6 +2059,23 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
   };
   const rackTile = (id) => [...document.querySelectorAll("#rack .charm")].find(t => t.dataset.id === id);
   // Pop a rack tile outside the payout sequence (used by Peek).
+  // Leo's Charm Thief: the stolen charm's glyph flies off the rack into his hands.
+  function stealFx() {
+    if (!H || !H.stolen) return;
+    const tile = rackTile(H.stolen);
+    const leoSeat = [...document.querySelectorAll("#opps .oseat")].find(s => s.querySelector("b")?.textContent === RIVALS.leo.name);
+    if (!tile || !leoSeat) return;
+    const s = pt(tile.querySelector(".g")), e = pt(leoSeat.querySelector(".avatar"));
+    tile.animate([{ translate: "0 0" }, { translate: "-6px 0" }, { translate: "6px 0" }, { translate: "0 0" }], { duration: 320 });
+    const g = fx("fx-call", CHARMS[H.stolen].g, { color: "var(--fx-purple)" });
+    play(g, [
+      { transform: at(g, s.x, s.y, "scale(1)"), opacity: 1 },
+      { transform: at(g, (s.x + e.x) / 2, Math.min(s.y, e.y) - 80, "scale(1.6) rotate(-20deg)"), opacity: 1, offset: .5 },
+      { transform: at(g, e.x, e.y, "scale(.6) rotate(10deg)"), opacity: 0 },
+    ], { duration: 950, easing: "cubic-bezier(.4,0,.3,1)" });
+    ring(e, "var(--fx-purple)", 900, 2.5);
+    callout("Charm Thief!", { x: e.x, y: e.y + 60 }, "var(--fx-purple)", 850);
+  }
   function pulseCharm(id) {
     const t = rackTile(id);
     if (!t) return;
@@ -1976,9 +2119,11 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       const r = R(o);
       const seat = document.createElement("div");
       const isWinner = H.over && H.winners && H.winners.includes(o);
-      seat.className = "oseat" + (o.folded ? " folded" : "") + (isWinner ? " winner" : "") + (tilted(o) ? " tilted" : "");
+      seat.className = "oseat" + (r.tier === 3 ? " elite" : "") + (o.folded ? " folded" : "") + (isWinner ? " winner" : "") + (tilted(o) ? " tilted" : "");
       seat.dataset.i = oi;
-      seat.innerHTML = `<div class="persona"><span class="avatar">${initials(r.name)}</span><div><b>${r.name}</b><small>${r.style}</small></div></div><div class="cards"></div><span class="o-act"></span>`;
+      seat.title = r.bio;
+      const blurb = r.power ? `♛ ${r.power.name}: ${r.power.desc}` : r.style;
+      seat.innerHTML = `<div class="persona"><span class="avatar">${initials(r.name)}</span><div><b>${r.name}</b><small>${blurb}</small></div></div><div class="cards"></div><span class="o-act"></span>`;
       const cards = seat.querySelector(".cards");
       const faceUp = (sd || H.allIn) && !o.folded;
       o.cards.forEach((c, i) => {
@@ -2047,7 +2192,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     };
     if (H.over) {
       const won = G.bank - G.start;
-      const label = won >= G.target ? (G.t === NUM_TABLES - 1 ? "Claim victory" : "Go to shop →") : (G.handsLeft <= 0 || G.bank < ANTE) ? "See result" : "Next hand";
+      const label = won >= G.target ? (G.t === NUM_TABLES - 1 ? "Claim victory" : "Go to shop →") : (G.handsLeft <= 0 || G.bank < anteHere()) ? "See result" : "Next hand";
       add(label, "Enter", afterHand, "btn big");
       return;
     }
@@ -2065,7 +2210,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       return;
     }
     const b = BETS[H.street];
-    const peekHint = H.street === 1 && G.charms.includes("peek") && H.peek === undefined;
+    const peekHint = H.street === 1 && has("peek") && H.peek === undefined;
     // Bet sizing. Not facing a bet: how much to bet (at least the street's minimum).
     // Facing a bet: the total to raise to (at least double their bet). Going all in stays on its own button.
     const facing = H.facing;
@@ -2104,7 +2249,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       }, confirm ? "btn allin confirm" : "btn allin-ghost");
     }
     // Second Chance is available once per table, from the flop on.
-    if (G.charms.includes("second") && !G.secondUsed && H.street >= 1 && H.deck && H.deck.length) {
+    if (has("second") && !G.secondUsed && H.street >= 1 && H.deck && H.deck.length) {
       add("Swap a card", "s", () => { H.swapPick = true; say("Second Chance: pick one of your hole cards to swap for a new one."); renderAll(); }, "btn ghost swapbtn");
     }
   }
@@ -2158,11 +2303,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       if (id === "streak") badge = G.streak ? `${G.streak} in a row` : "No streak";
       if (id === "echo") { const left = G.charms[i - 1]; note = left ? `Doubles ${CHARMS[left].name}` : "Nothing to its left yet. Move it right of a charm."; }
       if (id === "peek" && H && H.peek !== undefined) badge = "Peeking";
+      if (H && H.stolen === id && !H.over) { badge = "Stolen by Leo"; d.classList.add("stolen"); }
       if (id === "piggy") badge = `${G.piggy || 0} saved`;
       if (id === "second") badge = G.secondUsed ? "Used this table" : "Ready";
       if (id === "glass") badge = G.shatterGlass ? "Shattered" : "Fragile";
       if (id === "crowd" && G.mode === "duel") badge = "4-player only";
       d.dataset.type = c.type;
+      if (H && H.stolen === id && !H.over) badge = "Stolen by Leo";
       d.title = c.desc;
       d.innerHTML = `<span class="g">${c.g}</span><div><span class="ty">${ty.label}</span><b>${c.name}</b><small>${note}</small></div>${badge ? `<span class="badge">${badge}</span>` : ""}`;
       r.append(d);
@@ -2184,6 +2331,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
     $("s-hands").innerHTML = Array.from({ length: HANDS_PER_TABLE }, (_, i) => `<i class="${i < G.handsLeft ? "on" : ""}"></i>`).join("") + `<span class="sr">${G.handsLeft} hands left</span>`;
     const d = hudDelay; hudDelay = 0;
     tween($("s-bank"), shownBank, G.bank, n => n.toLocaleString("en-US"), d);
+    $("s-bank-mini").textContent = G.bank.toLocaleString("en-US");
+    $("bank-table").textContent = fmt(won);
+    $("bank-table").className = "mono " + (won > 0 ? "up" : won < 0 ? "down" : "");
+    $("bank-hand").textContent = H && !H.over ? Math.max(0, H.startBank - G.bank).toLocaleString("en-US") : "0";
+    // The chip stack grows with your bankroll: one chip per 40, up to 12.
+    const discs = Math.max(1, Math.min(12, Math.round(G.bank / 40)));
+    if ($("chip-stack").children.length !== discs) $("chip-stack").innerHTML = Array.from({ length: discs }, (_, i) => `<i style="--n:${i}"></i>`).join("");
     shownBank = G.bank;
     const who = G.mode === "duel" ? "Your rival remembers" : "The table remembers";
     $("shove-note").textContent = G.shoves >= 2 ? `${who} ${G.shoves} shoves and calls them lighter now.` : G.shoves === 1 ? `${who} your shove.` : "";
@@ -2690,15 +2844,20 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radi
       </div>`;
     }).join("");
     // Every rival, grouped by how tough they are.
+    $("rival-count").textContent = Object.keys(RIVALS).length;
     $("home-lineup").innerHTML = TIER_NAMES.map((tierName, tier) => {
       const ids = Object.keys(RIVALS).filter(id => RIVALS[id].tier === tier);
       return `<div class="tier tier-${tier}">
-        <p class="label">${tierName} <span>· ${tier === 3 ? "final table" : tier === 0 ? "tables 1–2" : tier === 1 ? "tables 3–5" : "tables 6–8"}</span></p>
-        <div class="tier-grid">${ids.map(id => `
-          <div class="rival${tier === 3 ? " boss" : ""}${id === "augustus" ? " star" : ""}">
-            <span class="avatar">${initials(RIVALS[id].name)}</span>
-            <div><b>${RIVALS[id].name}</b><small>${RIVALS[id].style}</small></div>
-          </div>`).join("")}</div>
+        <p class="label">${tierName} <span>· ${TIER_WHERE[tier]}</span></p>
+        <div class="tier-grid">${ids.map(id => {
+          const r = RIVALS[id];
+          return `<div class="rival${tier === 4 ? " boss" : ""}${tier === 3 ? " elite" : ""}">
+            <span class="avatar">${initials(r.name)}</span>
+            <div><b>${r.name}</b><small>${r.style}</small>
+              ${r.power ? `<span class="power">♛ ${r.power.name}: ${r.power.desc}</span>` : ""}
+              <p class="bio">${r.bio}</p></div>
+          </div>`;
+        }).join("")}</div>
       </div>`;
     }).join("");
   }
