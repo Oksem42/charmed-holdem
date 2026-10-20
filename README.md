@@ -49,6 +49,6 @@ New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (ne
 - **Play style**: changes how you play (Bluff Master, Peek)
 - **Grows**: gets stronger over a run (Hot Streak)
 - **Combo**: works with other charms (Echo, which makes the charm to its left trigger twice; Charm Bracelet)
-- **Cursed**: huge upside with a real cost (Glass Charm can shatter; Devil's Deal costs 15% of your chips per lost hand)
+- **Cursed**: huge upside with a real cost (Glass Charm shatters when you lose a hand and takes a third of your chips; Devil's Deal costs 15% of your chips per lost hand)
 
 The whole game is a single `index.html` with no build step.
