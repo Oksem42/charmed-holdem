@@ -4,6 +4,9 @@ Play Texas Hold'em, collect lucky charms, and build a combo that breaks the casi
 
 **Play it:** https://oksem42.github.io/charmed-holdem/
 
+## Languages
+Play in English, French or Mandarin (Simplified Chinese). Pick one from the 🌐 button at the top of the home page or in the game header. Your choice is saved on this device, and the first visit follows your browser's language. Rival names stay as they are.
+
 ## Tutorial
 The first time you visit, a hands-on practice run starts against Rookie Rae. A coach spotlights one thing at a time and you make each move yourself: bet a pair of Aces, check, size a pot bet, win the showdown, then fold a bad hand. It covers the core loop and leaves the rest for you to find as you play. Replay it from "How to play" on the home page. The ? button in the game opens a full written guide (hand rankings, moves, rivals and Elites, charms, archetypes, the shop, cases and modes).
 
