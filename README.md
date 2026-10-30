@@ -44,6 +44,7 @@ New rivals include Ben Anderson (every decision is a coin flip), Granny Gwen (ne
 - Pocket pairs get their own animation; pocket aces get the golden Pocket Rockets version.
 - The leaderboard keeps your 10 best runs per mode. Tokens, unlocks and the leaderboard are saved on your device.
 - Optional online leaderboard: run `supabase-setup.sql` in a Supabase project, then put the Project URL and publishable key in the `ONLINE` setting in `index.html`.
+- Anonymous play stats: with `supabase-analytics.sql` run too, the live site logs anonymous events (visits, runs, tables cleared, charms bought, cases opened, tutorial and friends-table use) under a random per-browser id. No names or personal details are sent.
 
 ## How to play
 - Each hand costs a 10-chip ante. Bet, check or fold on each street, just like Hold'em.
