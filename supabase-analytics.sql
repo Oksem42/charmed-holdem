@@ -4,16 +4,24 @@
 create table if not exists public.events (
   id         bigint generated always as identity primary key,
   created_at timestamptz not null default now(),
-  -- A random id stored in the player's browser, so visitors can be counted. No names or personal details.
+  -- A random id stored in the player's browser, so visitors can be counted. The data holds the in-game name.
   sid        text not null check (char_length(sid) between 8 and 40),
   kind       text not null check (kind in (
     'visit', 'run_start', 'table_clear', 'run_end', 'charm_buy', 'level_buy', 'case_open',
     'tutorial_start', 'tutorial_end', 'lang_change', 'augie_start', 'augie_end',
-    'mp_open', 'mp_join', 'mp_start'
+    'mp_open', 'mp_join', 'mp_start', 'session'
   )),
   mode       text check (mode is null or mode in ('table', 'duel')),
   data       jsonb not null default '{}'::jsonb check (jsonb_typeof(data) = 'object' and pg_column_size(data) < 2000)
 );
+
+-- Rebuild the list of event kinds, so running this file again adds any new ones to an existing table.
+alter table public.events drop constraint if exists events_kind_check;
+alter table public.events add constraint events_kind_check check (kind in (
+  'visit', 'run_start', 'table_clear', 'run_end', 'charm_buy', 'level_buy', 'case_open',
+  'tutorial_start', 'tutorial_end', 'lang_change', 'augie_start', 'augie_end',
+  'mp_open', 'mp_join', 'mp_start', 'session'
+));
 
 create index if not exists events_time on public.events (created_at);
 
